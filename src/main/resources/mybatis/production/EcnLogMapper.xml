@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.production.ecnLog.mapper.EcnLogMapper">
+    
+    <resultMap type="EcnLog" id="EcnLogResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="ecnType"    column="ecn_type"    />
+        <result property="saveId"    column="save_id"    />
+        <result property="saveCode"    column="save_code"    />
+        <result property="ecnText"    column="ecn_text"    />
+        <result property="createId"    column="create_id"    />
+        <result property="createPeople"    column="create_people"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="ecnNum"    column="ecn_num"    />
+        <result property="ecnStatus"    column="ecn_status"    />
+    </resultMap>
+	
+	<sql id="selectEcnLogVo">
+        select id, company_id, ecn_type, save_id, save_code, ecn_text, create_id, create_people, create_time,ecn_num,ecn_status from dev_ecn_log
+    </sql>
+	
+    <select id="selectEcnLogList" parameterType="EcnLog" resultMap="EcnLogResult">
+        <include refid="selectEcnLogVo"/>
+        <where>  
+            company_id = #{companyId}
+         </where>
+        <if test="ecnType != null  and ecnType != '' "> and ecn_type = #{ecnType}</if>
+        <if test="saveId != null  and saveId != '' "> and save_id = #{saveId}</if>
+        <if test="ecnText != null  and ecnText != '' ">
+            and ecn_text like concat('%', #{ecnText}, '%')
+        </if>
+        and ecn_num > 0
+        order by create_time desc
+    </select>
+
+    <select id="selectEcnLogById" parameterType="Integer" resultMap="EcnLogResult">
+        <include refid="selectEcnLogVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertEcnLog" parameterType="EcnLog" useGeneratedKeys="true" keyProperty="id">
+        insert into dev_ecn_log
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="ecnType != null  ">ecn_type,</if>
+			<if test="saveId != null  ">save_id,</if>
+			<if test="saveCode != null  and saveCode != ''  ">save_code,</if>
+			<if test="ecnText != null  and ecnText != ''  ">ecn_text,</if>
+			<if test="createId != null  ">create_id,</if>
+			<if test="createPeople != null  and createPeople != ''  ">create_people,</if>
+			<if test="createTime != null  ">create_time,</if>
+            <if test="ecnNum != null  ">ecn_num,</if>
+            <if test="ecnStatus != null  ">ecn_status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="ecnType != null  ">#{ecnType},</if>
+			<if test="saveId != null  ">#{saveId},</if>
+			<if test="saveCode != null  and saveCode != ''  ">#{saveCode},</if>
+			<if test="ecnText != null  and ecnText != ''  ">#{ecnText},</if>
+			<if test="createId != null  ">#{createId},</if>
+			<if test="createPeople != null  and createPeople != ''  ">#{createPeople},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+            <if test="ecnNum != null  ">#{ecnNum},</if>
+            <if test="ecnStatus != null  ">#{ecnStatus},</if>
+         </trim>
+    </insert>
+
+    <select id="findByCompanyIdAndProductId" resultMap="EcnLogResult">
+        SELECT * FROM dev_ecn_log where company_id = #{companyId} and ecn_type = 1 and save_id = #{productId}
+         order by create_time desc limit 1;
+    </select>
+
+    <update id="updateEcnLog" parameterType="EcnLog">
+        update dev_ecn_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="ecnType != null  ">ecn_type = #{ecnType},</if>
+            <if test="saveId != null  ">save_id = #{saveId},</if>
+            <if test="saveCode != null  and saveCode != ''  ">save_code = #{saveCode},</if>
+            <if test="ecnText != null  and ecnText != ''  ">ecn_text = #{ecnText},</if>
+            <if test="createId != null  ">create_id = #{createId},</if>
+            <if test="createPeople != null  and createPeople != ''  ">create_people = #{createPeople},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="ecnNum != null  ">ecn_num = #{ecnNum},</if>
+            <if test="ecnStatus != null  ">ecn_status = #{ecnStatus},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteEcnLogById" parameterType="Integer">
+        delete from dev_ecn_log where id = #{id}
+    </delete>
+
+    <delete id="deleteEcnLogByIds" parameterType="String">
+        delete from dev_ecn_log where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--查询对应类型对应id的有效ECN信息-->
+    <select id="selectEcnLogBySaveId" resultMap="EcnLogResult">
+        SELECT * FROM dev_ecn_log where ecn_type = #{ecnType} and save_id = #{saveId} and ecn_num > 0 limit 1;
+    </select>
+
+    <!--取消ECN-->
+    <update id="cancelEcn" parameterType="Integer">
+         update dev_ecn_log set ecn_num = 0,ecn_status = 5 where id = #{id}
+    </update>
+
+    <!--更新ECN状态-->
+    <update id="updateEcnStatus" parameterType="Integer">
+         update dev_ecn_log set ecn_status = #{ecnStatus} where id = #{id}
+    </update>
+
+</mapper>

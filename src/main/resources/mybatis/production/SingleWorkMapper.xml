@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper">
+    
+    <resultMap type="SingleWork" id="SingleWorkResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="workshopName"    column="workshop_name"    />
+        <result property="imId"    column="im_id"    />
+        <result property="imCode"    column="im_code"    />
+        <result property="sign"    column="sign"    />
+        <result property="liableOne"    column="liable_one"    />
+        <result property="liableTwo"    column="liable_two"    />
+        <result property="devId"    column="dev_id"    />
+        <result property="devCode"    column="dev_code"    />
+        <result property="watchId"    column="watch_id"    />
+        <result property="watchCode"    column="watch_code"    />
+        <result property="eId"    column="e_id"    />
+        <result property="eCode"    column="e_code"    />
+        <result property="cTime"    column="c_time"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="sopSign"    column="sop_sign"    />
+        <association property="liableOneName" column="liable_one" select="selectOneName">
+            <result property="liableOneName" column="user_name"/>
+        </association>
+        <association property="liableTwoName" column="liable_two" select="selectTwoName">
+            <result property="liableTwoName" column="user_name"/>
+        </association>
+    </resultMap>
+	
+	<sql id="selectSingleWorkVo">
+        select id, company_id, workshop_name, im_id,im_code, sign, liable_one, liable_two, dev_id, dev_code, c_time, parent_id,
+         watch_id,watch_code,e_id,e_code,sop_sign from tab_single_work
+    </sql>
+	
+    <select id="selectSingleWorkList" parameterType="SingleWork" resultMap="SingleWorkResult">
+        <include refid="selectSingleWorkVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="workshopName != null  and workshopName != '' ">
+                and workshop_name like concat(#{workshopName},'%')
+              </if>
+             <if test="imId != null and imId != -1"> and im_id = #{imId}</if>
+             <if test="sign != null "> and sign = #{sign}</if>
+             <if test="liableOne != null and liableOne != -1"> and liable_one = #{liableOne}</if>
+             <if test="liableTwo != null "> and liable_two = #{liableTwo}</if>
+             <if test="devId != null "> and dev_id = #{devId}</if>
+             <if test="devCode != null  and devCode != '' "> and dev_code = #{devCode}</if>
+             <if test="cTime != null "> and c_time = #{cTime}</if>
+             <if test="parentId != null "> and parent_id = #{parentId}</if>
+         </where>
+    </select>
+
+    <!--查询责任人一的名称-->
+    <select id="selectOneName" resultType="java.lang.String">
+        SELECT user_name FROM sys_user where user_id = #{liableOne};
+    </select>
+    <select id="selectTwoName" resultType="java.lang.String">
+        SELECT user_name FROM sys_user where user_id = #{liableTwo};
+    </select>
+
+    <select id="selectSingleWorkById" parameterType="Integer" resultMap="SingleWorkResult">
+        <include refid="selectSingleWorkVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSingleWork" parameterType="SingleWork" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_single_work
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="workshopName != null  and workshopName != ''  ">workshop_name,</if>
+			<if test="imId != null and imId != 0 ">im_id,</if>
+            <if test="imCode != null ">im_code,</if>
+			<if test="sign != null  ">sign,</if>
+			<if test="liableOne != null and liableOne != 0 ">liable_one,</if>
+			<if test="liableTwo != null and liableOne != 0  ">liable_two,</if>
+			<if test="devId != null  ">dev_id,</if>
+			<if test="devCode != null  and devCode != ''  ">dev_code,</if>
+            <if test="watchId != null  ">watch_id,</if>
+            <if test="watchCode != null  and watchCode != ''  ">watch_code,</if>
+            <if test="eId != null  ">e_id,</if>
+            <if test="eCode != null  and eCode != ''  ">e_code,</if>
+			<if test="cTime != null  ">c_time,</if>
+            <if test="parentId != null  ">parent_id,</if>
+            <if test="sopSign != null  ">sop_sign,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="workshopName != null  and workshopName != ''  ">#{workshopName},</if>
+			<if test="imId != null and imId != 0 ">#{imId},</if>
+            <if test="imCode != null  ">#{imCode},</if>
+			<if test="sign != null  ">#{sign},</if>
+			<if test="liableOne != null and liableOne != 0 ">#{liableOne},</if>
+			<if test="liableTwo != null and liableOne != 0  ">#{liableTwo},</if>
+			<if test="devId != null  ">#{devId},</if>
+			<if test="devCode != null  and devCode != ''  ">#{devCode},</if>
+            <if test="watchId != null  ">#{watchId},</if>
+            <if test="watchCode != null  and watchCode != ''  ">#{watchCode},</if>
+            <if test="eId != null  ">#{eId},</if>
+            <if test="eCode != null  and eCode != ''  ">#{eCode},</if>
+			<if test="cTime != null  ">#{cTime},</if>
+			<if test="parentId != null  ">#{parentId},</if>
+            <if test="sopSign != null  ">#{sopSign},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSingleWork" parameterType="SingleWork">
+        update tab_single_work
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="workshopName != null  and workshopName != ''  ">workshop_name = #{workshopName},</if>
+            <if test="imId != null  ">im_id = #{imId},</if>
+            <if test="imCode != null  ">im_code = #{imCode},</if>
+            <if test="sign != null  ">sign = #{sign},</if>
+            <if test="liableOne != null  ">liable_one = #{liableOne},</if>
+            <if test="liableTwo != null  ">liable_two = #{liableTwo},</if>
+            <if test="devId != null  ">dev_id = #{devId},</if>
+            dev_code = #{devCode},
+            <if test="watchId != null  ">watch_id = #{watchId},</if>
+            watch_code = #{watchCode},
+            <if test="eId != null  ">e_id = #{eId},</if>
+            e_code = #{eCode},
+            <if test="cTime != null  ">c_time = #{cTime},</if>
+            <if test="parentId != null  ">parent_id = #{parentId},</if>
+            <if test="sopSign != null  ">sop_sign = #{sopSign},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+
+    <update id="updateSingleWork1" parameterType="SingleWork">
+        update tab_single_work
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="workshopName != null  and workshopName != ''  ">workshop_name = #{workshopName},</if>
+            <if test="imId != null  ">im_id = #{imId},</if>
+            <if test="imCode != null  ">im_code = #{imCode},</if>
+            <if test="sign != null  ">sign = #{sign},</if>
+            <if test="liableOne != null  ">liable_one = #{liableOne},</if>
+            <if test="liableTwo != null  ">liable_two = #{liableTwo},</if>
+            <if test="cTime != null  ">c_time = #{cTime},</if>
+            <if test="parentId != null  ">parent_id = #{parentId},</if>
+            <if test="sopSign != null  ">sop_sign = #{sopSign},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteSingleWorkById" parameterType="Integer">
+        delete from tab_single_work where id = #{id}
+    </delete>
+	
+    <delete id="deleteSingleWorkByIds" parameterType="String">
+        delete from tab_single_work where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过车间名称查询车间信息-->
+    <select id="selectSingleWorkByWorkshopName" resultMap="SingleWorkResult">
+        SELECT * FROM tab_single_work where company_id = #{companyId} and workshop_name = #{workshopName}
+    </select>
+
+    <!--通过父id查询单工位列表-->
+    <select id="selectSingleWorkByParentId" resultMap="SingleWorkResult">
+        SELECT * FROM tab_single_work where parent_id = #{parentId}
+        <if test="companyId != null">
+            and company_id = #{companyId}
+        </if>
+    </select>
+
+    <!--根据硬件id查询对应的工位配置信息，没次调用只能使用一个参数-->
+    <select id="selectSingleWorkByCode" resultMap="SingleWorkResult">
+        SELECT * FROM tab_single_work
+        <where>
+            <if test="dev_id > 0">and dev_id = #{dev_id}</if>
+            <if test="watch_id > 0">and watch_id = #{watch_id}</if>
+            <if test="e_id > 0">and e_id = #{e_id}</if>
+        </where>
+          limit 1;
+    </select>
+
+    <!--根据车间id查询所以单工位信息-->
+    <select id="selectAllNotConfigChildren" resultMap="SingleWorkResult">
+        SELECT a.* FROM tab_single_work as a left join tab_single_work_order as b on a.id = b.single_id
+        where a.parent_id = #{pid} and b.work_id is null;
+    </select>
+
+    <!--根据工单id、车间id查询所有未配置的-->
+    <select id="selectAllNotConfigWorkByOrderId" resultMap="SingleWorkResult">
+      SELECT * FROM tab_single_work as a left join tab_single_work_order as b
+      on a.id = b.single_id and b.work_id = #{order_id}
+        where a.parent_id =#{pid} and b.work_id is null;
+    </select>
+
+    <!--查询未配置sop的单工位信息-->
+    <select id="selectNotConfigSop" resultMap="SingleWorkResult">
+        SELECT * FROM tab_single_work as a  left join tab_sop_line_work as b on a.id = b.w_id
+        and b.line_id = #{parentId} and b.sop_tag = #{sopTag} and b.sop_id = #{sopId}
+        and b.company_id = #{companyId} where a.parent_id = #{parentId} and b.w_id is null;
+    </select>
+
+    <!--通过车间id查询车间看板明细信息-->
+    <!--<select id="selectHouseDetailByParentId" resultType="com.ruoyi.project.page.pageInfo.domain.PageHouse">-->
+        <!--SELECT a.liable_one as liableOneId,d.user_name as userName, a.parent_id as parentId,b.work_id as workId,b.work_code as workCode,-->
+        <!--c.product_code as productCode,c.workorder_status as workOrderStatus,c.operation_status as operationStatus,-->
+        <!--c.order_code as orderCode,c.product_number as workTotalNum,count(im_code) as imTotalNum-->
+        <!--FROM tab_single_work as a-->
+        <!--left join tab_single_work_order as b on a.id = b.single_id-->
+        <!--left join dev_work_order as c on b.work_id = c.id-->
+        <!--left join sys_user as d on a.liable_one = d.user_id-->
+        <!--where a.parent_id = #{parentId} and a.company_id = #{companyId} and b.work_id is not null-->
+        <!--and c.workorder_status = #{workOrderStatus}-->
+        <!--group by a.liable_one,b.work_id-->
+    <!--</select>-->
+
+    <!--查询对应工单的所有责任人信息-->
+    <select id="selectWorkUserInfo" resultType="com.ruoyi.project.production.singleWork.domain.SingleWork">
+        SELECT b.liable_one as liableOne FROM tab_single_work_order as a
+            left join tab_single_work as b on  a.single_id = b.id
+            where a.work_id = #{workId} and b.sign = #{sign} and b.company_id = #{companyId} group by liable_one
+    </select>
+</mapper>

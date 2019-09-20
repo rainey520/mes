@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper">
+    
+    <resultMap type="ProductionLine" id="ProductionLineResult">
+        <result property="id"    column="id"    />
+        <result property="lineName"    column="line_name"    />
+        <result property="deviceLiable"    column="device_liable"    />
+        <result property="remark"    column="remark"    />
+        <result property="defId"    column="def_id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="create_by"    column="create_by"    />
+        <result property="deviceLiableTow"    column="device_liable1"    />
+        <result property="manual"    column="manual"    />
+        <result property="paramConfig"    column="param_config"    />
+        <result property="sopId"    column="sop_id"    />
+        <result property="productCodes"    column="product_codes"    />
+        <result property="edUser"    column="ed_user"    />
+        <result property="ipqcUser"    column="ipqc_user"    />
+        <result property="meUser"    column="me_user"    />
+        <result property="teUser"    column="te_user"    />
+    </resultMap>
+    <resultMap type="ProductionLine" id="ProductionLineResult1">
+        <result property="id"    column="id"    />
+        <result property="lineName"    column="line_name"    />
+        <result property="deviceLiable"    column="device_liable"    />
+        <result property="remark"    column="remark"    />
+        <result property="defId"    column="def_id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="create_by"    column="create_by"    />
+        <result property="deviceLiableTow"    column="device_liable1"    />
+        <result property="manual"    column="manual"    />
+        <result property="paramConfig"    column="param_config"    />
+        <result property="sopId"    column="sop_id"    />
+        <result property="productCodes"    column="product_codes"    />
+        <result property="edUser"    column="ed_user"    />
+        <result property="ipqcUser"    column="ipqc_user"    />
+        <result property="meUser"    column="me_user"    />
+        <result property="teUser"    column="te_user"    />
+        <association property="deviceLiableName" column="device_liable" select="selectDeviceLiableName">
+            <result property="deviceLiableName" column="user_name"/>
+        </association>
+    </resultMap>
+	
+	<sql id="selectProductionLineVo">
+        select id, line_name, device_liable, remark, def_id, company_id, create_time,
+        create_by,device_liable1,manual,param_config,sop_id,product_codes,ed_user,ipqc_user,me_user,te_user from dev_production_line
+    </sql>
+
+    <select id="selectProductionLineList" parameterType="ProductionLine" resultMap="ProductionLineResult">
+        <include refid="selectProductionLineVo"/>
+        <where>
+            and def_id = 0
+             <if test="lineName != null  and lineName != '' "> and line_name like concat (#{lineName},'%')</if>
+             <if test="companyId != null and companyId >0 "> and company_id = #{companyId}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+         </where>
+    </select>
+    
+    <select id="selectProductionLineById" parameterType="Integer" resultMap="ProductionLineResult">
+        <include refid="selectProductionLineVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertProductionLine" parameterType="ProductionLine" useGeneratedKeys="true" keyProperty="id">
+        insert into dev_production_line
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="lineName != null  and lineName != ''  ">line_name,</if>
+			<if test="deviceLiable != null  ">device_liable,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+			<if test="defId != null  ">def_id,</if>
+			<if test="companyId != null  ">company_id,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="create_by != null  ">create_by,</if>
+			<if test="deviceLiableTow != null  ">device_liable1,</if>
+			<if test="manual != null  ">manual,</if>
+			<if test="paramConfig != null  ">param_config,</if>
+			<if test="sopId != null and sopId != '' ">sop_id,</if>
+			<if test="productCodes != null and productCodes != '' ">product_codes,</if>
+            <if test="edUser != null and edUser != '' ">ed_user,</if>
+            <if test="ipqcUser != null and ipqcUser != '' ">ipqc_user,</if>
+            <if test="meUser != null and meUser != '' ">me_user,</if>
+            <if test="teUser != null and teUser != '' ">te_user,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="lineName != null  and lineName != ''  ">#{lineName},</if>
+			<if test="deviceLiable != null  ">#{deviceLiable},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+			<if test="defId != null  ">#{defId},</if>
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="create_by != null  ">#{create_by},</if>
+			<if test="deviceLiableTow != null  ">#{deviceLiableTow},</if>
+			<if test="manual != null  ">#{manual},</if>
+			<if test="paramConfig != null  ">#{paramConfig},</if>
+            <if test="sopId != null and sopId != '' ">#{sopId},</if>
+            <if test="productCodes != null and productCodes != '' ">#{productCodes},</if>
+            <if test="edUser != null and edUser != '' ">#{edUser},</if>
+            <if test="ipqcUser != null and ipqcUser != '' ">#{ipqcUser},</if>
+            <if test="meUser != null and meUser != '' ">#{meUser},</if>
+            <if test="teUser != null and teUser != '' ">#{teUser},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateProductionLine" parameterType="ProductionLine">
+        update dev_production_line
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="lineName != null  and lineName != ''  ">line_name = #{lineName},</if>
+            <if test="deviceLiable != null  ">device_liable = #{deviceLiable},</if>
+            <if test="deviceLiableTow != null  ">device_liable1 = #{deviceLiableTow},</if>
+            <if test="manual != null  ">manual = #{manual},</if>
+            remark = #{remark},
+            <if test="paramConfig != null    ">param_config = #{paramConfig},</if>
+            <if test="sopId != null and sopId != '' ">sop_id = #{sopId},</if>
+            <if test="productCodes != null and productCodes != '' ">product_codes = #{productCodes},</if>
+            <if test="edUser != null and edUser != '' ">ed_user = #{edUser},</if>
+            <if test="ipqcUser != null and ipqcUser != '' ">ipqc_user = #{ipqcUser},</if>
+            <if test="meUser != null and meUser != '' ">me_user = #{meUser},</if>
+            <if test="teUser != null and teUser != '' ">te_user = #{teUser},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<update id="deleteProductionLineById" parameterType="Integer">
+        update  dev_production_line set def_id =1 where id = #{id}
+    </update>
+	
+    <update id="deleteProductionLineByIds" parameterType="String">
+        update  dev_production_line set def_id =1 where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+
+    <!--查询产线已经配置的硬件信息-->
+    <select id="selectLineDev" resultType="java.util.Map">
+        SELECT a.id as dev_id,a.device_name,b.id as io_d,b.io_name,b.is_sign FROM
+         dev_io as b,dev_list as a where b.line_id = #{id} and a.id = b.dev_id;
+    </select>
+
+    <!--清空相关产线IO配置-->
+    <update id="updateLineConfigClear">
+        update dev_io set line_id =0,is_sign = 0 where line_id =#{line_id};
+    </update>
+    <!--将对应的IO口配置到对应的产线中-->
+    <update id="updateLineConfig">
+        update dev_io set line_id = #{line_id} where id =#{id}
+    </update>
+    <!--标记相关产线的警戒线-->
+    <update id="updateIoSignLine">
+        update dev_io set is_sign = 1 where id = #{id}
+    </update>
+
+    <!--查询对应公司所以未删除的产线-->
+    <select id="selectAllDef0" resultMap="ProductionLineResult">
+        <include refid="selectProductionLineVo"/>
+        where company_id = #{com_id} and  def_id = 0 order by id desc;
+    </select>
+
+    <!--查询对应公司所有的产线信息-->
+    <select id="selectAllProductionLineByCompanyId" resultType="com.ruoyi.project.production.productionLine.domain.ProductionLine">
+        select id as Id, line_name as lineName,def_id as defId from dev_production_line
+        where 1=1 and def_id = 0
+         and company_id = #{companyId}
+    </select>
+
+    <!--查询所有未配置指定sop的产线信息-->
+    <select id="selectLineNotConfigByIsoId" resultMap="ProductionLineResult">
+        SELECT * FROM dev_production_line  as l left join
+       (SELECT * FROM tab_sop_line where sop_id = #{isoId}) as sl on l.id = sl.line_id where sl.line_id is null and l.company_id = #{companyId};
+    </select>
+
+    <!--根据页面id查询对应的配置产线信息-->
+    <select id="selectLineByPageId" resultMap="ProductionLineResult">
+        SELECT l.* FROM dev_page_config as p,dev_production_line as l where p.line_id = l.id and  p_id = #{pid};
+    </select>
+
+    <!--查询产线详情-->
+    <select id="selectLineDetailByPageId" resultMap="ProductionLineResult1">
+        SELECT l.* FROM dev_page_config as p,dev_production_line as l where p.line_id = l.id and  p_id = #{pid} limit 1;
+    </select>
+    <select id="selectDeviceLiableName" resultType="java.lang.String">
+        SELECT user_name FROM sys_user where user_id = #{device_liable};
+    </select>
+
+    <!--校验产线名称的唯一性-->
+    <select id="selectProductionLineByName" resultType="com.ruoyi.project.production.productionLine.domain.ProductionLine">
+        SELECT id as id,line_name as lineName FROM dev_production_line where company_id = #{companyId} and line_name = #{lineName};
+    </select>
+</mapper>

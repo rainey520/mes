@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-sopLine-add">
+        <div class="form-group">
+            <input type="hidden" id="parentId" th:value="${parentId}">
+            <input type="hidden" id="lineId" th:value="${lineId}">
+            <label class="col-sm-3 control-label">SOP：</label>
+            <div class="col-sm-8">
+                <select style="width: 100%" id="sopId" onchange="sopChange(this)" name="sopId" class="form-control">
+                    <option value="0">请选择</option>
+                    <option th:if="${not #lists.isEmpty(sopLines) && sopLines.size() > 0}" selected  th:text="${sopLines[0].sopName}" th:value="${sopLines[0].sopId}"></option>
+                    <option th:each="item : ${iso}" th:text="${item.cName}" th:value="${item.isoId}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">产品编码：</label>
+            <div class="col-sm-8">
+                <select style="width: 100%" id="pnId" multiple="multiple" class="form-control" name="pnId">
+                    <option th:if="${not #lists.isEmpty(sopLines) && sopLines.size() > 0}" th:each="pn:${sopLines}"
+                            selected  th:text="${pn.pnCode}" th:value="${pn.pnId}"></option>
+                    <option th:each="item : ${pns}" th:text="${item.productCode}" th:value="${item.id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">选择作业指导书：</label>
+            <div class="col-sm-8">
+                <select id="pageId" style="width: 100%" name="pageId" class="form-control">
+                    <option value="0">请选择</option>
+                    <option th:if="${not #lists.isEmpty(pages)}" th:each="item:${pages}"
+                            th:value="${item.isoId}" th:utext="${item.cName}"></option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    $(function () {
+        $("#pnId").select2({
+            placeholder: '请选择'
+        });
+        $("#sopId").select2({
+            width: '100%'
+        });
+        $("#pageId").select2({
+            width: '100%'
+        });
+        $('select').select2();
+        var workConfig =[[${sopLineWork}]];
+        if (workConfig != null) {
+            $("#pageId").val(workConfig.pageId).trigger('change');
+        }
+
+    });
+    var prefix = ctx + "iso/sopLine";
+
+    /**
+     * 保存配置
+     */
+    function submitHandler() {
+        //先验证书
+        var sopId = $("#sopId").find("option:selected").val();
+        if (sopId <= 0) {
+            $.modal.alertWarning("请选择SOP");
+            return;
+        }
+        //验证产品编码
+        var pnSelect = $("#pnId").find("option:selected");
+        if ($(pnSelect).size() <= 0) {
+            $.modal.alertWarning("请选择产品编码");
+            return;
+        }
+        var pageId = $("#pageId").find("option:selected").val();
+        if (pageId < 0) {
+            $.modal.alertWarning("请选择指导书页");
+            return;
+        }
+        var pns = [];
+        for (var i = 0; i < $(pnSelect).size(); i++) {
+            pns.push($(pnSelect[i]).val())
+        }
+        // 单工位信息
+        var sopLineWorks = [];
+        var work = {
+            lineId: [[${parentId}]],
+            sopId: sopId,
+            sopTag: 1,
+            wId: [[${lineId}]],
+            pageId: pageId,
+        }
+        sopLineWorks.push(work);
+        var data = {
+            lineId: [[${lineId}]],
+            sopId: sopId,
+            pns: pns,
+            sopTag: 1,
+            sopLineWorks: sopLineWorks
+        }
+        var config = {
+            url: prefix + "/edit",
+            type: "post",
+            dataType: "json",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+                $.modal.disable();
+            },
+            success: function (result) {
+                $.operate.successCallback(result);
+            }
+        };
+        $.ajax(config)
+    }
+
+    /**
+     * sop下拉选择
+     */
+    function sopChange(val) {
+        var id = $(val).find("option:selected").val();
+        if (id > 0) {
+            $("#pageId option").remove();
+            $("#pageId select").select2({
+                data: [{id: 0, text: '请选择'}]
+            });
+            //获取对应书下的页
+            $.post("/iso/iso/findByPid", {pid: id}, function (res) {
+                if (res.code == 0) {
+                    var rows = [{id: 0, text: '请选择'}];
+                    var item = res.data;
+                    for (var i = 0; i < item.length; i++) {
+                        var row = {
+                            id: item[i].isoId,
+                            text: item[i].cName
+                        }
+                        rows.push(row);
+                    }
+                    $("#pageId").select2({
+                        data: rows
+                    });
+                } else {
+                    $.modal.alertWarning("操作异常...")
+                }
+            })
+        } else {
+            var data = [{id: 0, text: '请选择'}];
+            $("#pageId option").remove();
+            $("#pageId").select2({
+                data: data
+            });
+        }
+    }
+
+</script>
+</body>
+</html>

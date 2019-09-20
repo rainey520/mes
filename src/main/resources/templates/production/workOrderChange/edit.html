@@ -1,0 +1,101 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-workOrderChange-edit" th:object="${workOrderChange}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">公司id：</label>
+				<div class="col-sm-8">
+					<input id="companyId" name="companyId" th:field="*{companyId}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">工单id：</label>
+				<div class="col-sm-8">
+					<input id="orderId" name="orderId" th:field="*{orderId}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">工单号：</label>
+				<div class="col-sm-8">
+					<input id="orderCode" name="orderCode" th:field="*{orderCode}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">产线id：</label>
+				<div class="col-sm-8">
+					<input id="lineId" name="lineId" th:field="*{lineId}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">产线名称：</label>
+				<div class="col-sm-8">
+					<input id="lineName" name="lineName" th:field="*{lineName}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">第一责任人：</label>
+				<div class="col-sm-8">
+					<input id="deviceLiable" name="deviceLiable" th:field="*{deviceLiable}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">第二责任人：</label>
+				<div class="col-sm-8">
+					<input id="deviceLiable2" name="deviceLiable2" th:field="*{deviceLiable2}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">计划开始时间：</label>
+				<div class="col-sm-8">
+					<input id="productionStart" name="productionStart" th:field="*{productionStart}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">计划结束时间：</label>
+				<div class="col-sm-8">
+					<input id="productionEnd" name="productionEnd" th:field="*{productionEnd}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">生产数量：</label>
+				<div class="col-sm-8">
+					<input id="productNumber" name="productNumber" th:field="*{productNumber}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">创建者：</label>
+				<div class="col-sm-8">
+					<input id="createPeople" name="createPeople" th:field="*{createPeople}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">创建时间：</label>
+				<div class="col-sm-8">
+					<input id="createTime" name="createTime" th:field="*{createTime}" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "production/workOrderChange";
+		$("#form-workOrderChange-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-workOrderChange-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

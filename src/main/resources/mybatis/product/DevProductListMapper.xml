@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.product.list.mapper.DevProductListMapper">
+    
+    <resultMap type="DevProductList" id="DevProductListResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="productCode"    column="product_code"    />
+        <result property="productName"    column="product_name"    />
+        <result property="remark"    column="remark"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="standardHourYield"    column="standard_hour_yield"    />
+        <result property="create_by"    column="create_by"    />
+        <result property="def_id"    column="def_id"    />
+        <result property="productModel"    column="product_model"    />
+        <result property="price"    column="price"    />
+        <result property="productImg"    column="product_img"    />
+        <result property="imgSize"    column="img_size"    />
+        <result property="ecnStatus"    column="ecnstatus"    />
+        <result property="ecnText"    column="ecn_text"    />
+        <result property="sign"    column="sign"    />
+        <result property="unit"    column="unit"    />
+        <result property="ruleId"    column="rule_id"    />
+    </resultMap>
+	
+	<sql id="selectDevProductListVo">
+        select id, company_id, product_code, product_name, remark, create_time, standard_hour_yield,create_by,product_model,price,
+        product_img,img_size,ecnstatus,ecn_text,sign,unit,rule_id from dev_product_list
+    </sql>
+	
+    <select id="selectDevProductListList" parameterType="DevProductList" resultMap="DevProductListResult">
+        <include refid="selectDevProductListVo"/>
+        <where>
+            and def_id = 0
+            <if test="id != null "> and id = #{id}</if>
+            <if test="sign != null "> and sign = #{sign}</if>
+             <if test="companyId != null and  companyId > 0"> and company_id = #{companyId}</if>
+             <if test="productCode != null  and productCode != '' "> and product_code  like concat(#{productCode}, '%') </if>
+             <if test="productName != null  and productName != '' "> and product_name like concat(#{productName}, '%') </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+            <if test="productModel != null  and productModel != '' "> and product_model like concat(#{productModel}, '%') </if>
+            <if test="price != null  and price != '' "> and price = #{price}</if>
+            <if test="productImg != null  and productImg != '' "> and product_img = #{productImg}</if>
+            <if test="imgSize != null  and imgSize != '' "> and img_size = #{imgSize}</if>
+            <if test="ruleId != null  and ruleId != '' "> and rule_id = #{ruleId}</if>
+         </where>
+    </select>
+    
+    <select id="selectDevProductListById" parameterType="Integer" resultMap="DevProductListResult">
+        <include refid="selectDevProductListVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDevProductList" parameterType="DevProductList" useGeneratedKeys="true" keyProperty="id">
+        insert into dev_product_list
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="productCode != null  and productCode != ''  ">product_code,</if>
+			<if test="productName != null  and productName != ''  ">product_name,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+			create_time,def_id,
+			<if test="standardHourYield != null  ">standard_hour_yield,</if>
+			<if test="create_by != null  ">create_by,</if>
+            <if test="productModel != null  ">product_model,</if>
+            <if test="price != null  ">price,</if>
+            <if test="productImg != null  ">product_img,</if>
+            <if test="imgSize != null  ">img_size,</if>
+            <if test="sign != null  ">sign,</if>
+            <if test="unit != null  ">unit,</if>
+            <if test="ruleId != null and ruleId != '' ">rule_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="productCode != null  and productCode != ''  ">#{productCode},</if>
+			<if test="productName != null  and productName != ''  ">#{productName},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+			now(),0,
+			<if test="standardHourYield != null  ">#{standardHourYield},</if>
+			<if test="create_by != null  ">#{create_by},</if>
+            <if test="productModel != null  ">#{productModel},</if>
+            <if test="price != null  ">#{price},</if>
+            <if test="productImg != null  ">#{productImg},</if>
+            <if test="imgSize != null  ">#{imgSize},</if>
+            <if test="sign != null  ">#{sign},</if>
+            <if test="unit != null  ">#{unit},</if>
+            <if test="ruleId != null and ruleId != '' ">#{ruleId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateDevProductList" parameterType="DevProductList">
+        update dev_product_list
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productCode != null  and productCode != ''  ">product_code = #{productCode},</if>
+            <if test="productName != null  and productName != ''  ">product_name = #{productName},</if>
+            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+            <if test="productModel != null  and productModel != ''  ">product_model = #{productModel},</if>
+            <if test="price != null  and price != ''  ">price = #{price},</if>
+            <if test="productImg != null  and productImg != ''  ">product_img = #{productImg},</if>
+            <if test="imgSize != null  and imgSize != ''  ">img_size = #{imgSize},</if>
+            <if test="standardHourYield != null  ">standard_hour_yield = #{standardHourYield},</if>
+            <if test="ecnStatus != null  ">ecnstatus = #{ecnStatus},</if>
+            <if test="ecnText != null  ">ecn_text = #{ecnText},</if>
+            <if test="unit != null  ">unit = #{unit},</if>
+            <if test="ruleId != null and ruleId != '' ">rule_id = #{ruleId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<update id="deleteDevProductListById" parameterType="Integer">
+        update  dev_product_list set def_id = 1 where id = #{id}
+    </update>
+	
+    <update id="deleteDevProductListByIds" parameterType="String">
+        update  dev_product_list set def_id = 1 where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!--通过公司id查询该公司所有的产品信息-->
+    <select id="selectProductAllByCompanyId" resultType="com.ruoyi.project.product.list.domain.DevProductList">
+        select id as Id,product_code as productCode,product_model as productModel,product_name as productName,ecnstatus as ecnStatus, sign as  sign from dev_product_list
+         where company_id = #{companyId} and def_id = 0
+          <if test="sign > -1">
+              and sign=#{sign}
+          </if>
+
+    </select>
+
+    <!--通过产品id查询产品编码和标准小时产量-->
+    <select id="findProductInfo" resultType="com.ruoyi.project.product.list.domain.DevProductList">
+        select product_code as productCode,product_name as productName,standard_hour_yield as standardHourYield ,ecnstatus as ecnStatus,ecn_text as ecnText from dev_product_list
+        where id = #{productId} and def_id = 0;
+    </select>
+
+    <select id="selectDevProductByCode" resultMap="DevProductListResult">
+        <include refid="selectDevProductListVo"/>
+         where company_id = #{company_id} and product_code=#{code} and def_id = 0 limit 1;
+    </select>
+    <select id="selectDevProductByCodeAndSign" resultMap="DevProductListResult">
+        <include refid="selectDevProductListVo"/>
+        where company_id = #{company_id} and product_code=#{code} and def_id = 0 and sign=#{sign} limit 1;
+    </select>
+
+    <!--通过产品编码查询产品信息-->
+    <select id="selectProductByCode" parameterType="String" resultMap="DevProductListResult">
+        <include refid="selectDevProductListVo"/>
+        where product_code = #{productCode} and def_id = 0 limit 1
+    </select>
+
+    <!--校验产品编码的唯一性-->
+    <select id="checkProductCodeUnique" resultType="com.ruoyi.project.product.list.domain.DevProductList">
+        select * from dev_product_list where def_id = 0 and product_code = #{productCode} and company_id = #{companyId};
+    </select>
+
+    <!---->
+    <select id="findCustomerProduct" resultMap="DevProductListResult">
+        <include refid="selectDevProductListVo"/>
+        where  def_id = 0 and  id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+        #{id}
+    </foreach>
+    </select>
+
+    <!--根据订单id查询对应的产品信息-->
+    <select id="findProductByOrderId" resultMap="DevProductListResult">
+      SELECT prodect_code as product_code,product_id as  id FROM tab_order_details where order_id = #{orderId};
+    </select>
+
+    <!--根据产品编码查询对公司下的产品信息-->
+    <select id="findByCompanyIdAndProductCode" resultMap="DevProductListResult">
+        SELECT * FROM dev_product_list where company_id = #{companyId} and def_id = 0 and product_code = #{productCode} limit 1;
+    </select>
+
+    <!--查询各公司的产品名称信息-->
+    <select id="selectProNameAllByComId" resultType="com.ruoyi.project.product.list.domain.DevProductList">
+        select distinct product_name as productName from dev_product_list where company_id = #{companyId} and def_id = 0
+        <if test="sign > -1">
+            and sign=#{sign}
+        </if>
+    </select>
+
+    <!--根据产线id查询所以未配置的产品信息-->
+    <select id="selectNotConfigByLineId" resultMap="DevProductListResult">
+      SELECT p.id,p.product_code FROM dev_product_list as p
+      where p.company_id = #{companyid} and p.def_id = 0 and p.id not in
+      (select distinct pn_id from tab_sop_line where line_id = #{lineId}
+       and sop_tag = #{sopTag} and sop_id = #{isoId} and company_id = #{companyid})
+    </select>
+
+    <select id="selectNotConfigByLineId2" resultMap="DevProductListResult">
+      SELECT p.id,p.product_code FROM dev_product_list as p
+      where p.company_id = #{companyid} and p.def_id = 0 and p.id not in
+      (select distinct pn_id from tab_sop_line where line_id = #{lineId}
+       and sop_tag = #{sopTag}  and company_id = #{companyid})
+    </select>
+    <!--根据作业指导书id查询所有未配置的产品信息-->
+    <select id="selectNotConfigByIsoId" resultMap="DevProductListResult">
+         SELECT p.id,p.product_code FROM dev_product_list as p left join  (select * from tab_sop_line where  sop_id = #{isoId})
+        as l on p.id = l.pn_id where p.def_id =0 and p.company_id = #{companyId} and l.pn_id is null;
+    </select>
+
+    <!--查询公司的所有产品信息-->
+    <select id="selectProductAll" resultMap="DevProductListResult">
+        SELECT * FROM dev_product_list where company_id = #{companyId} and def_id = 0
+    </select>
+
+    <!--修改对应的产品MES规则-->
+    <update id="saveMesRuleConfig">
+        update dev_product_list set rule_id =#{ruleId} where id =#{id}
+    </update>
+
+    <!--查看mes规格配置明细-->
+    <select id="selectMesCfList" resultMap="DevProductListResult">
+        SELECT * FROM dev_product_list where company_id = #{companyId} and def_id = 0
+        <if test="productCode != null  and productCode != ''  ">
+            and product_code = #{productCode}
+        </if>
+        <if test="id != null  and id > 0  ">
+            and id = #{id}
+        </if>
+        <if test="sign != null and sign != -1 ">
+            and sign = #{sign}
+        </if>
+        <if test="ruleId != null and ruleId > 0">
+            and rule_id = #{ruleId}
+        </if>
+    </select>
+
+    <!--通过追踪规则id查询配置的产品信息-->
+    <select id="selectDevProductByRuleId" resultMap="DevProductListResult">
+        SELECT * FROM dev_product_list where company_id = #{companyId} and def_id = 0 and rule_id = #{ruleId}
+    </select>
+
+    <!--通过标记查询半成品或者成品-->
+    <select id="selectProAllBySign" resultType="com.ruoyi.project.product.list.domain.DevProductList">
+        SELECT id as id, product_code as productCode,rule_id as ruleId FROM dev_product_list where sign = #{sign} and def_id = 0;
+    </select>
+
+    <!--查看MES规则未配置的半成品明细-->
+    <select id="selectPartListByMesNotCof" resultMap="DevProductListResult">
+        SELECT a.* FROM dev_product_list as a left join
+        (SELECT * from tab_mes_batch_rule_detail where rule_id = #{ruleId} and d_type = 1) as b
+        on a.product_code = b.d_code where b.d_code is null and a.sign = 1
+    </select>
+
+    <!--根据sop 产线 配置查询已经配置的产品信息-->
+    <select id="selectSopConfigBySid" resultMap="DevProductListResult">
+      SELECT p.id,p.product_code FROM dev_product_list as p
+       where p.company_id = #{companyId} and p.id  in
+       (select distinct pn_id from tab_sop_line where s_id = #{sid})
+    </select>
+
+    <!--app端检索产品信息-->
+    <select id="appSearchProList" parameterType="com.ruoyi.project.app.domain.Product" resultType="com.ruoyi.project.app.domain.Product">
+        SELECT id as proId,product_code as productCode FROM dev_product_list
+        where def_id = 0
+        <if test="companyId != null and  companyId > 0"> and company_id = #{companyId}</if>
+        <if test="productCode != null  and productCode != '' "> and product_code  like concat(#{productCode}, '%') </if>
+        limit 0,5;
+    </select>
+
+</mapper>

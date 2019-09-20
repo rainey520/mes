@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.production.devWorkData.mapper.DevWorkDataMapper">
+    
+    <resultMap type="DevWorkData" id="DevWorkDataResult">
+        <result property="dataId"    column="data_id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="workId"    column="work_id"    />
+        <result property="devId"    column="dev_id"    />
+        <result property="devName"    column="dev_name"    />
+        <result property="ioId"    column="io_id"    />
+        <result property="ioName"    column="io_name"    />
+        <result property="ioOrder"    column="io_order"    />
+        <result property="dataSign"    column="data_sign"    />
+        <result property="initialData"    column="initial_data"    />
+        <result property="cumulativeNum"    column="cumulative_num"    />
+        <result property="manualNum"    column="manual_num"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="cumulativeNumber"    column="cumulative_number"    />
+        <result property="directPassRate"    column="direct_pass_rate"    />
+        <result property="paramConfig"    column="paramConfig"    />
+        <result property="ioSign"    column="io_sign"    />
+        <result property="scType"    column="sc_type"    />
+    </resultMap>
+	
+	<sql id="selectDevWorkDataVo">
+        select data_id, company_id, line_id, work_id, dev_id, dev_name, io_id, io_name, io_order, data_sign,io_sign,
+        initial_data, cumulative_num, manual_num, create_time,cumulative_number,direct_pass_rate,paramConfig,sc_type from dev_work_data
+    </sql>
+	
+    <select id="selectDevWorkDataList" parameterType="DevWorkData" resultMap="DevWorkDataResult">
+        <include refid="selectDevWorkDataVo"/>
+        <where>  
+            <if test="dataId != null "> and data_id = #{dataId}</if>
+             <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="lineId != null "> and line_id = #{lineId}</if>
+             <if test="workId != null "> and work_id = #{workId}</if>
+             <if test="devId != null "> and dev_id = #{devId}</if>
+             <if test="devName != null  and devName != '' "> and dev_name = #{devName}</if>
+             <if test="ioId != null "> and io_id = #{ioId}</if>
+             <if test="ioName != null  and ioName != '' "> and io_name = #{ioName}</if>
+             <if test="ioOrder != null "> and io_order = #{ioOrder}</if>
+             <if test="dataSign != null "> and data_sign = #{dataSign}</if>
+             <if test="initialData != null "> and initial_data = #{initialData}</if>
+             <if test="cumulativeNum != null "> and cumulative_num = #{cumulativeNum}</if>
+             <if test="manualNum != null "> and manual_num = #{manualNum}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectDevWorkDataById" parameterType="Integer" resultMap="DevWorkDataResult">
+        <include refid="selectDevWorkDataVo"/>
+        where data_id = #{dataId}
+    </select>
+        
+    <insert id="insertDevWorkData" parameterType="DevWorkData" useGeneratedKeys="true" keyProperty="dataId">
+        insert into dev_work_data
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="lineId != null  ">line_id,</if>
+			<if test="workId != null  ">work_id,</if>
+			<if test="devId != null  ">dev_id,</if>
+			<if test="devName != null  and devName != ''  ">dev_name,</if>
+			<if test="ioId != null  ">io_id,</if>
+			<if test="ioName != null  and ioName != ''  ">io_name,</if>
+			<if test="ioOrder != null  ">io_order,</if>
+			<if test="dataSign != null  ">data_sign,</if>
+			<if test="initialData != null  ">initial_data,</if>
+			<if test="cumulativeNum != null  ">cumulative_num,</if>
+			<if test="manualNum != null  ">manual_num,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="ioSign != null  ">io_sign,</if>
+            <if test="scType != null  ">sc_type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="lineId != null  ">#{lineId},</if>
+			<if test="workId != null  ">#{workId},</if>
+			<if test="devId != null  ">#{devId},</if>
+			<if test="devName != null  and devName != ''  ">#{devName},</if>
+			<if test="ioId != null  ">#{ioId},</if>
+			<if test="ioName != null  and ioName != ''  ">#{ioName},</if>
+			<if test="ioOrder != null  ">#{ioOrder},</if>
+			<if test="dataSign != null  ">#{dataSign},</if>
+			<if test="initialData != null  ">#{initialData},</if>
+			<if test="cumulativeNum != null  ">#{cumulativeNum},</if>
+			<if test="manualNum != null  ">#{manualNum},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="ioSign != null  ">#{ioSign},</if>
+            <if test="scType != null  ">#{scType},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateDevWorkData" parameterType="DevWorkData">
+        update dev_work_data
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="lineId != null  ">line_id = #{lineId},</if>
+            <if test="workId != null  ">work_id = #{workId},</if>
+            <if test="devId != null  ">dev_id = #{devId},</if>
+            <if test="devName != null  and devName != ''  ">dev_name = #{devName},</if>
+            <if test="ioId != null  ">io_id = #{ioId},</if>
+            <if test="ioName != null  and ioName != ''  ">io_name = #{ioName},</if>
+            <if test="ioOrder != null  ">io_order = #{ioOrder},</if>
+            <if test="dataSign != null  ">data_sign = #{dataSign},</if>
+            <if test="initialData != null  ">initial_data = #{initialData},</if>
+            <if test="cumulativeNum != null  ">cumulative_num = #{cumulativeNum},</if>
+            <if test="manualNum != null  ">manual_num = #{manualNum},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="ioSign != null  ">io_sign = #{ioSign},</if>
+            <if test="scType != null  ">sc_type = #{scType},</if>
+        </trim>
+        where data_id = #{dataId}
+    </update>
+
+	<delete id="deleteDevWorkDataById" parameterType="Integer">
+        delete from dev_work_data where data_id = #{dataId}
+    </delete>
+	
+    <delete id="deleteDevWorkDataByIds" parameterType="String">
+        delete from dev_work_data where data_id in 
+        <foreach item="dataId" collection="array" open="(" separator="," close=")">
+            #{dataId}
+        </foreach>
+    </delete>
+
+
+    <!--查询对应的公司对应产线对应工单对应硬件对应IO口的数据-->
+    <select id="selectWorkDataByCompanyLineWorkDev" resultMap="DevWorkDataResult">
+        SELECT * FROM dev_work_data where company_id= #{company_id} and line_id = #{line_id} and work_id = #{work_id}
+        and dev_id = #{dev_id} and io_id = #{io_id} and sc_type = #{scType} limit 1;
+    </select>
+
+    <!--记录第一次已经上传的数据-->
+    <update id="initWorkData">
+        update dev_work_data set data_sign = 0 ,initial_data = #{initial_data},io_sign=#{sign} where data_id = #{id}
+    </update>
+    <!--修改对应的累计产量-->
+    <update id="saveTotalWorkData">
+      update dev_work_data set cumulative_num = #{total},io_sign=#{sign} where data_id = #{id}
+    </update>
+
+    <!-- 需修改对应工单数据标记，需要重新记录初始值 -->
+    <update id="updateWorkSigInit">
+        update dev_work_data set data_sign = 1 where work_id = #{work_id}
+    </update>
+
+    <!--查询对应公司对应工单产线配置已作为标记数据的工单数据信息-->
+    <select id="selectWorkDataByIosign" resultMap="DevWorkDataResult">
+         SELECT * FROM dev_work_data where company_id= #{companyId} and work_id = #{workId} and line_id = #{lineId}
+          and dev_id = #{devId} and io_sign = 1 and sc_type = #{scType}
+    </select>
+
+    <!--查询车间对应工单的累计产量信息-->
+    <select id="selectHouseWorkDataActualNum" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        SELECT coalesce(sum(cumulative_num),0) as cumulativeNumber FROM dev_work_data
+        where company_id = #{companyId} and line_id = #{lineId} and work_id = #{workId} and sc_type = #{scType} group by work_id
+    </select>
+</mapper>

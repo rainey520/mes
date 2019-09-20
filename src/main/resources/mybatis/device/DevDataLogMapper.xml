@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.device.devDeviceCounts.mapper.DevDataLogMapper">
+    
+    <resultMap type="DevDataLog" id="DevDataLogResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="workId"    column="work_id"    />
+        <result property="devId"    column="dev_id"    />
+        <result property="ioId"    column="io_id"    />
+        <result property="ioOrder"    column="io_order"    />
+        <result property="dataTotal"    column="data_total"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="delData"    column="del_data"    />
+        <result property="scType"    column="sc_type"    />
+    </resultMap>
+	
+	<sql id="selectDevDataLogVo">
+        select id, company_id, line_id, work_id, dev_id, io_id, io_order, data_total, create_date, create_time,del_data,sc_type from dev_data_log
+    </sql>
+	
+    <select id="selectDevDataLogList" parameterType="DevDataLog" resultMap="DevDataLogResult">
+        <include refid="selectDevDataLogVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="lineId != null "> and line_id = #{lineId}</if>
+             <if test="workId != null "> and work_id = #{workId}</if>
+             <if test="devId != null "> and dev_id = #{devId}</if>
+             <if test="ioId != null "> and io_id = #{ioId}</if>
+             <if test="ioOrder != null "> and io_order = #{ioOrder}</if>
+             <if test="dataTotal != null "> and data_total = #{dataTotal}</if>
+             <if test="createDate != null "> and create_date = #{createDate}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectDevDataLogById" parameterType="Integer" resultMap="DevDataLogResult">
+        <include refid="selectDevDataLogVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDevDataLog" parameterType="DevDataLog" useGeneratedKeys="true" keyProperty="id">
+        insert into dev_data_log
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="lineId != null  ">line_id,</if>
+			<if test="workId != null  ">work_id,</if>
+			<if test="devId != null  ">dev_id,</if>
+			<if test="ioId != null  ">io_id,</if>
+			<if test="ioOrder != null  ">io_order,</if>
+			<if test="dataTotal != null  ">data_total,</if>
+			<if test="createDate != null  ">create_date,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="delData != null  ">del_data,</if>
+            <if test="scType != null  ">sc_type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="lineId != null  ">#{lineId},</if>
+			<if test="workId != null  ">#{workId},</if>
+			<if test="devId != null  ">#{devId},</if>
+			<if test="ioId != null  ">#{ioId},</if>
+			<if test="ioOrder != null  ">#{ioOrder},</if>
+			<if test="dataTotal != null  ">#{dataTotal},</if>
+			<if test="createDate != null  ">#{createDate},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="delData != null  ">#{delData},</if>
+            <if test="scType != null  ">#{scType},</if>
+         </trim>
+    </insert>
+
+    <!--查询当天正在生产或者已经生产完成当前系统时间与前一个小时的io口数据记录-->
+    <select id="selectDataLogBeInOrFinish" resultType="com.ruoyi.project.device.devDeviceCounts.domain.DataLogTask">
+         SELECT hour(create_time)as timeHour,create_date as createDate, COALESCE(sum(del_data),0) as sumData FROM dev_data_log
+        where dev_id = #{devId} and io_id = #{ioId} and work_id = #{workId} and line_id = #{lineId} and sc_type = #{scType}
+        and create_time BETWEEN #{sysDateTimeOld} AND #{sysDateTime} group by timeHour,createDate;
+    </select>
+
+    <!--通过工单id和产线id查询各个IO口数据记录-->
+    <select id="selectDevDataLogByWorkId" parameterType="Integer" resultMap="DevDataLogResult">
+        <include refid="selectDevDataLogVo"/>
+        where work_id = #{workId} and company_id =#{companyId} and sc_type = #{scType} and del_data > 0;
+    </select>
+    <!--查询对应产线工单硬件IO口上传回传的数据-->
+    <select id="selectLineWorkDevIo" resultMap="DevDataLogResult">
+        SELECT * FROM dev_data_log where line_id = #{line_id} and work_id = #{work_id} and dev_id =  #{dev_id}
+         and io_id = #{io_id} and sc_type = #{scType} order by create_time desc limit 1
+    </select>
+
+    <!--实时统计当前小时的工位产量-->
+    <select id="selectLineWorkSysTemData" resultType="java.lang.Integer">
+        SELECT coalesce(sum(del_data),0) FROM dev_data_log
+        where company_id =#{companyId} and line_id = #{lineId} and work_id = #{workId} and
+        dev_id = #{devId} and io_id = #{wid} and sc_type = #{scType}
+        and create_time &gt;= date_format(now(),'%Y-%m-%d %H:00:00')
+    </select>
+</mapper>

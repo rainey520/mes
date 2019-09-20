@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/jquery-layout/jquery.layout-latest.css}" rel="stylesheet"/>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <input type="hidden" name="cpUserId" id="cpUserId" th:value="${cpUserId}">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            工单号：
+                            <select id="workId" name="workId" th:with="allWork=${@workOrder.selectWorkListInSw(1)}">
+                                <option value="-1">请选择</option>
+                                <option th:each="item:${allWork}" th:text="${item.workorderNumber}" th:value="${item.id}"></option>
+                            </select>
+                        </li>
+
+                        <li class="select-time">
+                            <label>计件日期： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="params[beginTime]"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间"
+                                   name="params[endTime]"/>
+                        </li>
+
+                        <li>
+                            最后修改人：
+                            <select id="cpLastId" name="cpLastId" th:with="user=${@user.selectComAllUser()}">
+                                <option value="-1">请选择</option>
+                                <option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
+                            </select>
+                        </li>
+
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="formReset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:src="@{/ajax/libs/jquery-layout/jquery.layout-latest.js}"></script>
+<script th:inline="javascript">
+    $(function () {
+        $("select").select2({
+            width:"200px",
+            placeholder:'请选择'
+        });
+    })
+    // 重置搜索表单信息
+    function formReset(params) {
+        $('#formId')[0].reset();//input标签重置
+        $("#workId").val('-1').trigger("change"); // select2标签重置
+        $("#cpLastId").val('-1').trigger("change");
+    }
+    var editFlag = [[${@permission.hasPermi('production:countPiece:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('production:countPiece:remove')}]];
+    var prefix = ctx + "production/countPiece";
+
+    $(function() {
+        var options = {
+            url: prefix + "/listDetail",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "全部计件",
+            search: false,
+            showFooter: true,
+            showExport: false,
+            showSearch:true,
+            showRefresh:true,
+            showColumns:false,
+            showToggle:true,
+            columns: [
+                {
+                    field : 'cpId',
+                    title : '计件管理主键id',
+                    visible: false
+                },
+                {
+                    field : 'cpDate',
+                    title : '计件日期',
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        var date = new Date(row.cpDate);
+                        var y = date.getFullYear();
+                        var m = date.getMonth() + 1;
+                        var d = date.getDate();
+                        return y + '-' +m + '-' + d;
+                    },
+                    footerFormatter:function () {
+                        return "<span style='font-weight: bold;color: #1E0FBE'>总金额<span>";
+                    }
+                },
+                {
+                    field : 'workNumber',
+                    title : '工单号',
+                    sortable: true
+                },
+                {
+                    field : 'workPrice',
+                    title : '工价',
+                    sortable: true
+                },
+                {
+                    field : 'cpNumber',
+                    title : '计件数量',
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        return '<span style="font-weight: bold;color: green">'+ row.cpNumber+'</span>';
+                    }
+                },
+                {
+                    field : 'totalPrice',
+                    title : '总价',
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        return '<span style="font-weight: bold;color: orangered">'+ row.totalPrice+'</span>';
+                    },
+                    footerFormatter:function (value) {
+                        var sumBalance = 0;
+                        for (var i in value) {
+                            sumBalance += parseInt(value[i].totalPrice);
+                        }
+                        return '<span style="font-weight: bold;color: #1E0FBE">' + sumBalance + '</span>';
+                    }
+                },
+                {
+                    field : 'cpBadNumber',
+                    title : '不良品',
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        return '<span style="font-weight: bold;color: red">'+ row.cpBadNumber+'</span>';
+                    }
+                },
+                {
+                    field : 'cpRemark',
+                    title : '备注',
+                    sortable: true
+                },
+                {
+                    field : 'cpLastUpdate',
+                    title : '最后修改时间',
+                    sortable: true
+                },
+                {
+                    field : 'cpLastId',
+                    title : '最后修改人',
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        return row.cpLastName;
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.cpId + '\')"><i class="fa fa-edit"></i>修改</a> ');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+        $.table.search("formId");
+    });
+
+</script>
+</body>
+</html>

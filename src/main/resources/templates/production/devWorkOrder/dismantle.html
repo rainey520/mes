@@ -1,0 +1,215 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<!--<link th:href="@{/ajax/libs/layer/laydate/laydate.css}" rel="stylesheet"/>-->
+<link th:href="@{/ajax/libs/datapicker/jquery.datetimepicker.css}" rel="stylesheet"/>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading" style="font-size: 22px;">
+                    拆除工单:<span th:utext="${order.workorderNumber}"></span>&nbsp;&nbsp;&nbsp;
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-12">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                拆单详情
+                            </div>
+                            <div class="ibox-content" style="padding: 0px">
+                                <table class="table table-striped table-bordered table-hover ">
+                                    <thead>
+                                        <tr>
+                                            <th>产线</th>
+                                            <th>订单</th>
+                                            <th>生产数量</th>
+                                            <th >产品编码</th>
+                                            <th>产品名称</th>
+                                            <th>标准工时</th>
+                                            <th>计划开始时间</th>
+                                            <th>计划结束时间</th>
+                                            <th>ECN</th>
+                                            <th>ECN备注</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="add-bom-detail-new-table-body">
+                                        <tr th:each="item:${#numbers.sequence(0,1)}">
+                                            <td >
+                                                <select  name="lineId"
+                                                        th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId()}">
+                                                    <option value="">请选择</option>
+                                                    <option th:if="${line.defId == 0}" th:each="line : ${productionLine}" th:text="${line.lineName}"
+                                                            th:value="${line.Id}"></option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select   name="orderCode"  th:with="order=${@order.selectAllOrder(#httpServletRequest.getCookies())}">
+                                                    <option value="NaN" data-order-id="-1">无</option>
+                                                    <option  th:data-order-id="${item.id}" th:value="${item.orderCode}" th:text="${item.orderCode}"
+                                                             th:each="item:${order}" ></option>
+                                                </select>
+                                            </td>
+                                            <td style="width: 80px" ><input class="form-control" th:value="${ (order.productNumber/2)}"></td>
+                                            <td th:utext="${order.productCode}"></td>
+                                            <td th:utext="${order.productName}">产品名称</td>
+                                            <td th:utext="${order.productStandardHour}">标准工时</td>
+                                            <td><input  name="productionStart" class="form-control layer-date ks-time"></td>
+                                            <td><input  name="productionEnd" class="form-control layer-date js-time"></td>
+                                            <td>
+                                                <select   name="ecnStatus">
+                                                <option value="0">无</option>
+                                                <option value='1'>有</option>
+                                            </select></td>
+                                            <td style="min-width: 200px;">
+                                                <textarea rows="2" id="ecnText" name="ecnText" class="form-control"></textarea>
+                                            </td>
+                                            <td><a class='btn btn-primary btn-rounded btn-sm' onclick='removeTableTr(this)'>&nbsp;删除</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <a class='btn btn-primary btn-rounded btn-sm' onclick="addWork()">&nbsp;添加&nbsp;</a>
+                                <a class='btn btn-primary btn-rounded btn-sm' onclick="saveWork()">&nbsp;保存&nbsp;</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--<script th:src="@{/ajax/libs/layer/laydate/laydate.js}"></script>-->
+<div th:include="include::footer"></div>
+<script th:src="@{/ajax/libs/datapicker/jquery.datetimepicker.full.js}"></script>
+<script type="text/javascript">
+    var prefix = ctx + "device/devWorkOrder";
+    $(function () {
+        $("select").select2({
+            width:180
+        })
+    })
+    function submitHandler() {
+        $.modal.close();
+    }
+
+    $.datetimepicker.setLocale('ch');//设置中文
+    $('#add-bom-detail-new-table-body .ks-time').datetimepicker({
+        format:'Y-m-d H:i',
+    });
+    $('#add-bom-detail-new-table-body .js-time').datetimepicker({
+        format:'Y-m-d H:i',
+    });
+
+    function removeTableTr(val) {
+        if($("#add-bom-detail-new-table-body").find("tr").size()>2){
+            $(val).parent("td").parent("tr").remove();
+        }else{
+            $.modal.alertError("拆单详情数量必须大于2")
+        }
+    }
+    initDate();
+    function initDate() {
+        $(".ks-time").datetimepicker({
+            format:'Y-m-d H:i',
+        });
+        $(".js-time").datetimepicker({
+            format:'Y-m-d H:i',
+        });
+    }
+    function addWork() {
+        var row = $("#add-bom-detail-new-table-body").find("tr").eq(0).clone();
+        var line = $(row).find("td").eq(0).find("select").html();
+        $(row).find("td").eq(0).html('<select name="lineId">'+line+'</select>');
+        var order = $(row).find("td").eq(1).find("select").html();
+        $(row).find("td").eq(1).html('<select name="orderCode">'+order+'</select>');
+        var ecn = $(row).find("td").eq(8).find("select").html();
+        $(row).find("td").eq(8).html('<select name="ecnStatus">'+ecn+'</select>');
+        $(row).find("td").eq(6).html('<input   name="productionStart" class="form-control layer-date ks-time">');
+        $(row).find("td").eq(7).html('<input  name="productionStart" class="form-control layer-date js-time">');
+        $("#add-bom-detail-new-table-body").append(row);
+        initDate();
+        $("select").select2({
+            width:180
+        });
+    }
+
+    /**
+     * 保存拆单详情
+     */
+    function saveWork() {
+        var rows =new Array();
+        var isSubmit = true;
+        var sign = [[${order.id}]]
+        $("#add-bom-detail-new-table-body").find("tr").each(function () {
+            var row ={};
+            var line = $(this).find("td").eq(0).find("select option:selected").val();
+            if(!line){
+                $.modal.alertWarning("请选择产线");
+                isSubmit = false;
+                return;
+            }
+            row.lineId = line;
+            row.sign = sign;
+            row.orderCode = $(this).find("td").find("select[name='orderCode'] option:selected").val();
+            row.productNumber = $(this).find("td").eq(2).find("input").val();
+            row.productCode = $(this).find("td").eq(3).text();
+            row.productName = $(this).find("td").eq(4).text();
+            row.productStandardHour = $(this).find("td").eq(5).text();
+            var startTime = $(this).find("td").eq(6).find("input").val();;
+            if(!startTime){
+                $.modal.alertWarning("请选择开始时间");
+                isSubmit = false;
+                return;
+            }
+            row.productionStart =startTime+":00";
+            var endTime = $(this).find("td").eq(7).find("input").val();
+            if(!endTime){
+                $.modal.alertWarning("请选择结束时间");
+                isSubmit = false;
+                return;
+            }
+            row.productionEnd = endTime+":00";
+            row.ecnStatus = $(this).find("td").eq(8).find("select  option:selected").val();
+            var ecnText = $(this).find("td").eq(9).find("textarea").val();
+            if(row.ecnStatus == 1 && !ecnText){
+                $.modal.alertWarning("请填写ecn备注信息");
+                isSubmit = false;
+                return;
+            }
+            row.ecnText = ecnText;
+            rows.push(row);
+        });
+        if(isSubmit){
+            // console.log(rows);
+            $.modal.confirm("确定拆分工单",function (e) {
+                if(e){
+                    $.ajax({
+                        type: 'POST',
+                        url: prefix + "/workDismantle",
+                        dataType: 'json',
+                        data: JSON.stringify(rows),
+                        contentType: 'application/json',
+                        beforeSend: function () {
+                            $.modal.loading("正在处理中，请稍后...");
+                            $.modal.disable();
+                        },
+                        success : function(result) {
+                            if (result.code == web_status.SUCCESS) {
+                                $.modal.alertSuccess("拆分成功");
+                            }else{
+                                $.modal.alertError(result.msg);
+                            }
+                            $.modal.closeLoading();
+                            $.modal.enable();
+                        }
+                    });
+                }
+            })
+        }
+
+    }
+</script>
+</body>
+</html>

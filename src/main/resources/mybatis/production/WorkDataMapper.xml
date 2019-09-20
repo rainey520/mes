@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.production.workData.mapper.WorkDataMapper">
+    
+    <resultMap type="WorkData" id="WorkDataResult">
+        <result property="dataId"    column="data_id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="workId"    column="work_id"    />
+        <result property="devId"    column="dev_id"    />
+        <result property="devName"    column="dev_name"    />
+        <result property="ioId"    column="io_id"    />
+        <result property="ioName"    column="io_name"    />
+        <result property="ioOrder"    column="io_order"    />
+        <result property="dataSign"    column="data_sign"    />
+        <result property="initialData"    column="initial_data"    />
+        <result property="cumulativeNum"    column="cumulative_num"    />
+        <result property="manualNum"    column="manual_num"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="scType"    column="sc_type"    />
+    </resultMap>
+	
+	<sql id="selectWorkDataVo">
+        select data_id, company_id, line_id, work_id, dev_id, dev_name, io_id, io_name, io_order, data_sign, initial_data, cumulative_num, manual_num,
+        create_time,sc_type from dev_work_data
+    </sql>
+	
+    <select id="selectWorkDataList" parameterType="WorkData" resultMap="WorkDataResult">
+        <include refid="selectWorkDataVo"/>
+        <where>  
+            <if test="dataId != null "> and data_id = #{dataId}</if>
+             <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="lineId != null "> and line_id = #{lineId}</if>
+             <if test="workId != null "> and work_id = #{workId}</if>
+             <if test="devId != null "> and dev_id = #{devId}</if>
+             <if test="devName != null  and devName != '' "> and dev_name = #{devName}</if>
+             <if test="ioId != null "> and io_id = #{ioId}</if>
+             <if test="ioName != null  and ioName != '' "> and io_name = #{ioName}</if>
+             <if test="ioOrder != null "> and io_order = #{ioOrder}</if>
+             <if test="dataSign != null "> and data_sign = #{dataSign}</if>
+             <if test="initialData != null "> and initial_data = #{initialData}</if>
+             <if test="cumulativeNum != null "> and cumulative_num = #{cumulativeNum}</if>
+             <if test="manualNum != null "> and manual_num = #{manualNum}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectWorkDataById" parameterType="Integer" resultMap="WorkDataResult">
+        <include refid="selectWorkDataVo"/>
+        where data_id = #{dataId}
+    </select>
+        
+    <insert id="insertWorkData" parameterType="WorkData" useGeneratedKeys="true" keyProperty="dataId">
+        insert into dev_work_data
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="lineId != null  ">line_id,</if>
+			<if test="workId != null  ">work_id,</if>
+			<if test="devId != null  ">dev_id,</if>
+			<if test="devName != null  and devName != ''  ">dev_name,</if>
+			<if test="ioId != null  ">io_id,</if>
+			<if test="ioName != null  and ioName != ''  ">io_name,</if>
+			<if test="ioOrder != null  ">io_order,</if>
+			<if test="dataSign != null  ">data_sign,</if>
+			<if test="initialData != null  ">initial_data,</if>
+			<if test="cumulativeNum != null  ">cumulative_num,</if>
+			<if test="manualNum != null  ">manual_num,</if>
+			<if test="createTime != null  ">create_time,</if>
+            <if test="scType != null  ">sc_type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="lineId != null  ">#{lineId},</if>
+			<if test="workId != null  ">#{workId},</if>
+			<if test="devId != null  ">#{devId},</if>
+			<if test="devName != null  and devName != ''  ">#{devName},</if>
+			<if test="ioId != null  ">#{ioId},</if>
+			<if test="ioName != null  and ioName != ''  ">#{ioName},</if>
+			<if test="ioOrder != null  ">#{ioOrder},</if>
+			<if test="dataSign != null  ">#{dataSign},</if>
+			<if test="initialData != null  ">#{initialData},</if>
+			<if test="cumulativeNum != null  ">#{cumulativeNum},</if>
+			<if test="manualNum != null  ">#{manualNum},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+            <if test="scType != null  ">#{scType},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateWorkData" parameterType="WorkData">
+        update dev_work_data
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="lineId != null  ">line_id = #{lineId},</if>
+            <if test="workId != null  ">work_id = #{workId},</if>
+            <if test="devId != null  ">dev_id = #{devId},</if>
+            <if test="devName != null  and devName != ''  ">dev_name = #{devName},</if>
+            <if test="ioId != null  ">io_id = #{ioId},</if>
+            <if test="ioName != null  and ioName != ''  ">io_name = #{ioName},</if>
+            <if test="ioOrder != null  ">io_order = #{ioOrder},</if>
+            <if test="dataSign != null  ">data_sign = #{dataSign},</if>
+            <if test="initialData != null  ">initial_data = #{initialData},</if>
+            <if test="cumulativeNum != null  ">cumulative_num = #{cumulativeNum},</if>
+            <if test="manualNum != null  ">manual_num = #{manualNum},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="scType != null  ">sc_type = #{scType},</if>
+        </trim>
+        where data_id = #{dataId}
+    </update>
+
+	<delete id="deleteWorkDataById" parameterType="Integer">
+        delete from dev_work_data where data_id = #{dataId}
+    </delete>
+	
+    <delete id="deleteWorkDataByIds" parameterType="String">
+        delete from dev_work_data where data_id in 
+        <foreach item="dataId" collection="array" open="(" separator="," close=")">
+            #{dataId}
+        </foreach>
+    </delete>
+    
+</mapper>

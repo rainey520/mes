@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.quality.mesBatch.mapper.MesBatchMapper">
+    
+    <resultMap type="MesBatch" id="MesBatchResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="mesCode"    column="mes_code"    />
+        <result property="workCode"    column="work_code"    />
+        <result property="orderCode"    column="order_code"    />
+        <result property="pbCode"    column="pb_code"    />
+        <result property="ruleId"    column="rule_id"    />
+        <result property="ruleName"    column="rule_name"    />
+        <result property="ruleMateriel"    column="rule_materiel"    />
+        <result property="cTime"    column="c_time"    />
+        <result property="uTime"    column="u_time"    />
+        <result property="mesSign"    column="mes_sign"    />
+    </resultMap>
+	
+	<sql id="selectMesBatchVo">
+        select id, company_id, mes_code, work_code, order_code, pb_code, rule_id, rule_name, rule_materiel, c_time, u_time,mes_sign from tab_mes_batch
+    </sql>
+	
+    <select id="selectMesBatchList" parameterType="MesBatch" resultMap="MesBatchResult">
+        <include refid="selectMesBatchVo"/>
+        <where>
+             <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="mesCode != null  and mesCode != '' "> and mes_code like concat(#{mesCode},'%')</if>
+             <if test="workCode != null  and workCode != '' "> and work_code like concat(#{workCode},'%')</if>
+             <if test="orderCode != null  and orderCode != '' "> and order_code like concat (#{orderCode},'%')</if>
+             <if test="pbCode != null  and pbCode != '' "> and pb_code like concat(#{pbCode},'%')</if>
+             <if test="ruleId != null "> and rule_id = #{ruleId}</if>
+             <if test="ruleName != null  and ruleName != '' "> and rule_name = #{ruleName}</if>
+             <if test="ruleMateriel != null  and ruleMateriel != '' "> and rule_materiel like concat(#{ruleMateriel},'%')</if>
+             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(c_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+             </if>
+             <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(c_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+             </if>
+         </where>
+    </select>
+
+    <select id="selectMesBatchList2" parameterType="MesBatch" resultMap="MesBatchResult">
+        SELECT a.* FROM tab_mes_batch as a,tab_mes_batch_detail as b where a.id = b.b_id
+        <if test="batchCode != null and batchCode != ''">
+            and b.batch_code = #{batchCode}
+        </if>
+        <if test="companyId != null ">
+            and a.company_id = #{companyId}
+        </if>
+        <if test="pbCode != null  and pbCode != '' "> and a.pb_code like concat(#{pbCode},'%')</if>
+        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(a.c_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(a.c_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+        </if>
+        group by a.id
+    </select>
+    
+    <select id="selectMesBatchById" parameterType="Integer" resultMap="MesBatchResult">
+        <include refid="selectMesBatchVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMesBatch" parameterType="MesBatch" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_mes_batch
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="mesCode != null  and mesCode != ''  ">mes_code,</if>
+			<if test="workCode != null  and workCode != ''  ">work_code,</if>
+			<if test="orderCode != null  and orderCode != ''  ">order_code,</if>
+			<if test="pbCode != null  and pbCode != ''  ">pb_code,</if>
+			<if test="ruleId != null  ">rule_id,</if>
+			<if test="ruleName != null  and ruleName != ''  ">rule_name,</if>
+			<if test="ruleMateriel != null  and ruleMateriel != ''  ">rule_materiel,</if>
+			<if test="cTime != null  ">c_time,</if>
+			<if test="uTime != null  ">u_time,</if>
+            <if test="mesSign != null and mesSign != '' ">mes_sign,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="mesCode != null  and mesCode != ''  ">#{mesCode},</if>
+			<if test="workCode != null  and workCode != ''  ">#{workCode},</if>
+			<if test="orderCode != null  and orderCode != ''  ">#{orderCode},</if>
+			<if test="pbCode != null  and pbCode != ''  ">#{pbCode},</if>
+			<if test="ruleId != null  ">#{ruleId},</if>
+			<if test="ruleName != null  and ruleName != ''  ">#{ruleName},</if>
+			<if test="ruleMateriel != null  and ruleMateriel != ''  ">#{ruleMateriel},</if>
+			<if test="cTime != null  ">#{cTime},</if>
+			<if test="uTime != null  ">#{uTime},</if>
+            <if test="mesSign != null and mesSign != '' ">#{mesSign},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateMesBatch" parameterType="MesBatch">
+        update tab_mes_batch
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="mesCode != null  and mesCode != ''  ">mes_code = #{mesCode},</if>
+            <if test="workCode != null  and workCode != ''  ">work_code = #{workCode},</if>
+            <if test="orderCode != null  and orderCode != ''  ">order_code = #{orderCode},</if>
+            <if test="pbCode != null  and pbCode != ''  ">pb_code = #{pbCode},</if>
+            <if test="ruleId != null  ">rule_id = #{ruleId},</if>
+            <if test="ruleName != null  and ruleName != ''  ">rule_name = #{ruleName},</if>
+            <if test="ruleMateriel != null  and ruleMateriel != ''  ">rule_materiel = #{ruleMateriel},</if>
+            <if test="cTime != null  ">c_time = #{cTime},</if>
+            <if test="uTime != null  ">u_time = #{uTime},</if>
+            <if test="mesSign != null  and mesSign != ''  ">mes_sign = #{mesSign},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteMesBatchById" parameterType="Integer">
+        delete from tab_mes_batch where id = #{id}
+    </delete>
+	
+    <delete id="deleteMesBatchByIds" parameterType="String">
+        delete from tab_mes_batch where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过工单号查询工单追中批次列表-->
+    <select id="selectMesBatchListByWorkCode"  parameterType="String" resultMap="MesBatchResult">
+        SELECT * FROM tab_mes_batch where work_code = #{workCode}
+    </select>
+
+    <!--通过mes编码查询mes批次追踪信息-->
+    <select id="selectMesBatchByMesCode" resultMap="MesBatchResult">
+        SELECT * FROM tab_mes_batch where mes_code = #{mesCode} and company_id = #{companyId} limit 1
+    </select>
+
+    <!--通过工单编号删除MES批次追踪信息-->
+    <delete id="deleteMesBatchByWorkCode" parameterType="String">
+        delete from tab_mes_batch where work_code = #{workCode}
+    </delete>
+    
+</mapper>

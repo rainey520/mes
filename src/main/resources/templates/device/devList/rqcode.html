@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head th:include="include :: header"></head>
+<body>
+    <div id="qr-code-div" >
+        <div id="container" style="text-align: center" >
+            <canvas  width="260" height="260"></canvas>
+        </div>
+    </div>
+    <div th:include="include::footer"></div>
+    <script th:src="@{/js/jqueryqr.js}"></script>
+    <script th:src="@{/js/qrcode.js}"></script>
+</body>
+<script th:inline="javascript" >
+    $(function () {
+        $('#container').erweima({
+            fill:"#000",
+            size:230,
+            text:[[${d.deviceId}]],
+            label:'扫码'
+        });
+    })
+    function submitHandler() {
+        $.modal.close();
+    }
+</script>
+ 
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<meta charset="utf-8">
+<title>公司轮播图片修改</title>
+<link th:href="@{/ajax/libs/layui/css/layui.css}" rel="stylesheet"/>
+<style>
+    body{padding: 50px 100px;}
+    .layui-upload-img{width: 150px; height: 150px; margin: 0 10px 10px 0;}
+    hr{margin: 30px 0;}
+</style>
+<body class="white-bg">
+<div class="container">
+    <div class="layui-upload">
+        <button type="button" class="layui-btn" id="test2">多图片上传</button>
+        <div class="layui-upload-list" id="demo2"></div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<!--<script th:src="@{/ajax/libs/cropbox/cropbox.js}"></script>-->
+<script th:src="@{/ajax/libs/layui/lay/modules/upload.js}"></script>
+<script type="text/javascript">
+    var prefix = ctx + "device/devCompany";
+    var success = 0;
+    var fail = 0;
+    var imgurls = [];
+    layui.use('upload', function(){
+        var $ = layui.jquery
+        var upload = layui.upload;
+
+        upload.render({
+            elem: '#test2'
+            ,url: prefix + '/uploadComPicture'
+            ,multiple: true
+            ,number: 3
+            ,size: 2560
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo2').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img">')
+                });
+            }
+            ,done: function(res, index, upload){
+                //每个图片上传结束的回调，成功的话，就把新图片的名字保存起来，作为数据提交
+                if(res.code == web_status.SUCCESS){ // 上传成功
+                    success++;
+                    // imgurls=imgurls+""+res.msg+",";
+                    imgurls.push(res.msg);
+                }else{
+                    fail++; // 上传失败
+                }
+            }
+            ,allDone: function(obj){
+                console.log(obj.total); //得到总文件数
+                console.log(obj.successful); //请求成功的文件数
+                console.log(obj.aborted); //请求失败的文件数
+            }
+        });
+    });
+
+    /**
+     * 保存轮播图片
+     */
+    function submitHandler() {
+        $.ajax({
+            type: 'POST',
+            url: prefix + '/updateComPicture',
+            dataType: 'json',
+            data:{
+                comPicture:JSON.stringify(imgurls),
+            },
+            async:false,  //同步请求，
+            success: function (result) {
+                // if (result.code == web_status.SUCCESS) {
+                //     alert("上传成功");
+                // }
+                $.operate.successCallback(result);
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

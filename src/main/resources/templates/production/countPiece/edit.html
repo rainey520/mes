@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-countPiece-edit" th:object="${countPiece}">
+            <input id="cpId" name="cpId" th:field="*{cpId}"  type="hidden">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">计件归属人：</label>
+				<div class="col-sm-8">
+					<input id="cpUserName" name="cpUserName" th:field="*{cpUserName}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">计件日期：</label>
+				<div class="col-sm-8">
+					<input id="cpDate" name="cpDate" th:value="${#dates.format(countPiece.cpDate,'yyyy-MM-dd')}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">工单号：</label>
+				<div class="col-sm-8">
+					<input id="workNumber" name="workNumber" th:field="*{workNumber}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">工价：</label>
+				<div class="col-sm-8">
+					<input id="workPrice" name="workPrice" th:field="*{workPrice}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">计件数量：</label>
+				<div class="col-sm-8">
+					<input id="cpNumber" name="cpNumber" th:field="*{cpNumber}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">不良品：</label>
+				<div class="col-sm-8">
+					<input id="cpBadNumber" name="cpBadNumber" th:field="*{cpBadNumber}" class="form-control" type="number">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">备注：</label>
+				<div class="col-sm-8">
+					<textarea rows="4" id="cpRemark" name="cpRemark" th:field="*{cpRemark}" class="form-control" type="text"></textarea>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "production/countPiece";
+		$("#form-countPiece-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-countPiece-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

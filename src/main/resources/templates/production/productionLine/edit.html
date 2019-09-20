@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-productionLine-edit" th:object="${productionLine}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">产线名称：</label>
+				<div class="col-sm-8">
+					<input id="lineName" name="lineName" th:field="*{lineName}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">责任人1：</label>
+				<div class="col-sm-8">
+					<select id="deviceLiable" name="deviceLiable" class="form-control m-b"  th:with="user=${@user.selectComAllUser()}">
+						<option th:each="u : ${user}" th:text="${u.userName}" th:field="*{deviceLiable}" th:value="${u.userId}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">责任人2：</label>
+				<div class="col-sm-8">
+					<select id="deviceLiableTow" name="deviceLiableTow" class="form-control m-b"  th:with="user=${@user.selectComAllUser()}">
+						<option th:each="u : ${user}" th:text="${u.userName}" th:field="*{deviceLiableTow}" th:value="${u.userId}"></option>
+					</select>
+				</div>
+			</div>
+			<!--<div class="form-group">-->
+				<!--<label class="col-sm-3 control-label">PE：</label>-->
+				<!--<div class="col-sm-8">-->
+					<!--<select id="edUser" name="edUser" class="form-control m-b"  th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">-->
+						<!--<option value="">请选择</option>-->
+						<!--<option th:each="u : ${user}" th:text="${u.userName}" th:field="*{edUser}" th:value="${u.userId}"></option>-->
+					<!--</select>-->
+				<!--</div>-->
+			<!--</div>-->
+			<!--<div class="form-group">-->
+				<!--<label class="col-sm-3 control-label">IPQC：</label>-->
+				<!--<div class="col-sm-8">-->
+					<!--<select id="ipqcUser" name="ipqcUser" class="form-control m-b"  th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">-->
+						<!--<option value="">请选择</option>-->
+						<!--<option th:each="u : ${user}" th:text="${u.userName}" th:field="*{ipqcUser}" th:value="${u.userId}"></option>-->
+					<!--</select>-->
+				<!--</div>-->
+			<!--</div>-->
+			<!--<div class="form-group">-->
+				<!--<label class="col-sm-3 control-label">ME：</label>-->
+				<!--<div class="col-sm-8">-->
+					<!--<select id="meUser" name="meUser" class="form-control m-b"  th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">-->
+						<!--<option value="">请选择</option>-->
+						<!--<option th:each="u : ${user}" th:text="${u.userName}" th:field="*{meUser}" th:value="${u.userId}"></option>-->
+					<!--</select>-->
+				<!--</div>-->
+			<!--</div>-->
+			<!--<div class="form-group">-->
+				<!--<label class="col-sm-3 control-label">TE：</label>-->
+				<!--<div class="col-sm-8">-->
+					<!--<select id="teUser" name="teUser" class="form-control m-b"  th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">-->
+						<!--<option value="">请选择</option>-->
+						<!--<option th:each="u : ${user}" th:text="${u.userName}" th:field="*{teUser}" th:value="${u.userId}"></option>-->
+					<!--</select>-->
+				<!--</div>-->
+			<!--</div>-->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">备注信息：</label>
+				<div class="col-sm-8">
+					<textarea id="remark" name="remark" rows="4" th:field="*{remark}"  class="form-control" type="text"></textarea>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "production/productionLine";
+		$("#form-productionLine-edit").validate({
+            rules:{
+				lineName:{
+					required:true,
+					remote: {
+						url: prefix + "/checkLineNameUnique",
+						type: "post",
+						dataType: "json",
+						data: {
+							name : function() {
+								return $.common.trim($("#lineName").val());
+							},
+							id : function() {
+								return $.common.trim($("#id").val());
+							}
+						},
+						dataFilter: function(data, type) {
+							return $.validate.unique(data);
+						}
+					}
+				},
+                deviceLiable:{
+                    required:true,
+                },
+
+            },
+            messages:{
+                lineName:{
+                    required:"产线名称必填",
+					remote:"产线名称已存在",
+                },
+                deviceLiable:{
+                    required:"责任人1必填",
+                },
+            }
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-productionLine-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

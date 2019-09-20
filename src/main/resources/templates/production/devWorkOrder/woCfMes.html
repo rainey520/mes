@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-product-mes-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">MES规则：</label>
+            <div class="col-sm-8">
+                <input name="id" type="hidden" th:value="${pro.id}">
+                <select id="ruleId" name="ruleId" class="form-control" th:with="mesRule=${@mesRule.selectMesRuleByType(0)}" onchange="checkMesRule(this)">
+                    <option value="0">请选择</option>
+                    <option th:each="mes:${mesRules}" th:text="${mes.ruleName}" th:data-mes-matriels="${mes.materiels}" th:value="${mes.id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">物料：</label>
+            <div class="col-sm-8">
+                <textarea id="matList" class="form-control" rows="4" readonly="readonly"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var prefix = ctx + "product"
+    $("#form-product-mes-add").validate({
+        rules:{
+            ruleId:{
+                required:true,
+            },
+        },
+        messages: {
+            ruleId: {
+                required:"请选择MES规则",
+            },
+        }
+    });
+
+    function submitHandler() {
+        var ruleId = $("#ruleId").find("option:selected").val();
+        if(ruleId　>0){
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/saveMesRule", $('#form-product-mes-add').serialize());
+            }
+        }else{
+            $.modal.alertWarning("请选择MES规则");
+        }
+    }
+
+    /**
+     * 选择MES规格
+     */
+    function checkMesRule(val) {
+        var ruleId = $("#ruleId").find("option:selected").val();
+        if (ruleId > 0) {
+            $("#matList").html($(val).find("option:selected").attr("data-mes-matriels"));
+        } else {
+            $("#matList").html('');
+        }
+    }
+</script>
+</body>
+</html>

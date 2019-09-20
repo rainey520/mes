@@ -1,0 +1,318 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/layer/laydate/laydate.css}" rel="stylesheet"/>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <div class="row">
+        <div class="col-sm-12 select-table">
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-8">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title" style="text-align: center">
+                            <h2 style="color: red" th:if="${config == null}">当前未配置</h2>
+                            <h5>产品导入配置&nbsp;&nbsp;&nbsp;<span style="color: red">当选择下标为0时将不对其进行解析</span></h5>
+                        </div>
+                        <div class="ibox-content">
+                            <form class="form-horizontal m" id="form-devProductList-import-config-add" >
+                            <table class="table table-striped table-bordered table-hover " >
+                                <thead>
+                                    <tr>
+                                        <th>开始解析行数</th>
+                                        <th>产品编码</th>
+                                        <th>产品名称</th>
+                                        <th>产品型号</th>
+                                        <th>标准工时</th>
+                                        <th>单价</th>
+                                        <th>单位</th>
+                                        <th>备注信息</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="add-product-config-table">
+                                    <tr>
+                                        <th>
+                                            <select name="rowIndex" id="rowIndex"  onchange="indexRow(this)">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                            </select>
+                                        </th>
+                                        <td>
+                                            <select name="con1" onchange="pCode(this)">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select name="con2"  onchange="pName(this)">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select name="con3"  onchange="pModel(this)">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select name="con4"  onchange="pHours(this)">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select name="price"  onchange="pPrice(this)">
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select name="unit"  onchange="pUnit(this)">
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select name="con5"  onchange="pRemark(this)">
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                                <option value="5">5</option>
+                                                <option value="6">6</option>
+                                                <option value="7">7</option>
+                                                <option value="8">8</option>
+                                                <option value="9">9</option>
+                                                <option value="10">10</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2"></div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-8">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title" >
+                            <h5>配置排序预览&nbsp;&nbsp;&nbsp;<span style="color: red">配置导入时将从第</span><span
+                                   th:utext="${config != null?config.rowIndex:1}" id="index-row">1</span>
+                                <span style="color: red">行按照以下下标顺序进行解析</span></h5>
+                        </div>
+                        <div class="ibox-content">
+                            <table class="table table-striped table-bordered table-hover " >
+                                <thead>
+                                <tr>
+                                    <th>开始解析行数</th>
+                                    <th>产品编码</th>
+                                    <th>产品名称</th>
+                                    <th>产品型号</th>
+                                    <th>标准工时</th>
+                                    <th>单价</th>
+                                    <th>单位</th>
+                                    <th>备注信息</th>
+                                </tr>
+                                </thead>
+                                <tbody id="add-product-config-eye-table">
+                                <tr>
+                                    <td th:utext="${config != null?config.rowIndex:1}">1</td>
+                                    <td th:utext="${config != null?config.con1:1}">1</td>
+                                    <td th:utext="${config != null?config.con2:1}">1</td>
+                                    <td th:utext="${config != null?config.con3:1}">1</td>
+                                    <td th:utext="${config != null?config.con4:1}">1</td>
+                                    <td th:utext="${config != null?config.price:0}">0</td>
+                                    <td th:utext="${config != null?config.unit:0}">0</td>
+                                    <td th:utext="${config != null?config.con5:0}">0</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-2"></div>
+                <div class="col-sm-12" style="text-align: center">
+                    <a class="btn btn-primary" onclick="addImportProductConfig()" shiro:hasPermission="device:devProductList:importConfig">
+                        <i class="fa fa-plus"></i> 保存配置
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript" th:inline="javascript">
+    var prefix = ctx + "product";
+    $(function () {
+        $("select").select2();
+        var config = [[${config}]];
+        if(config){
+            $("#rowIndex").select2("val", [config.rowIndex]);
+            $("select[name='con1']").select2("val", [config.con1]);
+            $("select[name='con2']").select2("val", [config.con2]);
+            $("select[name='con3']").select2("val", [config.con3]);
+            $("select[name='con4']").select2("val", [config.con4]);
+            $("select[name='price']").select2("val", [config.price]);
+            $("select[name='unit']").select2("val", [config.unit]);
+            $("select[name='con5']").select2("val", [config.con5]);
+        }
+    })
+    /**
+     * 解析行改变
+     */
+    function indexRow(val) {
+        $("#add-product-config-eye-table").find("tr").eq(0).find("td").eq(0).text($(val).find("option:selected").val());
+        $("#index-row").text($(val).find("option:selected").val());
+    }
+
+    /**
+     * 产品编码
+     * @param val
+     */
+    function pCode(val) {
+        $("#add-product-config-eye-table").find("tr").eq(0).find("td").eq(1).text($(val).find("option:selected").val());
+    }
+
+    /**
+     * 产品名称
+     * @param val
+     */
+    function pName(val) {
+        $("#add-product-config-eye-table").find("tr").eq(0).find("td").eq(2).text($(val).find("option:selected").val());
+    }
+
+    /**
+     * 产品型号
+     * @param val
+     */
+    function pModel(val) {
+        $("#add-product-config-eye-table").find("tr").eq(0).find("td").eq(3).text($(val).find("option:selected").val());
+    }
+
+    /**
+     * 标准工时
+     * @param val
+     */
+    function pHours(val) {
+        $("#add-product-config-eye-table").find("tr").eq(0).find("td").eq(4).text($(val).find("option:selected").val());
+    }
+
+    /**
+     * 单价
+     * @param val
+     */
+    function pPrice(val) {
+        $("#add-product-config-eye-table").find("tr").eq(0).find("td").eq(5).text($(val).find("option:selected").val());
+    }
+
+    /**
+     * 单位
+     * @param val
+     */
+    function pUnit(val) {
+        $("#add-product-config-eye-table").find("tr").eq(0).find("td").eq(6).text($(val).find("option:selected").val());
+    }
+
+    /**
+     * 备注信息
+     * @param val
+     */
+    function pRemark(val) {
+        $("#add-product-config-eye-table").find("tr").eq(0).find("td").eq(7).text($(val).find("option:selected").val());
+    }
+    function addImportProductConfig() {
+        $.modal.confirm("确定保存对应配置吗,请核对配置是否正确",function (e) {
+            if(e){
+                // 保存信息
+                    var config = {
+                        url: prefix+"/addProductConfig",
+                        type: "post",
+                        dataType: "json",
+                        data: $('#form-devProductList-import-config-add').serialize(),
+                        beforeSend: function () {
+                            $.modal.loading("正在处理中，请稍后...");
+                            $.modal.disable();
+                        },
+                        success: function (result) {
+                            if (result.code == web_status.SUCCESS) {
+                                $.modal.msgSuccess(result.msg);
+                            } else {
+                                $.modal.alertError(result.msg);
+                            }
+                            $.modal.closeLoading();
+                            $.modal.enable();
+                        }
+                    };
+                    $.ajax(config)
+            }
+        })
+    }
+</script>
+</body>
+</html>

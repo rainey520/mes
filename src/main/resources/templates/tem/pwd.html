@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>输入密码</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css">
+    <style type="text/css">
+        body {
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #eee;
+        }
+
+        .form-signin {
+            max-width: 330px;
+            padding: 15px;
+            margin: 0 auto;
+        }
+
+        .form-signin .form-signin-heading,
+        .form-signin .checkbox {
+            margin-bottom: 10px;
+        }
+
+        .form-signin .checkbox {
+            font-weight: normal;
+        }
+
+        .form-signin .form-control {
+            position: relative;
+            height: auto;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .form-signin .form-control:focus {
+            z-index: 2;
+        }
+
+        .form-signin input[type="email"] {
+            margin-bottom: -1px;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .form-signin input[type="password"] {
+            margin-bottom: 10px;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form class="form-signin" style="text-align: center" method="post" th:action="${'/t/'+code}">
+            <h2 class="form-signin-heading">请输入页面密码</h2>
+            <input type="password" id="inputPassword" name="pwd" class="form-control" placeholder="页面密码" required="">
+            <span style="color:red" th:utext="${msg}"></span>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">查看</button>
+            <a href="javascript:void(0)" onclick="closeWin()" id="close-win" style="font-size: 20px;margin-top: 5px">返回</a>
+        </form>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    <script th:inline="javascript" >
+        var isWAP = false;
+        $(document).ready(function () {
+            var agentcheck = navigator.userAgent.toLowerCase();
+            var chesys = true;
+            var keywords = ["mobile", "android",
+                "symbianos", "iphone", "windows phone",
+                "mqqbrowser", "nokia", "samsung", "midp-2",
+                "untrusted/1.0", "windows ce", "blackberry", "ucweb",
+                "brew", "j2me", "yulong", "coolpad", "tianyu", "ty-",
+                "k-touch", "haier", "dopod", "lenovo", "huaqin", "aigo-",
+                "ctc/1.0", "ctc/2.0", "cmcc", "daxian", "mot-",
+                "sonyericsson", "gionee", "htc", "zte", "huawei", "webos",
+                "gobrowser", "iemobile", "wap2.0", "wapi"];
+            //排除 windows,苹果等桌面系统 和ipad 、iPod
+            var rekeywords = ["Windows 98", "Windows ME", "Windows 2000", "Windows XP", "Windows NT", "Ubuntu", "ipad", "ipod", "macintosh"];
+            if (agentcheck != null) {
+                for (var i = 0; i < rekeywords.length; i++) {
+                    if (agentcheck.indexOf(rekeywords[i].toLowerCase()) > -1) {
+                        chesys = false;
+                    }
+                }
+            }
+            if (chesys) {
+                for (var i = 0; i < keywords.length; i++) {
+                    if (agentcheck.indexOf(keywords[i].toLowerCase()) > -1) {
+                        isWAP = true;
+                        break;
+                    }
+                }
+            }
+            if (isWAP) {
+            } else
+            {
+                $('#close-win').css('display', 'none');
+            }
+        });
+        function closeWin() {
+            if(isWAP){
+                var data={code:"1"};
+                console.log(JSON.stringify(data));
+            }
+        }
+    </script>
+</body>
+
+</html>

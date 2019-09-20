@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-singleWork-edit" th:object="${singleWork}">
+        <input id="parentId" name="parentId" th:field="*{parentId}" type="hidden">
+        <input id="id" name="id" th:field="*{id}"  type="hidden">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">单工位名称：</label>
+            <div class="col-sm-8">
+                <input id="workshopName" name="workshopName" th:field="*{workshopName}" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">单工位责任人：</label>
+            <div class="col-sm-8">
+                <select style="width: 100%"  id="liableOne" name="liableOne" class="form-control"
+                        th:with="user=${@user.selectComAllUser()}">
+                    <option value="0">请选择</option>
+                    <option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}" th:field="*{liableOne}"></option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var prefix = ctx + "production/singleWork";
+    $("#form-singleWork-edit").validate({
+        rules:{
+            workshopName:{
+                required:true,
+                remote: {
+                    url: prefix + "/checkNameUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        name : function() {
+                            return $.common.trim($("#workshopName").val());
+                        },
+                        id : function () {
+                            return $.common.trim($("#id").val());
+                        }
+                    },
+                    dataFilter: function(data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            },
+        },
+        messages: {
+            "workshopName": {
+                remote: "单工位名称已存在"
+            },
+        }
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            var liableOne = $("#liableOne").find('option:selected').val();
+            if (liableOne <= 0) {
+                $.modal.alertWarning("请选择单工位责任人");
+                return;
+            }
+            $.operate.save(prefix + "/edit", $('#form-singleWork-edit').serialize());
+        }
+    }
+</script>
+</body>
+</html>

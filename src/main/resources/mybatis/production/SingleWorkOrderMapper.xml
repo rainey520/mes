@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.production.singleWork.mapper.SingleWorkOrderMapper">
+    
+    <resultMap type="SingleWorkOrder" id="SingleWorkOrderResult">
+        <result property="id"    column="id"    />
+        <result property="workId"    column="work_id"    />
+        <result property="workCode"    column="work_code"    />
+        <result property="singleId"    column="single_id"    />
+        <result property="singleP"    column="single_p"    />
+        <result property="cTime"    column="c_time"    />
+    </resultMap>
+
+    <resultMap type="SingleWorkOrder" id="SingleWorkOrderResult2">
+        <result property="id"    column="id"    />
+        <result property="workId"    column="work_id"    />
+        <result property="workCode"    column="work_code"    />
+        <result property="singleId"    column="single_id"    />
+        <result property="singleP"    column="single_p"    />
+        <result property="cTime"    column="c_time"    />
+        <association property="imCode" column="single_id" select="selectImCode">
+            <result property="imCode" column="id"/>
+        </association>
+    </resultMap>
+
+    <resultMap type="SingleWorkOrder" id="SingleWorkOrderResult1">
+        <result property="id"    column="id"    />
+        <result property="workId"    column="work_id"    />
+        <result property="workCode"    column="work_code"    />
+        <result property="singleId"    column="single_id"    />
+        <result property="singleP"    column="single_p"    />
+        <result property="cTime"    column="c_time"    />
+        <result property="imCode"    column="im_code"    />
+        <result property="liableOne"    column="liable_one"    />
+        <result property="workorderStatus"    column="workorder_status"    />
+        <result property="productNumber"    column="product_number"    />
+        <association property="liableOneName" column="liable_one" select="selectOneName1">
+            <result property="liableOneName" column="user_name"/>
+        </association>
+    </resultMap>
+	
+	<sql id="selectSingleWorkOrderVo">
+        select id, work_id, work_code, single_id, single_p, c_time from tab_single_work_order
+    </sql>
+
+    <!--查询单工位的设备信息-->
+    <select id="selectImCode" resultType="java.lang.String">
+        SELECT im_code FROM tab_single_work where id =#{singleId}
+    </select>
+
+    <select id="selectSingleWorkOrderList" parameterType="SingleWorkOrder" resultMap="SingleWorkOrderResult1">
+        SELECT a.*,b.im_code,b.liable_one,c.workorder_status,c.product_number FROM
+        tab_single_work_order as a ,tab_single_work as b,dev_work_order as c
+        where a.single_id = b.id and a.work_id = c.id
+        <if test="type == 0">
+            <!--根据设备查询-->
+            and a.single_id = #{singleId}
+        </if>
+        <if test="type == 1">
+            <!--根据工单查询-->
+            and a.work_id= #{workId}
+        </if>
+    </select>
+    <select id="selectOneName1" resultType="java.lang.String">
+        SELECT user_name FROM sys_user where user_id = #{liable_one};
+    </select>
+    <select id="selectSingleWorkOrderById" parameterType="Integer" resultMap="SingleWorkOrderResult">
+        <include refid="selectSingleWorkOrderVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSingleWorkOrder" parameterType="SingleWorkOrder" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_single_work_order
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="workId != null  ">work_id,</if>
+			<if test="workCode != null  and workCode != ''  ">work_code,</if>
+			<if test="singleId != null  ">single_id,</if>
+			<if test="singleP != null  ">single_p,</if>
+			<if test="cTime != null  ">c_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="workId != null  ">#{workId},</if>
+			<if test="workCode != null  and workCode != ''  ">#{workCode},</if>
+			<if test="singleId != null  ">#{singleId},</if>
+			<if test="singleP != null  ">#{singleP},</if>
+			<if test="cTime != null  ">#{cTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateSingleWorkOrder" parameterType="SingleWorkOrder">
+        update tab_single_work_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workId != null  ">work_id = #{workId},</if>
+            <if test="workCode != null  and workCode != ''  ">work_code = #{workCode},</if>
+            <if test="singleId != null  ">single_id = #{singleId},</if>
+            <if test="singleP != null  ">single_p = #{singleP},</if>
+            <if test="cTime != null  ">c_time = #{cTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteSingleWorkOrderById" parameterType="Integer">
+        delete from tab_single_work_order where id = #{id}
+    </delete>
+	
+    <delete id="deleteSingleWorkOrderByIds" parameterType="String">
+        delete from tab_single_work_order where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过车间id工单id查询工单单工位记录列表-->
+    <select id="selectSingleWorkByWorkIdAndPid" resultMap="SingleWorkOrderResult2">
+        SELECT * FROM tab_single_work_order where 1=1
+        <if test="singleP != null ">
+            and single_p = #{singleP}
+        </if>
+        <if test="workId != null ">
+            and work_id = #{workId}
+        </if>
+    </select>
+
+    <!--查询车间对应工单个人负责的工单生产数量-->
+    <!--<select id="selectWorkInHouseCountNumByUid" resultType="com.ruoyi.project.page.pageInfo.domain.PageHouse">-->
+        <!--select coalesce(sum(cumulative_num),0) as countNum from tab_single_work_order as a-->
+            <!--left join tab_single_work as b on a.single_id = b.id-->
+            <!--left join dev_work_data as c on b.id = c.io_id-->
+            <!--where a.work_id = #{workId} and b.sign = #{sign} and b.company_id = #{companyId} and b.dev_id >0-->
+            <!--and c.work_id = #{workId} and b.liable_one = #{liableOne}-->
+    <!--</select>-->
+    
+</mapper>

@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.production.devWorkDayHour.mapper.DevWorkDayHourMapper">
+    
+    <resultMap type="DevWorkDayHour" id="DevWorkDayHourResult">
+        <result property="hourId"    column="hour_id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="workId"    column="work_id"    />
+        <result property="devId"    column="dev_id"    />
+        <result property="devName"    column="dev_name"    />
+        <result property="ioId"    column="io_id"    />
+        <result property="ioName"    column="io_name"    />
+        <result property="ioOrder"    column="io_order"    />
+        <result property="hour1"    column="hour1"    />
+        <result property="hour2"    column="hour2"    />
+        <result property="hour3"    column="hour3"    />
+        <result property="hour4"    column="hour4"    />
+        <result property="hour5"    column="hour5"    />
+        <result property="hour6"    column="hour6"    />
+        <result property="hour7"    column="hour7"    />
+        <result property="hour8"    column="hour8"    />
+        <result property="hour9"    column="hour9"    />
+        <result property="hour10"    column="hour10"    />
+        <result property="hour11"    column="hour11"    />
+        <result property="hour12"    column="hour12"    />
+        <result property="hour13"    column="hour13"    />
+        <result property="hour14"    column="hour14"    />
+        <result property="hour15"    column="hour15"    />
+        <result property="hour16"    column="hour16"    />
+        <result property="hour17"    column="hour17"    />
+        <result property="hour18"    column="hour18"    />
+        <result property="hour19"    column="hour19"    />
+        <result property="hour20"    column="hour20"    />
+        <result property="hour21"    column="hour21"    />
+        <result property="hour22"    column="hour22"    />
+        <result property="hour23"    column="hour23"    />
+        <result property="hour24"    column="hour24"    />
+        <result property="dataTime"    column="data_time"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+	
+	<sql id="selectDevWorkDayHourVo">
+        select hour_id, company_id, line_id, work_id, dev_id, dev_name, io_id, io_name, io_order, hour1, hour2, hour3, hour4, hour5, hour6, hour7, hour8, hour9, hour10, hour11, hour12, hour13, hour14, hour15, hour16, hour17, hour18, hour19, hour20, hour21, hour22, hour23, hour24, data_time, create_time from dev_work_day_hour
+    </sql>
+	
+    <select id="selectDevWorkDayHourList" parameterType="DevWorkDayHour" resultMap="DevWorkDayHourResult">
+        <include refid="selectDevWorkDayHourVo"/>
+        <where>  
+            <if test="hourId != null "> and hour_id = #{hourId}</if>
+             <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="lineId != null "> and line_id = #{lineId}</if>
+             <if test="workId != null "> and work_id = #{workId}</if>
+             <if test="devId != null "> and dev_id = #{devId}</if>
+             <if test="devName != null  and devName != '' "> and dev_name = #{devName}</if>
+             <if test="ioId != null "> and io_id = #{ioId}</if>
+             <if test="ioName != null  and ioName != '' "> and io_name = #{ioName}</if>
+             <if test="ioOrder != null "> and io_order = #{ioOrder}</if>
+             <if test="hour1 != null "> and hour1 = #{hour1}</if>
+             <if test="hour2 != null "> and hour2 = #{hour2}</if>
+             <if test="hour3 != null "> and hour3 = #{hour3}</if>
+             <if test="hour4 != null "> and hour4 = #{hour4}</if>
+             <if test="hour5 != null "> and hour5 = #{hour5}</if>
+             <if test="hour6 != null "> and hour6 = #{hour6}</if>
+             <if test="hour7 != null "> and hour7 = #{hour7}</if>
+             <if test="hour8 != null "> and hour8 = #{hour8}</if>
+             <if test="hour9 != null "> and hour9 = #{hour9}</if>
+             <if test="hour10 != null "> and hour10 = #{hour10}</if>
+             <if test="hour11 != null "> and hour11 = #{hour11}</if>
+             <if test="hour12 != null "> and hour12 = #{hour12}</if>
+             <if test="hour13 != null "> and hour13 = #{hour13}</if>
+             <if test="hour14 != null "> and hour14 = #{hour14}</if>
+             <if test="hour15 != null "> and hour15 = #{hour15}</if>
+             <if test="hour16 != null "> and hour16 = #{hour16}</if>
+             <if test="hour17 != null "> and hour17 = #{hour17}</if>
+             <if test="hour18 != null "> and hour18 = #{hour18}</if>
+             <if test="hour19 != null "> and hour19 = #{hour19}</if>
+             <if test="hour20 != null "> and hour20 = #{hour20}</if>
+             <if test="hour21 != null "> and hour21 = #{hour21}</if>
+             <if test="hour22 != null "> and hour22 = #{hour22}</if>
+             <if test="hour23 != null "> and hour23 = #{hour23}</if>
+             <if test="hour24 != null "> and hour24 = #{hour24}</if>
+             <if test="dataTime != null "> and data_time = #{dataTime}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectDevWorkDayHourById" parameterType="Integer" resultMap="DevWorkDayHourResult">
+        <include refid="selectDevWorkDayHourVo"/>
+        where hour_id = #{hourId}
+    </select>
+        
+    <insert id="insertDevWorkDayHour" parameterType="DevWorkDayHour" useGeneratedKeys="true" keyProperty="hourId">
+        insert into dev_work_day_hour
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="lineId != null  ">line_id,</if>
+			<if test="workId != null  ">work_id,</if>
+			<if test="devId != null  ">dev_id,</if>
+			<if test="devName != null  and devName != ''  ">dev_name,</if>
+			<if test="ioId != null  ">io_id,</if>
+			<if test="ioName != null  and ioName != ''  ">io_name,</if>
+			<if test="ioOrder != null  ">io_order,</if>
+			<if test="hour1 != null  ">hour1,</if>
+			<if test="hour2 != null  ">hour2,</if>
+			<if test="hour3 != null  ">hour3,</if>
+			<if test="hour4 != null  ">hour4,</if>
+			<if test="hour5 != null  ">hour5,</if>
+			<if test="hour6 != null  ">hour6,</if>
+			<if test="hour7 != null  ">hour7,</if>
+			<if test="hour8 != null  ">hour8,</if>
+			<if test="hour9 != null  ">hour9,</if>
+			<if test="hour10 != null  ">hour10,</if>
+			<if test="hour11 != null  ">hour11,</if>
+			<if test="hour12 != null  ">hour12,</if>
+			<if test="hour13 != null  ">hour13,</if>
+			<if test="hour14 != null  ">hour14,</if>
+			<if test="hour15 != null  ">hour15,</if>
+			<if test="hour16 != null  ">hour16,</if>
+			<if test="hour17 != null  ">hour17,</if>
+			<if test="hour18 != null  ">hour18,</if>
+			<if test="hour19 != null  ">hour19,</if>
+			<if test="hour20 != null  ">hour20,</if>
+			<if test="hour21 != null  ">hour21,</if>
+			<if test="hour22 != null  ">hour22,</if>
+			<if test="hour23 != null  ">hour23,</if>
+			<if test="hour24 != null  ">hour24,</if>
+			<if test="dataTime != null  ">data_time,</if>
+			<if test="createTime != null  ">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="lineId != null  ">#{lineId},</if>
+			<if test="workId != null  ">#{workId},</if>
+			<if test="devId != null  ">#{devId},</if>
+			<if test="devName != null  and devName != ''  ">#{devName},</if>
+			<if test="ioId != null  ">#{ioId},</if>
+			<if test="ioName != null  and ioName != ''  ">#{ioName},</if>
+			<if test="ioOrder != null  ">#{ioOrder},</if>
+			<if test="hour1 != null  ">#{hour1},</if>
+			<if test="hour2 != null  ">#{hour2},</if>
+			<if test="hour3 != null  ">#{hour3},</if>
+			<if test="hour4 != null  ">#{hour4},</if>
+			<if test="hour5 != null  ">#{hour5},</if>
+			<if test="hour6 != null  ">#{hour6},</if>
+			<if test="hour7 != null  ">#{hour7},</if>
+			<if test="hour8 != null  ">#{hour8},</if>
+			<if test="hour9 != null  ">#{hour9},</if>
+			<if test="hour10 != null  ">#{hour10},</if>
+			<if test="hour11 != null  ">#{hour11},</if>
+			<if test="hour12 != null  ">#{hour12},</if>
+			<if test="hour13 != null  ">#{hour13},</if>
+			<if test="hour14 != null  ">#{hour14},</if>
+			<if test="hour15 != null  ">#{hour15},</if>
+			<if test="hour16 != null  ">#{hour16},</if>
+			<if test="hour17 != null  ">#{hour17},</if>
+			<if test="hour18 != null  ">#{hour18},</if>
+			<if test="hour19 != null  ">#{hour19},</if>
+			<if test="hour20 != null  ">#{hour20},</if>
+			<if test="hour21 != null  ">#{hour21},</if>
+			<if test="hour22 != null  ">#{hour22},</if>
+			<if test="hour23 != null  ">#{hour23},</if>
+			<if test="hour24 != null  ">#{hour24},</if>
+			<if test="dataTime != null  ">#{dataTime},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateDevWorkDayHour" parameterType="DevWorkDayHour">
+        update dev_work_day_hour
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="lineId != null  ">line_id = #{lineId},</if>
+            <if test="workId != null  ">work_id = #{workId},</if>
+            <if test="devId != null  ">dev_id = #{devId},</if>
+            <if test="devName != null  and devName != ''  ">dev_name = #{devName},</if>
+            <if test="ioId != null  ">io_id = #{ioId},</if>
+            <if test="ioName != null  and ioName != ''  ">io_name = #{ioName},</if>
+            <if test="ioOrder != null  ">io_order = #{ioOrder},</if>
+            <if test="hour1 != null  ">hour1 = #{hour1},</if>
+            <if test="hour2 != null  ">hour2 = #{hour2},</if>
+            <if test="hour3 != null  ">hour3 = #{hour3},</if>
+            <if test="hour4 != null  ">hour4 = #{hour4},</if>
+            <if test="hour5 != null  ">hour5 = #{hour5},</if>
+            <if test="hour6 != null  ">hour6 = #{hour6},</if>
+            <if test="hour7 != null  ">hour7 = #{hour7},</if>
+            <if test="hour8 != null  ">hour8 = #{hour8},</if>
+            <if test="hour9 != null  ">hour9 = #{hour9},</if>
+            <if test="hour10 != null  ">hour10 = #{hour10},</if>
+            <if test="hour11 != null  ">hour11 = #{hour11},</if>
+            <if test="hour12 != null  ">hour12 = #{hour12},</if>
+            <if test="hour13 != null  ">hour13 = #{hour13},</if>
+            <if test="hour14 != null  ">hour14 = #{hour14},</if>
+            <if test="hour15 != null  ">hour15 = #{hour15},</if>
+            <if test="hour16 != null  ">hour16 = #{hour16},</if>
+            <if test="hour17 != null  ">hour17 = #{hour17},</if>
+            <if test="hour18 != null  ">hour18 = #{hour18},</if>
+            <if test="hour19 != null  ">hour19 = #{hour19},</if>
+            <if test="hour20 != null  ">hour20 = #{hour20},</if>
+            <if test="hour21 != null  ">hour21 = #{hour21},</if>
+            <if test="hour22 != null  ">hour22 = #{hour22},</if>
+            <if test="hour23 != null  ">hour23 = #{hour23},</if>
+            <if test="hour24 != null  ">hour24 = #{hour24},</if>
+            <if test="dataTime != null  ">data_time = #{dataTime},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+        </trim>
+        where hour_id = #{hourId}
+    </update>
+
+	<delete id="deleteDevWorkDayHourById" parameterType="Integer">
+        delete from dev_work_day_hour where hour_id = #{hourId}
+    </delete>
+	
+    <delete id="deleteDevWorkDayHourByIds" parameterType="String">
+        delete from dev_work_day_hour where hour_id in 
+        <foreach item="hourId" collection="array" open="(" separator="," close=")">
+            #{hourId}
+        </foreach>
+    </delete>
+    <!--查询对应公司对应产线对应工单对应硬件对应IO口上一个小时的产量数据-->
+    <select id="sumCompanyLineWorkDevIoHour" resultType="java.lang.Integer">
+        SELECT COALESCE(sum('hour${hour}'),0) as total FROM dev_work_day_hour where company_id= #{company_id}
+        and line_id = #{line_id} and work_id = #{work_id} and dev_id = #{dev_id} and io_id = #{io_id} limit 1;
+    </select>
+
+    <!--查询对应公司对应产线正在进行工单对应的硬件IO口24小时的数据-->
+    <select id="selectInfoByCompanyLineWorkDevIo" resultMap="DevWorkDayHourResult">
+        SELECT * FROM dev_work_day_hour where company_id = #{company_id} and line_id = #{line_id} and work_id = #{work_id} and dev_id = #{dev_id} and io_id = #{io_id} limit 1;
+    </select>
+
+    <!--查询正在生产或者已经生产完成的每小时记录-->
+    <select id="selectWorkDayHourListBeInOrFinish" resultMap="DevWorkDayHourResult">
+        <include refid="selectDevWorkDayHourVo"/>
+        where work_id = #{workId}
+    </select>
+
+    <!--更新每小时数据-->
+    <update id="updateDevWorkDayHour2">
+        update dev_work_day_hour set hour${hour} =#{data}  where work_id = #{workId} and dev_id = #{devId} and io_id = #{ioId} and data_time = #{dataTime};
+    </update>
+
+    <!--查询指定日期的工单每小时统计列表-->
+    <select id="selectWorkDayHourListByDate" resultMap="DevWorkDayHourResult">
+        <include refid="selectDevWorkDayHourVo"/>
+        where work_id = #{workId} and line_id = #{lineId} and dev_id = #{devId} and io_id = #{ioId} and data_time = #{dataTime}
+    </select>
+
+</mapper>

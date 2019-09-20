@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-productionLine-add">
+        <input type="hidden" id="line_id" th:value="${line.id}">
+        <div id="data-param-body">
+            <div data-param class="input-group" style="margin-bottom: 10px"
+                 th:if="${not #lists.isEmpty(line.paramArray)}" th:each="item:${line.paramArray}" >
+                <input type="text" class="form-control" name="paramName" th:value="${item}">
+                <span class="input-group-btn">
+                    <button type="button" class="btn  btn-danger btn-del btn-del" onclick="removeParam(this)">移除</button>
+                </span>
+            </div>
+        </div>
+        <div class="form-group" style="text-align: center;">
+            <a class="btn btn-success" id="add-param-btn"  onclick="add()">
+                <i class="fa fa-plus"></i> 添加数据
+            </a>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var prefix = ctx + "production/productionLine"
+
+    function submitHandler() {
+        var paramItem =[];
+        var validate = false;
+        $("#data-param-body").find("div[data-param]").each(function () {
+            var text = $(this).find("input[name='paramName']").val();
+            if(text == ""){
+                validate = true;
+            }else{
+                paramItem.push(text);
+            }
+        })
+        if(validate){
+            $.modal.alertWarning("请检查相关数据是否填写..")
+        }else{
+            var data ={};
+            data.id = $("#line_id").val();
+            data.paramConfig = JSON.stringify(paramItem);
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "production/productionLine/edit",
+                data : data,
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
+        }
+    }
+
+    /**
+     * 动态添加数据，最多只能添加5个
+     */
+    function add() {
+        var param ="<div data-param class=\"input-group\" style=\"margin-bottom: 10px\">\n" +
+            "                <input type=\"text\" class=\"form-control\" name=\"paramName\">\n" +
+            "                <span class=\"input-group-btn\">\n" +
+            "                    <button type=\"button\" class=\"btn  btn-danger btn-del btn-del\" onclick=\"removeParam(this)\">移除</button>\n" +
+            "                </span>\n" +
+            "            </div>";
+        $("#data-param-body").append(param);
+        var size = $("div[data-param]").size();
+        if(size >= 5){
+            $("#add-param-btn").hide();
+        }
+    }
+
+    /**
+     * 移除数据框
+     */
+    function removeParam(val) {
+        $(val).parent("span[class='input-group-btn']").parent('div[data-param]').remove();
+        var size = $("div[data-param]").size();
+        if(size < 5){
+            $("#add-param-btn").show();
+        }
+    }
+</script>
+</body>
+</html>

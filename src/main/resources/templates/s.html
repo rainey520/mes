@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>八爪鱼</title>
+    <script src="../static/js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+</head>
+<body>
+    <script type="text/javascript" th:inline="javascript">
+        $(function () {
+            document.cookie="token="+[[${token}]];
+            window.location.href='/index';
+        })
+    </script>
+</body>
+</html>

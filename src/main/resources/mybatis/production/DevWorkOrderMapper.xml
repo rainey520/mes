@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper">
+
+    <resultMap type="DevWorkOrder" id="DevWorkOrderResult">
+        <result property="id"    column="id"    />
+        <result property="workorderName"    column="workorder_name"    />
+        <result property="workorderNumber"    column="workorder_number"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="productName"    column="product_name"    />
+        <result property="productCode"    column="product_code"    />
+        <result property="productNumber"    column="product_number"    />
+        <result property="productionStart"    column="production_start"    />
+        <result property="productionEnd"    column="production_end"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="productStandardHour"    column="product_standard_hour"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="deviceLiable"    column="device_liable"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="peopleNumber"    column="people_number"    />
+        <result property="workingHour"    column="working_hour"    />
+        <result property="overtimeHour"    column="overtime_hour"    />
+        <result property="overtimeRace"    column="overtime_race"    />
+        <result property="manualTime"    column="manual_time"    />
+        <result property="workorderStatus"    column="workorder_status"    />
+        <result property="operationStatus"    column="operation_status"    />
+        <result property="initDate"    column="init_date"    />
+        <result property="workSign"    column="work_sign"    />
+        <result property="scrapNum"    column="scrap_num"    />
+        <result property="actualWarehouseNum"    column="actual_warehouse_num"    />
+        <result property="cumulativeNumber"    column="cumulative_number"    />
+        <result property="directPassRate"    column="direct_pass_rate"    />
+        <result property="paramConfig"    column="paramConfig"    />
+        <result property="badNumber"    column="bad_number"    />
+        <result property="productModel"    column="product_model"    />
+        <result property="remark"    column="remark"    />
+        <result property="orderCode"    column="order_code"    />
+        <result property="ecnStatus"    column="ecn_status"    />
+        <result property="ecnText"    column="ecn_text"    />
+        <result property="sign"    column="sign"    />
+        <result property="putIntoNumber"    column="put_into_number"    />
+        <result property="signTime"    column="sign_time"    />
+        <result property="signHuor"    column="sign_huor"    />
+        <result property="abolish"    column="abolish"    />
+        <result property="wlSign"    column="wl_sign"    />
+        <result property="makeType"    column="make_type"    />
+        <result property="workPrice"    column="work_price"    />
+        <result property="pbSign"    column="pb_sign"    />
+        <result property="resSign"    column="res_sign"    />
+    </resultMap>
+    <sql id="selectDevWorkOrderVo">
+        select id, workorder_name, workorder_number, company_id, line_id, product_name, product_code, product_number, production_start,
+         production_end, start_time, end_time, product_standard_hour, create_time, create_by, update_time, device_liable, update_by, people_number,
+          working_hour, overtime_hour,overtime_race, manual_time, workorder_status, operation_status, init_date, work_sign, scrap_num,
+          actual_warehouse_num,cumulative_number,direct_pass_rate,paramConfig,bad_number,product_model,remark,order_code,ecn_status,ecn_text,sign,
+         put_into_number,sign_time,sign_huor,abolish,wl_sign,make_type,work_price,pb_sign,res_sign from dev_work_order
+    </sql>
+
+
+    <select id="selectDevWorkOrderList" parameterType="DevWorkOrder" resultMap="DevWorkOrderResult">
+        <include refid="selectDevWorkOrderVo"/>
+        <where>
+            1=1
+            <if test="id != null "> and id = #{id}</if>
+            <if test="workorderName != null  and workorderName != '' "> and workorder_name = #{workorderName}</if>
+            <if test="workorderNumber != null  and workorderNumber != '' ">
+                and workorder_number like concat('%', #{workorderNumber}, '%')
+            </if>
+            <if test="companyId != null "> and company_id = #{companyId}</if>
+            <if test="lineId != null and lineId > 0 "> and line_id = #{lineId} and wl_sign = 0</if>
+            <if test="single != null and single > 0 "> and line_id = #{single} and wl_sign = 1</if>
+            <if test="productName != null  and productName != '' "> and product_name = #{productName}</if>
+            <if test="productCode != null  and productCode != '' "> and product_code = #{productCode}</if>
+            <if test="orderCode != null and orderCode != '' "> and order_code like concat(#{orderCode}, '%')</if>
+            <if test="ecnStatus != null and ecnStatus >= 0"> and ecn_status = #{ecnStatus}</if>
+            <if test="productStandardHour != null "> and product_standard_hour = #{productStandardHour}</if>
+            <if test="createTime != null "> and create_time = #{createTime}</if>
+            <if test="createBy != null  and createBy != '' "> and create_by = #{createBy}</if>
+            <if test="updateTime != null "> and update_time = #{updateTime}</if>
+            <if test="deviceLiable != null "> and device_liable = #{deviceLiable}</if>
+            <if test="updateBy != null  and updateBy != '' "> and update_by = #{updateBy}</if>
+            <if test="peopleNumber != null "> and people_number = #{peopleNumber}</if>
+            <if test="workingHour != null "> and working_hour = #{workingHour}</if>
+            <if test="overtimeHour != null "> and overtime_hour = #{overtimeHour}</if>
+            <if test="overtimeRace != null "> and overtime_race = #{overtimeRace}</if>
+            <if test="manualTime != null "> and manual_time = #{manualTime}</if>
+            <if test="workorderStatus != null and workorderStatus > -1"> and workorder_status = #{workorderStatus}</if>
+            <if test="operationStatus != null "> and operation_status = #{operationStatus}</if>
+            <if test="initDate != null "> and init_date = #{initDate}</if>
+            <if test="workSign != null "> and work_sign = #{workSign}</if>
+            <if test="scrapNum != null "> and scrap_num = #{scrapNum}</if>
+            <if test="wlSign != null "> and wl_sign = #{wlSign}</if>
+            <if test="actualWarehouseNum != null "> and actual_warehouse_num = #{actualWarehouseNum}</if>
+            <if test="abolish != null and abolish > -1"> and abolish = #{abolish}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(production_start,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(production_end,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="selectDevWorkOrderById" parameterType="Integer" resultMap="DevWorkOrderResult">
+        <include refid="selectDevWorkOrderVo"/>
+        where id = #{id}
+    </select>
+
+    <!--通过工单id查询工单的基本信息-->
+    <select id="selectWorkOrderInfoById" parameterType="Integer" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        SELECT workorder_number as workorderNumber FROM dev_work_order where id = #{workId} and company_id = #{companyId}
+    </select>
+
+    <insert id="insertDevWorkOrder" parameterType="DevWorkOrder" useGeneratedKeys="true" keyProperty="id">
+        insert into dev_work_order
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="workorderName != null  and workorderName != ''  ">workorder_name,</if>
+			<if test="workorderNumber != null  and workorderNumber != ''  ">workorder_number,</if>
+			<if test="companyId != null  ">company_id,</if>
+			<if test="lineId != null  ">line_id,</if>
+			<if test="productName != null  and productName != ''  ">product_name,</if>
+			<if test="productCode != null  and productCode != ''  ">product_code,</if>
+			<if test="productNumber != null  ">product_number,</if>
+			<if test="productionStart != null  ">production_start,</if>
+			<if test="productionEnd != null  ">production_end,</if>
+			<if test="startTime != null  ">start_time,</if>
+			<if test="endTime != null  ">end_time,</if>
+			<if test="productStandardHour != null  ">product_standard_hour,</if>
+			<if test="createBy != null  and createBy != ''  ">create_by,</if>
+			<if test="updateTime != null  ">update_time,</if>
+			<if test="deviceLiable != null  ">device_liable,</if>
+			<if test="updateBy != null  and updateBy != ''  ">update_by,</if>
+			<if test="peopleNumber != null  ">people_number,</if>
+			<if test="workingHour != null  ">working_hour,</if>
+			<if test="overtimeHour != null  ">overtime_hour,</if>
+			<if test="overtimeRace != null  ">overtime_race,</if>
+			<if test="manualTime != null  ">manual_time,</if>
+			<if test="workorderStatus != null  ">workorder_status,</if>
+			<if test="operationStatus != null  ">operation_status,</if>
+			<if test="initDate != null  ">init_date,</if>
+			<if test="workSign != null  ">work_sign,</if>
+			<if test="scrapNum != null  ">scrap_num,</if>
+			<if test="actualWarehouseNum != null  ">actual_warehouse_num,</if>
+            <if test="badNumber != null  ">bad_number,</if>
+            <if test="productModel != null  ">product_model,</if>
+            <if test="cumulativeNumber != null  ">cumulative_number,</if>
+            <if test="directPassRate != null  ">direct_pass_rate,</if>
+            <if test="paramConfig != null  ">paramConfig,</if>
+            <if test="remark != null  ">remark,</if>
+            <if test="orderCode != null  ">order_code,</if>
+            <if test="ecnStatus != null  ">ecn_status,</if>
+            <if test="ecnText != null  ">ecn_text,</if>
+            <if test="wlSign != null  ">wl_sign,</if>
+            <if test="makeType != null  ">make_type,</if>
+            <if test="workPrice != null  ">work_price,</if>
+            <if test="pbSign != null  ">pb_sign,</if>
+            create_time
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="workorderName != null  and workorderName != ''  ">#{workorderName},</if>
+			<if test="workorderNumber != null  and workorderNumber != ''  ">#{workorderNumber},</if>
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="lineId != null  ">#{lineId},</if>
+			<if test="productName != null  and productName != ''  ">#{productName},</if>
+			<if test="productCode != null  and productCode != ''  ">#{productCode},</if>
+			<if test="productNumber != null  ">#{productNumber},</if>
+			<if test="productionStart != null  ">#{productionStart},</if>
+			<if test="productionEnd != null  ">#{productionEnd},</if>
+			<if test="startTime != null  ">#{startTime},</if>
+			<if test="endTime != null  ">#{endTime},</if>
+			<if test="productStandardHour != null  ">#{productStandardHour},</if>
+			<if test="createBy != null  and createBy != ''  ">#{createBy},</if>
+			<if test="updateTime != null  ">#{updateTime},</if>
+			<if test="deviceLiable != null  ">#{deviceLiable},</if>
+			<if test="updateBy != null  and updateBy != ''  ">#{updateBy},</if>
+			<if test="peopleNumber != null  ">#{peopleNumber},</if>
+			<if test="workingHour != null  ">#{workingHour},</if>
+			<if test="overtimeHour != null  ">#{overtimeHour},</if>
+			<if test="overtimeRace != null  ">#{overtimeRace},</if>
+			<if test="manualTime != null  ">#{manualTime},</if>
+			<if test="workorderStatus != null  ">#{workorderStatus},</if>
+			<if test="operationStatus != null  ">#{operationStatus},</if>
+			<if test="initDate != null  ">#{initDate},</if>
+			<if test="workSign != null  ">#{workSign},</if>
+			<if test="scrapNum != null  ">#{scrapNum},</if>
+			<if test="actualWarehouseNum != null  ">#{actualWarehouseNum},</if>
+            <if test="badNumber != null  ">#{badNumber},</if>
+            <if test="productModel != null  ">#{productModel},</if>
+            <if test="cumulativeNumber != null  ">#{cumulativeNumber},</if>
+            <if test="directPassRate != null  ">#{directPassRate},</if>
+            <if test="paramConfig != null  ">#{paramConfig},</if>
+            <if test="remark != null  ">#{remark},</if>
+            <if test="orderCode != null  ">#{orderCode},</if>
+            <if test="ecnStatus != null  ">#{ecnStatus},</if>
+            <if test="ecnText != null  ">#{ecnText},</if>
+            <if test="wlSign != null  ">#{wlSign},</if>
+            <if test="makeType != null  ">#{makeType},</if>
+            <if test="workPrice != null  ">#{workPrice},</if>
+            <if test="pbSign != null  ">#{pbSign},</if>
+            now()
+         </trim>
+    </insert>
+
+    <update id="updateDevWorkOrder" parameterType="DevWorkOrder">
+        update dev_work_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workorderName != null  and workorderName != ''  ">workorder_name = #{workorderName},</if>
+            <if test="workorderNumber != null  and workorderNumber != ''  ">workorder_number = #{workorderNumber},</if>
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="lineId != null  ">line_id = #{lineId},</if>
+            <if test="productName != null  and productName != ''  ">product_name = #{productName},</if>
+            <if test="productCode != null  and productCode != ''  ">product_code = #{productCode},</if>
+            <if test="productNumber != null  ">product_number = #{productNumber},</if>
+            <if test="productionStart != null  ">production_start = #{productionStart},</if>
+            <if test="productionEnd != null  ">production_end = #{productionEnd},</if>
+            <if test="startTime != null  ">start_time = #{startTime},</if>
+            <if test="endTime != null  ">end_time = #{endTime},</if>
+            <if test="productStandardHour != null  ">product_standard_hour = #{productStandardHour},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="createBy != null  and createBy != ''  ">create_by = #{createBy},</if>
+            <if test="updateTime != null  ">update_time = #{updateTime},</if>
+            <if test="deviceLiable != null  ">device_liable = #{deviceLiable},</if>
+            <if test="updateBy != null  and updateBy != ''  ">update_by = #{updateBy},</if>
+            <if test="peopleNumber != null  ">people_number = #{peopleNumber},</if>
+            <if test="workingHour != null  ">working_hour = #{workingHour},</if>
+            <if test="overtimeHour != null  ">overtime_hour = #{overtimeHour},</if>
+            <if test="overtimeRace != null  ">overtime_race = #{overtimeRace},</if>
+            <if test="manualTime != null  ">manual_time = #{manualTime},</if>
+            <if test="workorderStatus != null  ">workorder_status = #{workorderStatus},</if>
+            <if test="operationStatus != null  ">operation_status = #{operationStatus},</if>
+            <if test="initDate != null  ">init_date = #{initDate},</if>
+            <if test="workSign != null  ">work_sign = #{workSign},</if>
+            <if test="scrapNum != null  ">scrap_num = #{scrapNum},</if>
+            <if test="actualWarehouseNum != null  ">actual_warehouse_num = #{actualWarehouseNum},</if>
+            <if test="badNumber != null  ">bad_number = #{badNumber},</if>
+            <if test="cumulativeNumber != null  ">cumulative_number = #{cumulativeNumber},</if>
+            <if test="directPassRate != null  ">direct_pass_rate = #{directPassRate},</if>
+            <if test="paramConfig != null  ">paramConfig = #{paramConfig},</if>
+            <if test="remark != null  ">remark = #{remark},</if>
+            <if test="orderCode != null  ">order_code =#{orderCode},</if>
+            <if test="ecnStatus != null  ">ecn_status =#{ecnStatus},</if>
+            <if test="ecnText != null  ">ecn_text =#{ecnText},</if>
+            <if test="putIntoNumber != null  ">put_into_number =#{putIntoNumber},</if>
+            <if test="signTime != null  ">sign_time =#{signTime},</if>
+            <if test="signHuor != null  ">sign_huor =#{signHuor},</if>
+            <if test="wlSign != null  ">wl_sign =#{wlSign},</if>
+            <if test="makeType != null  ">make_type =#{makeType},</if>
+            <if test="workPrice != null  ">work_price =#{workPrice},</if>
+            <if test="pbSign != null  ">pb_sign =#{pbSign},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteDevWorkOrderById" parameterType="Integer">
+        delete from dev_work_order where id = #{id}
+    </delete>
+
+    <delete id="deleteDevWorkOrderByIds" parameterType="String">
+        delete from dev_work_order where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--校验工单号的唯一性-->
+    <select id="checkWorkOrderNumber" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        select id as id from dev_work_order where workorder_number = #{workorderNumber} and company_id = #{companyId} limit 1
+    </select>
+
+    <!--校验一条流水线是否只存在一个处于生产状态的工单-->
+    <select id="checkWorkLineUnique" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        SELECT id as id FROM dev_work_order where line_id = #{lineId} and wl_sign =#{sign} and workorder_status = 1 limit 1
+    </select>
+
+    <!--查询所有生产状态处于正在进行的工单-->
+    <select id="selectWorkOrderAllBeIn" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        SELECT id as Id,workorder_number as workorderNumber FROM dev_work_order where workorder_status = 1
+        and company_id = #{companyId};
+    </select>
+
+    <!--查询对应公司对应产线正在进行中的工单-->
+    <select id="selectWorkByCompandAndLine" resultMap="DevWorkOrderResult">
+         SELECT * FROM dev_work_order where company_id = #{compand_id} and line_id = #{line_id} and wl_sign = #{wlSign}
+          and workorder_status = 1  limit 1;
+    </select>
+
+    <!--查询对应公司对应产线正在进行中的工单-->
+    <select id="selectWorkByCompandAndLine2" resultMap="DevWorkOrderResult">
+         SELECT * FROM dev_work_order where company_id = #{compand_id} and line_id = #{line_id}
+          and workorder_status = 1 and operation_status = 1  limit 1;
+    </select>
+
+    <!--查询当天排版计划-->
+    <select id="selectDayWorkOrder" resultMap="DevWorkOrderResult">
+      select id, workorder_number,  operation_status FROM
+      dev_work_order where wl_sign = #{wlSign} and company_id= #{company_id} and line_id = #{line_id}
+      and production_start BETWEEN DATE_FORMAT(NOW(),'%Y-%m-%d 00:00:00')  AND DATE_FORMAT(NOW(),'%Y-%m-%d 23:59:59');
+    </select>
+
+    <!--查询当天所有的排班计划-->
+    <select id="selectWorkOrderAllToday" parameterType="Integer" resultMap="DevWorkOrderResult">
+        <include refid="selectDevWorkOrderVo"/>
+        where company_id= #{companyId} and production_start BETWEEN DATE_FORMAT(NOW(),'%Y-%m-%d 00:00:00')  AND DATE_FORMAT(NOW(),'%Y-%m-%d 23:59:59');
+    </select>
+
+
+    <!--查询对应时间段内产线已经提交的所以工单数据-->
+    <select id="selectOrderByLineIsSubmit" resultMap="DevWorkOrderResult">
+      SELECT * FROM dev_work_order where company_id = #{company_id}
+      <if test="line_id > 0">
+          and line_id = #{line_id}
+      </if>
+      <if test="productCode != null and productCode != ''">
+          and product_code = #{productCode}
+      </if>
+       and work_sign = 1 and wl_sign=#{wlSign} and end_time between #{startTime} and #{endTime} ;
+    </select>
+
+    <!--查询对应时间段内车间已经提交的所以工单数据-->
+    <select id="selectOrderBySingleIsSubmit" resultMap="DevWorkOrderResult">
+        SELECT w.* FROM dev_work_order as w,tab_count_piece as p where w.id = p.work_id and cp_user_id = #{userId}
+        and w.company_id = #{company_id}
+        <if test="line_id > 0">
+            and w.line_id = #{line_id}
+        </if>
+        <if test="productCode != null and productCode != ''">
+            and w.product_code = #{productCode}
+        </if>
+        and w.work_sign = 1 and w.wl_sign=#{wlSign} and w.end_time between #{startTime} and #{endTime} ;
+    </select>
+
+    <!--查询昨天所有的排单-->
+    <select id="selectWorkOrderAllYesterday" parameterType="Integer" resultMap="DevWorkOrderResult">
+        <include refid="selectDevWorkOrderVo"/>
+        where company_id= #{companyId} and date(production_end) = date_sub(curdate(),interval 1 day);
+    </select>
+
+    <!--查询当天所有正在生产的工单或者已经结束的工单-->
+    <select id="selectWorkOrderTodayBeInOrFinish" parameterType="Integer" resultMap="DevWorkOrderResult">
+        <include refid="selectDevWorkOrderVo"/>
+        where workorder_status in (1,2)
+        <if test="companyId != null and companyId != '' ">
+            and company_id = #{companyId}
+        </if>
+        and start_time BETWEEN DATE_FORMAT(NOW(),'%Y-%m-%d 00:00:00')  AND DATE_FORMAT(NOW(),'%Y-%m-%d 23:59:59')
+    </select>
+
+    <!--查询正在生产或者已经完成的所有工单-->
+    <select id="selectWorkOrderAllBeInOrFinish" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        SELECT id,company_id as companyId,line_id as lineId,wl_sign as wlSign FROM dev_work_order where wl_sign = #{wlSign} and workorder_status in (1,2)
+    </select>
+
+    <!--通过产品id或者工单id查询已经提交的工单-->
+    <select id="selectWorkOrderFinishByLineIdOrWorkOrderId"  resultMap="DevWorkOrderResult">
+        <include refid="selectDevWorkOrderVo"/>
+        where company_id = #{companyId}
+        <if test="workOrderId != null and workOrderId != '' ">
+            and id = #{workOrderId}
+        </if>
+        and line_id = #{lineId} and work_sign = 1 and actual_warehouse_num &lt; product_number;
+    </select>
+
+    <!--修改对应公司对应产品下未进行的工单ecn状态-->
+    <update id="editCompanyProductWorkOrderEcn">
+        update dev_work_order set ecn_status = 1 where company_id = #{companyId} and product_code=#{productCode} and workorder_status =0;
+    </update>
+
+    <!--根据公司id产线id查询对应的数据-->
+    <select id="selectWorkDataByCompanyIdAndLineId" resultMap="DevWorkOrderResult">
+     SELECT * FROM dev_work_order where company_id = #{companyId}
+     and  line_id = #{lineId} and workorder_status in (0,1) order by workorder_status desc;
+    </select>
+
+    <!--查询最近完成工单信息-->
+    <select id="selectLatelyCompleteWork" resultMap="DevWorkOrderResult">
+      SELECT * FROM dev_work_order where company_id = #{compand_id} and line_id = #{line_id} and wl_sign = #{wlSign}
+      and workorder_status = 2 order by end_time desc limit 1;
+    </select>
+
+    <!--修改已经完成工单的标记-->
+    <update id="editLatelyCompleteWorkSign">
+        update dev_work_order set sign = 0 where id = #{workid} ;
+    </update>
+    <!--根据查询id查询是否存在未完成工单信息-->
+    <select id="selectWorkByLineId" resultMap="DevWorkOrderResult">
+        SELECT * FROM dev_work_order where line_id =#{lineId} and  workorder_status != 2 limit 1;
+    </select>
+
+    <!--将工单作废-->
+    <update id="updateWorkOrderAbolish">
+        update dev_work_order set abolish = 1 where id = #{workId}
+    </update>
+
+    <!--通过工单下发标记查询对应的所有工单列表-->
+    <select id="selectWorkListInSw" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        SELECT id as id,workorder_number as workorderNumber FROM dev_work_order where company_id = #{companyId}
+        and wl_sign = #{wlSign} order by create_time desc
+    </select>
+
+    <!--通过工单状态查询工单列表信息-->
+    <select id="selectWorkListInWorkStatus" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        SELECT id as id,workorder_number as workorderNumber,work_price as workPrice FROM dev_work_order where company_id = #{companyId} and workorder_status = #{workOrderStatus}
+    </select>
+
+    <!--查询单工位还未配置的工单信息-->
+    <select id="selectAllNotConfigBySwId" resultType="com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder">
+        select a.id as id,a.workorder_number as workorderNumber from dev_work_order as a
+        left join tab_single_work_order as b on a.id = b.work_id
+        and b.single_id = #{singleId} where a.company_id = #{companyId} and a.line_id = #{lineId} and a.workorder_status = #{workorderStatus}
+        and a.wl_sign = #{wlSign} and b.work_id is null
+    </select>
+
+    <!--查询正在车间对应单工位生产的工单信息-->
+    <select id="selectWorkInHouseBeInBySingId"  resultMap="DevWorkOrderResult">
+        SELECT w.* FROM dev_work_order as w,tab_single_work_order as wo where w.id = wo.work_id and w.line_id = #{lineId}
+        and w.wl_sign = #{wlSign} and w.company_id = #{companyId} and wo.single_id = #{singleId} and w.workorder_status = #{workStatus} limit 1
+    </select>
+
+    <!--查询车间对应工单对应工位的最后一条记录-->
+    <select id="selectWorkInHouseLastByWorkStatus"  resultMap="DevWorkOrderResult">
+        SELECT a.*  FROM dev_work_order as a,tab_single_work_order as b where a.id = b.work_id
+            and a.line_id = #{lineId} and a.wl_sign = #{wlSign} and a.company_id = #{companyId}
+            and b.single_id = #{singleId} and a.workorder_status = #{workStatus} order by a.end_time desc limit 1
+    </select>
+
+
+    <resultMap type="DevWorkOrder" id="WorkOrderResultByCode">
+        <result property="id"    column="id"    />
+        <result property="workorderNumber"    column="workorder_number"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="productName"    column="product_name"    />
+        <result property="productCode"    column="product_code"    />
+        <result property="productNumber"    column="product_number"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="makeType"    column="make_type"    />
+        <association property="lineName" column="line_id" select="selectLineName">
+            <result property="lineName" column="id"/>
+        </association>
+    </resultMap>
+    <!--查询产线名称-->
+    <select id="selectLineName" resultType="java.lang.String">
+        select line_name from dev_production_line where id = #{lineId}
+    </select>
+    <sql id="selectWorkCodeVo">
+        select id,workorder_number,line_id,product_code,product_name,start_time,end_time from dev_work_order
+    </sql>
+    <!--通过工单号查询工单信息-->
+    <select id="selectWorkOrderByCode" resultMap="WorkOrderResultByCode">
+        select workorder_number,line_id,product_code,product_name,product_number,start_time,end_time,make_type from dev_work_order where workorder_number = #{workCode}
+    </select>
+
+    <select id="appSelectWorkListTwo" resultMap="DevWorkOrderResult">
+
+    </select>
+</mapper>

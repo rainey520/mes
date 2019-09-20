@@ -1,0 +1,141 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="add-file-form" enctype="multipart/form-data">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <input type="hidden" name="saveType" th:value="${saveType}"/>
+                            <input type="file" id="file" name="file" required>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="toAddFile()"><i
+                                    class="fa fa-plus"></i>&nbsp;上传</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    var prefix = ctx + "iso/fileSource";
+    var data={
+        saveType:0,
+    }
+    $(function() {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "文件",
+            sortOrder:"desc",
+            sortName:"createTime",
+            queryParams:data,
+            pageSize:50,
+            search: false,
+            showSearch:false,
+            showRefresh:false,
+            showColumns:false,
+            showToggle:false,
+            showExport:false,
+            columns: [
+                {
+                    field : 'id',
+                    title : '主键，自增长',
+                    visible: false
+                },
+                {
+                    field : 'filePath',
+                    title : '图片',
+                    formatter:function (value, row, index) {
+                        if(row.fileType == 0){
+                            return "<a href='"+value+"' target='_blank'><img src='"+value+"' width='100' height='80' style='border-radius: 10px;'/></a>"
+                        }else{
+                            return "<a href='"+value+"'>"+row.fileName+"</a>"
+                        }
+                    }
+                },
+                {
+                    field : 'fileName',
+                    title : '名称',
+                },
+                {
+                    field : 'createTime',
+                    title : '上传时间',
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-danger btn-xs" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+    /**
+     * 添加文件
+     */
+    function toAddFile() {
+        if(!$('#file')[0].files[0]){
+            $.modal.alertWarning("请选择上传的文件")
+            return;
+        }
+        var formData = new FormData();
+        formData.append("avatarfile", $('#file')[0].files[0]);
+        formData.append("saveType", [[${saveType}]]);
+        $.ajax({
+            url: "/iso/fileSource/add",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            type: 'POST',
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+            },
+            success: function (result) {
+                if (result.code == web_status.SUCCESS) {
+                    $.modal.msg("保存成功,正在刷新数据请稍后……", modal_status.SUCCESS);
+                    $.table.refresh();
+                } else {
+                    $.modal.alertError(result.msg);
+                }
+                $.modal.closeLoading();
+            }
+        });
+    }
+
+    function submitHandler() {
+        $.modal.close();
+        refreshTab();
+        // window.parent.$.table.refresh();
+    }
+
+    /**
+     * 刷新页面
+     */
+    function refreshTab() {
+        var currentId = window.parent.window.parent.$('.page-tabs-content').find('.active').attr('data-id');
+        var target = window.parent.window.parent.$('.RuoYi_iframe[data-id="' + currentId + '"]');
+        var url = target.attr('src');
+        target.attr('src', url).ready();
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-singleWorkOrder-add">
+			<input type="hidden" name="type" id="type" th:value="${type}">
+			<div class="form-group" th:if="${type == 0}">
+				<label class="col-sm-3 control-label">工单编号：</label>
+				<div class="col-sm-8">
+					<input name="singleId" th:value="${singleId}" type="hidden">
+					<select id="workId" name="workId" class="form-control">
+						<option value="0">请选择</option>
+						<option th:each="item:${works}" th:text="${item.workorderNumber}" th:value="${item.id}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group" th:if="${type == 1}">
+				<label class="col-sm-3 control-label">单工位：</label>
+				<div class="col-sm-8" th:with=" singleId =${singleId}">
+					<input name="workId" th:with="orderId=${orderId}" th:value="${orderId}" class="form-control" type="hidden">
+					<select id="singleId" class="form-control"  name="singleId" th:with="singles=${@single.selectAllNotConfigWorkByOrderId(orderId,singleId)}">
+						<option th:each="item : ${singles}"  th:text="${item.imCode}" th:value="${item.id}"></option>
+					</select>
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "production/singleWorkOrder"
+		$("#form-singleWorkOrder-add").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+				//先验证书
+				var workId = $("#workId").find("option:selected").val();
+				if (workId <= 0) {
+					$.modal.alertWarning("请选择工单");
+					return;
+				}
+	            $.operate.save(prefix + "/add", $('#form-singleWorkOrder-add').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

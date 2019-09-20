@@ -1,0 +1,249 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header">
+    <style type="text/css">
+        .layer-date {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<link th:href="@{/ajax/libs/layer/laydate/laydate.css}" rel="stylesheet"/>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-devWorkOrder-add">
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">工单号：</label>
+                <div class="col-sm-8">
+                    <input id="workorderNumber" name="workorderNumber" class="form-control"
+                           type="text" th:value="${workorderNumber}">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">选择产线：</label>
+                <div class="col-sm-8">
+                    <select onchange="findDeviceLiableByLineId(this)" name="lineId" id="lineId"
+                            class="form-control"
+                            th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId()}">
+                        <option value="">请选择</option>
+                        <option th:if="${line.defId == 0}" th:each="line : ${productionLine}"
+                                th:text="${line.lineName}"
+                                th:value="${line.Id}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">责任人1：</label>
+                <div class="col-sm-8">
+                    <!--显示责任人名称-->
+                    <input id="userName1" name="userName1" class="form-control" type="text"
+                           readonly="true">
+                    <!--隐藏责任人id-->
+                    <input id="deviceLiable" name="deviceLiable" type="hidden" value="">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">责任人2：</label>
+                <div class="col-sm-8">
+                    <!--显示责任人名称-->
+                    <input id="userName2" name="userName2" class="form-control" type="text"
+                           readonly="true">
+                    <!--隐藏责任人id-->
+                    <input id="deviceLiableTow" name="deviceLiableTow" type="hidden" value="">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">产品：</label>
+                <div class="col-sm-8">
+                    <select id="productCode" name="productCode"
+                            class="form-control"
+                            th:with="productList=${@product.selectProductAllByCompanyId(-1)}">
+                        <option value="">请选择</option>
+                        <option th:each="pro : ${productList}"
+                                th:data-code="${pro.productCode}" th:date-sign="${pro.sign}"
+                                th:text="${pro.productName+ ' - ' +pro.productCode}"
+                                th:value="${pro.id}" th:data-name="${pro.productName}"></option>
+                    </select>
+                    <input type="hidden" id="ecn-status" value="0">
+                    <input type="hidden" name="wlSign" value="0">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">开始时间：</label>
+                <div class="col-sm-8">
+                    <input id="productionStart" name="productionStart"
+                           class="form-control layer-date">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script th:src="@{/ajax/libs/layer/laydate/laydate.js}"></script>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    //日期范围限制
+    var start = {
+        elem: '#productionStart',
+        format: 'YYYY/MM/DD hh:mm',
+        min: laydate.now(), //设定最小日期为当前日期
+        max: '2099-06-16 23:59:59', //最大日期
+        istime: true,
+        istoday: true,
+        choose: function (datas) {
+
+        }
+    };
+    laydate(start);
+
+    var prefix = ctx + "device/devWorkOrder";
+
+    $("#form-devWorkOrder-add").validate({
+        rules: {
+            productCode: {
+                required: true,
+            },
+            lineId: {
+                required: true,
+            },
+            workorderNumber: {
+                required: true,
+                remote: {
+                    url: prefix + "/checkWorkOrderNumber",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        name: function () {
+                            return $.common.trim($("#workorderNumber").val());
+                        }
+                    },
+                    dataFilter: function (data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            },
+            productionStart: {
+                required: true,
+            },
+        },
+        messages: {
+            "workorderNumber": {
+                remote: "工单号已经存在"
+            },
+            productionStart: {
+                required: "请选择开始生产时间",
+            },
+            productCode: {
+                required: "请选择产品",
+            },
+            lineId: {
+                required: "请选择产线",
+            },
+        },
+    });
+
+    /**
+     * 新增工单
+     */
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.modal.confirm("工单号是否已经确认？", function (callBack) {
+                if (callBack) {
+                    $.operate.save(prefix + "/add", $('#form-devWorkOrder-add').serialize());
+                }
+            });
+        }
+    }
+
+    /**
+     * 点击产线查询产线责任人
+     */
+    function findDeviceLiableByLineId(value) {
+        var lineId = value.value;
+        if (lineId) {
+            $.ajax({
+                type: 'POST',
+                url: '/production/productionLine/findDeviceLiableByLineId',
+                data: {
+                    "lineId": lineId,
+                },
+                dataType: 'json',
+                async: false,  //同步请求，
+                success: function (data) {
+                    $("#userName1").val(data.data.user1.userName);
+                    $("#userName2").val(data.data.user2.userName);
+                    $("#deviceLiable").val(data.data.user1.userId);
+                    $("#deviceLiableTow").val(data.data.user2.userId);
+                }
+            });
+        }
+    }
+
+    /**
+     * 点击产品编码查询产品以及标准小时产量
+     */
+    function findProductCode(value) {
+        var productId = value.value;
+        if (productId) {
+            $.ajax({
+                type: 'POST',
+                url: '/product/findProductInfo',
+                data: {
+                    "productId": productId,
+                },
+                dataType: 'json',
+                async: false,  //同步请求，
+                success: function (data) {
+                    if (data.data) {
+                        $("#ecn-status").val(data.data.ecnStatus);
+                        $("#ecnStatus").select2().val(data.data.ecnStatus).trigger("change");
+                        if (data.data.ecnStatus == 1) {
+                            $.modal.alertWarning(data.data.ecnText);
+                            $("#ecnText").val(data.data.ecnText);
+                        } else {
+                            $("#ecnText").val("");
+                        }
+                    } else {
+                        $("#ecnStatus").select2().val("0").trigger("change");
+                        $("#ecn-status").val(0);
+                        $("#ecnText").val("");
+                    }
+                    $("#productName").val(data.data.productName);
+                    $("#productStandardHour").val(data.data.standardHourYield)
+                }
+            });
+        } else {
+            $("#ecnStatus").select2().val("0").trigger("change");
+            $("#ecn-status").val(0);
+            $("#ecnText").val("");
+            $("#productName").val("");
+            $("#productStandardHour").val("");
+        }
+    }
+
+
+    function refreshLine() {
+        $.post(prefix + "/getWorkOrderCode", function (data) {
+            $("#workorderNumber").val(data);
+            $("#workorderNumber1").val(data);
+        })
+        $.form.reset("form-devWorkOrder-add"); // 重置
+        $("#productCode").select2().val("").trigger("change");
+        $("#lineId").select2().val("").trigger("change");
+        $("#ecnStatus").select2().val("0").trigger("change");
+
+    }
+
+</script>
+</body>
+</html>

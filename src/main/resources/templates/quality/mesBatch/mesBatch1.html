@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/jquery-layout/jquery.layout-latest.css}" rel="stylesheet"/>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse" shiro:hasPermission="mes:mesBatch:list">
+            <form id="formId1">
+                <input name="batchCode" type="hidden" th:value="${mesCode}">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            产品/半成品：<input type="text" name="pbCode"/>
+                        </li>
+                        <li class="select-time">
+                            <label>创建时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="params[beginTime]"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间"
+                                   name="params[endTime]"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="formReset1()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="mes:mesBatch:export">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:src="@{/ajax/libs/jquery-layout/jquery.layout-latest.js}"></script>
+<script th:inline="javascript">
+    var prefix = ctx + "mes/mesBatch";
+
+    $(function () {
+        $("select").select2({
+            width:"180px",
+            // placeholder:'请选择'
+        });
+    })
+    // 重置搜索表单信息
+    function formReset1() {
+        $('#formId1')[0].reset();//input标签重置
+        $("select").val(null).trigger("change"); // select2标签重置
+    }
+
+    $(function() {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "MES批准追踪",
+            search: false,
+            showExport: false,
+            showSearch:true,
+            showRefresh:true,
+            showColumns:false,
+            showToggle:true,
+            columns: [
+                {
+                    field : 'id',
+                    title : '主键，自增长',
+                    visible: false
+                },
+                {
+                    field : 'pbCode',
+                    title : '产品/半成品',
+                    sortable: true
+                },
+                {
+                    field : 'mesCode',
+                    title : '批次信息',
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        return '<a class="btn btn-primary btn-sm" href="javascript:void(0)" onclick="showMesData(\''+ row.mesCode +'\')"><i></i>'+ value +'</a>';
+                    }
+                },
+                {
+                    field : 'workCode',
+                    title : '工单号',
+                    sortable: true
+                },
+                {
+                    field : 'orderCode',
+                    title : '订单号',
+                    sortable: true
+                },
+                {
+                    field : 'cTime',
+                    title : '创建时间',
+                    sortable: true
+                }]
+        };
+        $.table.init(options);
+        $.table.search("formId1");
+    });
+
+
+    /**
+     * 查看MES明细
+     */
+    function showMesData(batchCode) {
+        var url = prefix + "/selectMesData?batchCode=" + batchCode;
+        createMenuItem(url,"查看" + batchCode + "批次相关信息");
+    }
+</script>
+</body>
+</html>

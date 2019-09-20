@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.system.ser.mapper.SerMapper">
+    
+    <resultMap type="Ser" id="SerResult">
+        <result property="id"    column="id"    />
+        <result property="sname"    column="sname"    />
+        <result property="sip"    column="sip"    />
+        <result property="spath"    column="spath"    />
+        <result property="suserNum"    column="suser_num"    />
+        <result property="remark"    column="remark"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="maxNum"    column="max_num"    />
+        <result property="spwd"    column="spwd"    />
+        <result property="pwd"    column="pwd"    />
+    </resultMap>
+	
+	<sql id="selectSerVo">
+        select id, sname, sip, spath, suser_num, remark, create_time, max_num, spwd, pwd from tab_ser
+    </sql>
+	
+    <select id="selectSerList" parameterType="Ser" resultMap="SerResult">
+        <include refid="selectSerVo"/>
+        <where>
+             <if test="sname != null  and sname != '' "> and sname like concat( #{sname},'%')</if>
+             <if test="sip != null  and sip != '' "> and sip like concat( #{sip},'%')</if>
+            <if test="spwd != null  and spwd != '' "> and spwd like concat(#{spwd},'%')</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+         </where>
+    </select>
+    
+    <select id="selectSerById" parameterType="Integer" resultMap="SerResult">
+        <include refid="selectSerVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertSer" parameterType="Ser" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_ser
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="sname != null  and sname != ''  ">sname,</if>
+			<if test="sip != null  and sip != ''  ">sip,</if>
+			<if test="spath != null  and spath != ''  ">spath,</if>
+			<if test="suserNum != null  ">suser_num,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="maxNum != null  ">max_num,</if>
+			<if test="spwd != null  and spwd != ''  ">spwd,</if>
+			<if test="pwd != null  and pwd != ''  ">pwd,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="sname != null  and sname != ''  ">#{sname},</if>
+			<if test="sip != null  and sip != ''  ">#{sip},</if>
+			<if test="spath != null  and spath != ''  ">#{spath},</if>
+			<if test="suserNum != null  ">#{suserNum},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="maxNum != null  ">#{maxNum},</if>
+			<if test="spwd != null  and spwd != ''  ">#{spwd},</if>
+			<if test="pwd != null  and pwd != ''  ">#{pwd},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateSer" parameterType="Ser">
+        update tab_ser
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sname != null  and sname != ''  ">sname = #{sname},</if>
+            <if test="sip != null  and sip != ''  ">sip = #{sip},</if>
+            <if test="spath != null  and spath != ''  ">spath = #{spath},</if>
+            <if test="suserNum != null  ">suser_num = #{suserNum},</if>
+            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="maxNum != null  ">max_num = #{maxNum},</if>
+            <if test="spwd != null  and spwd != ''  ">spwd = #{spwd},</if>
+            <if test="pwd != null  and pwd != ''  ">pwd = #{pwd},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteSerById" parameterType="Integer">
+        delete from tab_ser where id = #{id}
+    </delete>
+	
+    <delete id="deleteSerByIds" parameterType="String">
+        delete from tab_ser where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

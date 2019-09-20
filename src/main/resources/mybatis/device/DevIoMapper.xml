@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.device.devIo.mapper.DevIoMapper">
+    
+    <resultMap type="DevIo" id="DevIoResult">
+        <result property="id"    column="id"    />
+        <result property="devId"    column="dev_id"    />
+        <result property="ioOrder"    column="io_order"    />
+        <result property="ioName"    column="io_name"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="isSign"    column="is_sign"    />
+        <result property="remark"    column="remark"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+	
+	<sql id="selectDevIoVo">
+        select id, dev_id, io_order, io_name, line_id, is_sign, remark, create_time from dev_io
+    </sql>
+	
+    <select id="selectDevIoList" parameterType="DevIo" resultMap="DevIoResult">
+        <include refid="selectDevIoVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="devId != null "> and dev_id = #{devId}</if>
+             <if test="ioOrder != null "> and io_order = #{ioOrder}</if>
+             <if test="ioName != null  and ioName != '' "> and io_name = #{ioName}</if>
+             <if test="lineId != null "> and line_id = #{lineId}</if>
+             <if test="isSign != null "> and is_sign = #{isSign}</if>
+             <if test="remark != null  and remark != '' "> and remark = #{remark}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectDevIoById" parameterType="Integer" resultMap="DevIoResult">
+        <include refid="selectDevIoVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDevIo" parameterType="DevIo" useGeneratedKeys="true" keyProperty="id">
+        insert into dev_io
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="devId != null  ">dev_id,</if>
+			<if test="ioOrder != null  ">io_order,</if>
+			<if test="ioName != null  and ioName != ''  ">io_name,</if>
+			<if test="lineId != null  ">line_id,</if>
+			<if test="isSign != null  ">is_sign,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+			<if test="createTime != null  ">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="devId != null  ">#{devId},</if>
+			<if test="ioOrder != null  ">#{ioOrder},</if>
+			<if test="ioName != null  and ioName != ''  ">#{ioName},</if>
+			<if test="lineId != null  ">#{lineId},</if>
+			<if test="isSign != null  ">#{isSign},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateDevIo" parameterType="DevIo">
+        update dev_io
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="devId != null  ">dev_id = #{devId},</if>
+            <if test="ioOrder != null  ">io_order = #{ioOrder},</if>
+            <if test="ioName != null  and ioName != ''  ">io_name = #{ioName},</if>
+            <if test="lineId != null  ">line_id = #{lineId},</if>
+            <if test="isSign != null  ">is_sign = #{isSign},</if>
+            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteDevIoById" parameterType="Integer">
+        delete from dev_io where id = #{id}
+    </delete>
+	
+    <delete id="deleteDevIoByIds" parameterType="String">
+        delete from dev_io where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--根据硬件id查询对应未配置的IO口数据-->
+    <select id="selectDevIoByDevId" resultType="com.ruoyi.project.device.devIo.domain.DevIo">
+        SELECT id,io_name as ioName FROM dev_io where dev_id=#{id}
+        <if test="line_id  == 0">
+            and line_id = 0;
+        </if>
+        <if test="line_id > 0">
+            and line_id in (0,${line_id});
+        </if>
+    </select>
+
+    <!--根据硬件id查询对应的顺序的IO数据-->
+    <select id="selectDevIoByDevIdAndOrder" resultMap="DevIoResult">
+        SELECT * FROM dev_io where dev_id = #{dev_id} and io_order = #{order_id} limit 1
+    </select>
+
+
+    <select id="selectLineDevIO" resultMap="DevIoResult">
+         SELECT i.id,i.dev_id,i.io_order,i.io_name,d.device_name as remark FROM dev_io as i,dev_list as d
+         where i.line_id = #{line_id} and i.dev_id = d.id and d.device_status = 1;
+    </select>
+
+    <select id="selectDevListAndIOByIoId" resultMap="DevIoResult">
+        SELECT i.id,i.io_name,i.dev_id ,d.device_name as remark FROM dev_io as i,dev_list as d
+         where i.id = #{io_id}  and i.dev_id = d.id limit 1
+    </select>
+
+    <!--查询对应查询的警戒标记IO口数据-->
+    <select id="selectLineIsSignDevIo" resultMap="DevIoResult">
+      SELECT * FROM dev_io where  line_id = #{line_id} and is_sign = 1 limit 1;
+    </select>
+
+    <!--根据硬件id查询对应的警戒线io口的配置信息-->
+    <select id="selectByDevId" resultMap="DevIoResult">
+      SELECT * FROM dev_io where dev_id = #{dev_id} and is_sign = 1 limit 1;
+    </select>
+</mapper>

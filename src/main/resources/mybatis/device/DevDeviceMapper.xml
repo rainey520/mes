@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.device.devDevice.mapper.DevDeviceMapper">
+    
+    <resultMap type="DevDevice" id="DevDeviceResult">
+        <result property="id"    column="id"    />
+        <result property="iemi"    column="iemi"    />
+        <result property="uploadtime"    column="uploadtime"    />
+        <result property="name"    column="name"    />
+        <result property="note"    column="note"    />
+        <result property="code"    column="code"    />
+        <result property="firstTime"    column="first_time"    />
+        <result property="lastTime"    column="last_time"    />
+        <result property="state"    column="state"    />
+    </resultMap>
+	
+	<sql id="selectDevDeviceVo">
+        select id, iemi, uploadtime, name, note, code, first_time, last_time, state from dev_device
+    </sql>
+	
+    <select id="selectDevDeviceList" parameterType="DevDevice" resultMap="DevDeviceResult">
+        <include refid="selectDevDeviceVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="iemi != null  and iemi != '' "> and iemi = #{iemi}</if>
+             <if test="uploadtime != null  and uploadtime != '' "> and uploadtime = #{uploadtime}</if>
+             <if test="name != null  and name != '' "> and name = #{name}</if>
+             <if test="note != null  and note != '' "> and note = #{note}</if>
+             <if test="code != null  and code != '' "> and code = #{code}</if>
+             <if test="firstTime != null "> and first_time = #{firstTime}</if>
+             <if test="lastTime != null "> and last_time = #{lastTime}</if>
+             <if test="state != null "> and state = #{state}</if>
+         </where>
+    </select>
+    
+    <select id="selectDevDeviceById" parameterType="Integer" resultMap="DevDeviceResult">
+        <include refid="selectDevDeviceVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDevDevice" parameterType="DevDevice" useGeneratedKeys="true" keyProperty="id">
+        insert into dev_device
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="iemi != null  and iemi != ''  ">iemi,</if>
+			<if test="uploadtime != null  and uploadtime != ''  ">uploadtime,</if>
+			<if test="name != null  and name != ''  ">name,</if>
+			<if test="note != null  and note != ''  ">note,</if>
+			<if test="code != null  and code != ''  ">code,</if>
+			<if test="firstTime != null  ">first_time,</if>
+			<if test="lastTime != null  ">last_time,</if>
+			<if test="state != null  ">state,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="iemi != null  and iemi != ''  ">#{iemi},</if>
+			<if test="uploadtime != null  and uploadtime != ''  ">#{uploadtime},</if>
+			<if test="name != null  and name != ''  ">#{name},</if>
+			<if test="note != null  and note != ''  ">#{note},</if>
+			<if test="code != null  and code != ''  ">#{code},</if>
+			<if test="firstTime != null  ">#{firstTime},</if>
+			<if test="lastTime != null  ">#{lastTime},</if>
+			<if test="state != null  ">#{state},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateDevDevice" parameterType="DevDevice">
+        update dev_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="iemi != null  and iemi != ''  ">iemi = #{iemi},</if>
+            <if test="uploadtime != null  and uploadtime != ''  ">uploadtime = #{uploadtime},</if>
+            <if test="name != null  and name != ''  ">name = #{name},</if>
+            <if test="note != null  and note != ''  ">note = #{note},</if>
+            <if test="code != null  and code != ''  ">code = #{code},</if>
+            <if test="firstTime != null  ">first_time = #{firstTime},</if>
+            <if test="lastTime != null  ">last_time = #{lastTime},</if>
+            <if test="state != null  ">state = #{state},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteDevDeviceById" parameterType="Integer">
+        delete from dev_device where id = #{id}
+    </delete>
+	
+    <delete id="deleteDevDeviceByIds" parameterType="String">
+        delete from dev_device where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <select id="selectDevDeviceByIemi" parameterType="String" resultMap="DevDeviceResult">
+        <include refid="selectDevDeviceVo"/>
+        where iemi = #{iemi}
+    </select>
+    
+</mapper>

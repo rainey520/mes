@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper">
+
+    <resultMap type="DevCompany" id="DevCompanyResult">
+        <result property="companyId"    column="company_id"    />
+        <result property="comName"    column="com_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="comAddress"    column="com_address"    />
+        <result property="comType"    column="com_type"    />
+        <result property="comLogo"    column="com_logo"    />
+        <result property="comPicture"    column="com_picture"    />
+        <result property="industry"    column="industry"    />
+        <result property="totalIso"    column="total_iso"    />
+        <result property="sign"    column="sign"    />
+        <result property="fileSize"    column="file_size"    />
+    </resultMap>
+
+    <sql id="selectDevCompanyVo">
+        select company_id, com_name, create_time, com_address, com_type, com_logo, com_picture,
+        industry,total_iso,sign,file_size from dev_company
+    </sql>
+
+    <select id="selectDevCompanyList" parameterType="DevCompany" resultMap="DevCompanyResult">
+        <include refid="selectDevCompanyVo"/>
+        <where>
+            <if test="comName != null  and comName != '' "> and com_name  like concat(#{comName}, '%')</if>
+            <if test="comAddress != null  and comAddress != '' "> and com_address  like concat(#{comAddress}, '%')</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectDevCompanyById" parameterType="Integer" resultMap="DevCompanyResult">
+        <include refid="selectDevCompanyVo"/>
+        where company_id = #{companyId}
+    </select>
+
+    <insert id="insertDevCompany" parameterType="DevCompany" useGeneratedKeys="true" keyProperty="companyId">
+        insert into dev_company
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            company_id,
+            <if test="comName != null  and comName != ''  ">com_name,</if>
+            <if test="createTime != null  ">create_time,</if>
+            <if test="comAddress != null  and comAddress != ''  ">com_address,</if>
+            <if test="comType != null  and comType != ''  ">com_type,</if>
+            <if test="comLogo != null  and comLogo != ''  ">com_logo,</if>
+            <if test="comPicture != null  and comPicture != ''  ">com_picture,</if>
+            <if test="industry != null  and industry != ''  ">industry,</if>
+            <if test="totalIso != null  and totalIso != ''  ">total_iso,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{companyId},
+            <if test="comName != null  and comName != ''  ">#{comName},</if>
+            <if test="createTime != null  ">#{createTime},</if>
+            <if test="comAddress != null  and comAddress != ''  ">#{comAddress},</if>
+            <if test="comType != null  and comType != ''  ">#{comType},</if>
+            <if test="comLogo != null  and comLogo != ''  ">#{comLogo},</if>
+            <if test="comPicture != null  and comPicture != ''  ">#{comPicture},</if>
+            <if test="industry != null  and industry != ''  ">#{industry},</if>
+            <if test="totalIso != null  and totalIso != ''  ">#{totalIso},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDevCompany" parameterType="DevCompany">
+        update dev_company
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="comName != null  and comName != ''  ">com_name = #{comName},</if>
+            <if test="comAddress != null  and comAddress != ''  ">com_address = #{comAddress},</if>
+            <if test="comType != null  and comType != ''  ">com_type = #{comType},</if>
+            <if test="comLogo != null  and comLogo != ''  ">com_logo = #{comLogo},</if>
+            <if test="comPicture != null  and comPicture != ''  ">com_picture = #{comPicture},</if>
+            <if test="sign >= 0  ">sign = #{sign},</if>
+            <if test="fileSize  >= 0  ">file_size = #{fileSize},</if>
+        </trim>
+        where company_id = #{companyId}
+    </update>
+
+
+    <delete id="deleteDevCompanyByIds" parameterType="String">
+        delete from dev_company where company_id in
+        <foreach item="companyId" collection="array" open="(" separator="," close=")">
+            #{companyId}
+        </foreach>
+    </delete>
+    
+    <select id="selectDevCompanyByComCode" parameterType="String" resultMap="DevCompanyResult">
+        <include refid="selectDevCompanyVo"/>
+        where com_code = #{comCode}
+    </select>
+
+    <select id="selectDevCompanyByComName" parameterType="String" resultMap="DevCompanyResult">
+        <include refid="selectDevCompanyVo"/>
+        where com_name = #{comName}
+    </select>
+
+    <select id="selectDevCompanyAll" resultMap="DevCompanyResult">
+        <include refid="selectDevCompanyVo"/>
+    </select>
+
+
+    <!--查询所以注册公司-->
+    <select id="selectComType0Company" resultMap="DevCompanyResult">
+        SELECT company_id,com_name FROM dev_company where com_type = 0;
+    </select>
+</mapper>

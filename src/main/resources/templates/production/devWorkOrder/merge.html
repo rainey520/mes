@@ -1,0 +1,169 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-devWorkOrder-merge">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">工单号(唯一)：</label>
+            <div class="col-sm-8">
+                <input type="hidden" th:value="${workids}" name="param1">
+                <input id="workorderNumber" name="workorderNumber" th:value="${data.code}"  readonly="true"
+                       class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group" >
+            <label class="col-sm-3 control-label">产线：</label>
+            <div class="col-sm-8">
+                <!--<input id="lineId" name="lineId" th:field="*{lineId}" class="form-control" type="text">-->
+                <select name="lineId" id="lineId" class="form-control"
+                        th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId()}">
+                    <option value="">请选择</option>
+                    <option th:each="line : ${productionLine}" th:text="${line.lineName}"
+                            th:value="${line.Id}" ></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group" >
+            <label class="col-sm-3 control-label">订单：</label>
+            <div class="col-sm-8">
+                <select class="form-control" id="orderCode" name="orderCode"  th:with="order=${@order.selectAllOrder(#httpServletRequest.getCookies())}">
+                    <option value="NaN" data-order-id="-1">无</option>
+                    <option   th:value="${item.orderCode}" th:text="${item.orderCode}"
+                             th:each="item:${order}" ></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">工单数量：</label>
+            <div class="col-sm-8">
+                <input id="productNumber" name="productNumber" th:value="${data.num}" class="form-control" type="number">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">产品编码：</label>
+            <div class="col-sm-8">
+                <input id="productCode" name="productCode" th:value="${data.product.productCode}" readonly class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">产品名称：</label>
+            <div class="col-sm-8">
+                <input id="productName" name="productName" th:value="${data.product.productName}" readonly  class="form-control" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">产品型号：</label>
+            <div class="col-sm-8">
+                <input id="productModel" name="productModel" th:value="${data.product.productModel}" readonly  class="form-control" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">标准小时产量：</label>
+            <div class="col-sm-8">
+                <input id="productStandardHour" name="productStandardHour" th:value="${data.product.standardHourYield}" readonly class="form-control" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">计划生产开始时间：</label>
+            <div class="col-sm-8">
+                <input id="productionStart" name="productionStart" class="form-control layer-date">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">计划生产完成时间：</label>
+            <div class="col-sm-8">
+                <input id="productionEnd" name="productionEnd" class="form-control layer-date">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">ECN：</label>
+            <div class="col-sm-8">
+                <select class="form-control" id="ecnStatus" name="ecnStatus">
+                    <option value="0" th:selected="${data.product.ecnStatus == 0}">无</option>
+                    <option value='1' th:selected="${data.product.ecnStatus == 1}">有</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">ECN备注：</label>
+            <div class="col-sm-8">
+                <textarea rows="4" id="ecnText" name="ecnText" th:utext="${data.product.ecnText}" class="form-control"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<script th:src="@{/ajax/libs/layer/laydate/laydate.js}"></script>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+
+    //日期范围限制
+    var start = {
+        elem: '#productionStart',
+        format: 'YYYY/MM/DD hh:mm',
+        min: laydate.now(), //设定最小日期为当前日期
+        max: '2099-06-16 23:59:59', //最大日期
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            end.min = datas; //开始日选好后，重置结束日的最小日期
+            end.start = datas //将结束日的初始值设定为开始日
+        }
+    };
+    var end = {
+        elem: '#productionEnd',
+        format: 'YYYY/MM/DD hh:mm',
+        min: laydate.now(),
+        max: '2099-06-16 23:59:59',
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            start.max = datas; //结束日选好后，重置开始日的最大日期
+        }
+    };
+    laydate(start);
+    laydate(end);
+
+    var prefix = ctx + "device/devWorkOrder";
+    $("#form-devWorkOrder-merge").validate({
+        rules: {
+            productionStart: {
+                required: true,
+            },
+            productionEnd: {
+                required: true,
+            },
+        },
+        messages: {
+            productionStart: {
+                required: "请选择计划开始时间",
+            },
+            productionEnd: {
+                required: "请选择计划结束时间",
+            },
+        }
+    });
+
+    function submitHandler() {
+        var lineId = $("#lineId").find("option:selected").val();
+        if(!lineId){
+            $.modal.alertWarning("请选择产线");
+            return;
+        }
+        var  ecnStatus = $("#ecnStatus").find("option:selected").val();
+        var ecnText = $("#ecnText").val();
+        console.log(ecnText);
+        if(ecnStatus == 1 && ecnText==""){
+            $.modal.alertWarning("请填写ECN备注信息");
+            return;
+        }
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/merge", $('#form-devWorkOrder-merge').serialize());
+        }
+    }
+
+
+</script>
+</body>
+</html>

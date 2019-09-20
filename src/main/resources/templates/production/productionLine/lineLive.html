@@ -1,0 +1,839 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title" style="text-align: center;padding: 0px;min-height: 20px">
+            <span style="float: left" th:with="user = ${@user.getSysUser(#httpServletRequest.getCookies())}"
+                  th:utext="${'责任人:'+user.userName}"></span> <span style="font-size: 16px;font-weight: bold;"
+                                                                   th:utext="${line.lineName}"></span><span
+                style="float: right" id="now_time"></span>
+        </div>
+        <div>
+            <div class="panel-body">
+                <div class="panel-group" id="accordion1">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    工单列表
+                                </div>
+                                <div class="panel-body" style="max-height: 350px;overflow-y: scroll">
+                                    <form>
+                                        <div class="select-list">
+                                            <ul>
+                                                <li>
+                                                    工单号：<input style="width: 180px;" type="text" id="workorderNumber"
+                                                               name="workorderNumber"/>
+                                                </li>
+                                                <li style="display: none">
+                                                    <input name="lineId" th:value="${line.id}">
+                                                </li>
+                                                <li>
+                                                    工单生产状态：
+                                                    <select style="width: 100px" name="workorderStatus"
+                                                            id="workorderStatus">
+                                                        <option selected value="">全部</option>
+                                                        <option value="0">未进行</option>
+                                                        <option value="1">进行中</option>
+                                                        <option value="2">已完成</option>
+                                                    </select>
+                                                </li>
+                                                <li class="select-time">
+                                                    <label>开始时间： </label>
+                                                    <input type="text" class="time-input" id="startTime"
+                                                           placeholder="开始时间" name="params[beginTime]"/>
+                                                    <span>-</span>
+                                                    <input type="text" class="time-input" id="endTime"
+                                                           placeholder="结束时间" name="params[endTime]"/>
+                                                </li>
+                                                <li>
+                                                    <a class="btn btn-primary btn-rounded btn-sm"
+                                                       onclick="searchWork()"><i
+                                                            class="fa fa-search"></i>&nbsp;搜索</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </form>
+                                    <table id="bootstrap-table1" data-mobile-responsive="true"
+                                           style="max-height: 200px"></table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" style="margin-top: 5px;">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    工单数据 <span style="margin-left: 20px;font-size: 12px" id="start-time"></span> &nbsp;&nbsp;&nbsp;
+                                    <span style="font-weight: bold;font-size: 18px;">生产状态：</span>
+                                    <span style="font-weight: bold;font-size: 24px;color: #fff"
+                                          id="line-live-work-gdzt">未进行</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                                        style="font-weight: bold;font-size: 18px;">操作：</span>
+                                    <a class="btn btn-success btn-sm " id="action-btn-start" href="javascript:void(0)"
+                                       onclick="editStatus(1)" shiro:hasPermission="device:devWorkOrder:edit"><i></i>开始</a>
+                                    <a class="btn  btn-success btn-sm " id="action-btn-stop" style="display: none"
+                                       onclick="editStatus(0)" href="javascript:void(0)"
+                                       shiro:hasPermission="device:devWorkOrder:edit"><i></i>暂停</a>
+                                    <a class="btn btn-danger btn-sm " id="action-btn-end" href="javascript:void(0)"
+                                       style="display: none" onclick="finishWorkerOrder()"
+                                       shiro:hasPermission="device:devWorkOrder:edit"><i></i>结束</a>
+                                    <a class="btn btn-success btn-sm " id="action-btn-save" href="javascript:void(0)"
+                                       style="display: none" shiro:hasPermission="device:devWorkOrder:edit"
+                                       onclick="save()"> <i></i>刷新数据</a>
+                                    <a class="btn btn-success btn-sm " id="action-btn-submit" href="javascript:void(0)"
+                                       style="display: none" onclick="submitWorkOrder()"
+                                       shiro:hasPermission="device:devWorkOrder:edit">
+                                        <i></i>提交</a>
+                                </div>
+                                <div class="panel-body">
+                                    <input type="hidden" id="work-id" value="0">
+                                    <form role="form" id="form-page-add">
+                                        <div class="row">
+                                            <table style="width: 98%;" cellspacing="5">
+                                                <tbody>
+                                                <tr>
+                                                    <td align="right"><label>工单号:<input type="text"
+                                                                                        id="line-live-work-id" readonly></label>
+                                                    </td>
+                                                    <td align="right"><label>工单数量:<input type="number"
+                                                                                         id="line-live-work-num"></label>
+                                                    </td>
+                                                    <td align="right"><label>产品编码:<input type="text" readonly
+                                                                                         id="line-live-work-product-code"></label>
+                                                    </td>
+                                                    <td align="right"><label>产品名称:<input type="text" readonly
+                                                                                         id="line-live-work-product-name"></label>
+                                                    </td>
+                                                    <td align="right"><label>标准工时:<input type="number"
+                                                                                         id="line-live-work-stadard-hour"></label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="right"><label>累计产量:<input type="number"
+                                                                                         id="line-live-work-cumulative"
+                                                                                         th:readonly="${line.manual == 1 ?false:true}"></label>
+                                                    </td>
+                                                    <td align="right"><label>入库数量:<input type="number"
+                                                                                         id="line-live-work-rk"></label>
+                                                    </td>
+                                                    <td align="right"><label>报废数量:<input type="number"
+                                                                                         id="line-live-work-bf"></label>
+                                                    </td>
+                                                    <td align="right"><label>直通率[%]:<input type="number"
+                                                                                           id="line-live-work-ztl"></label>
+                                                    </td>
+                                                    <td align="right"><label>达成率[%]:<input type="number" readonly
+                                                                                           id="line-live-work-dcl"></label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="right"><label>出勤工时:<input type="number"
+                                                                                         id="line-live-work-zcgs"></label>
+                                                    </td>
+                                                    <td align="right"><label>调整工时:<input type="number"
+                                                                                         id="line-live-work-tzgs"></label>
+                                                    </td>
+                                                    <td align="right"><label>加班工时:<input type="number"
+                                                                                         id="line-live-work-gbgs"
+                                                                                         style="width: 40%"><select
+                                                            style="border: 1px solid #ddd;border-radius: 4px;background: transparent;outline: none;height: 26px;"
+                                                            id="line-live-work-gbbl">
+                                                        <option value="1.5">1.5倍</option>
+                                                        <option value="2">2.0倍</option>
+                                                        <option value="3">3.0倍</option>
+                                                    </select></label></td>
+                                                    <td align="right"><label>用工人数:<input type="number"
+                                                                                         id="line-live-work-ygrs"></label>
+                                                    </td>
+                                                    <td align="right"><label>投入数量:<input type="number"
+                                                                                         id="line-live-work-trcl"></label>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td align="right"><label>生产工时:<input type="number" readonly
+                                                                                         id="line-live-work-scgs"></label>
+                                                    </td>
+                                                    <td align="right"></td>
+                                                    <td align="right"></td>
+                                                    <td align="right"></label></td>
+                                                    <td align="right"></label></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="4" style="padding: 8px">
+                                                        <table id="bootstrap-table" data-mobile-responsive="true"
+                                                               style="max-height: 240px"></table>
+                                                    </td>
+                                                    <td style="padding:15px;" id="action-btn">
+                                                        <a class="btn btn-primary btn-sm " style="display: none"
+                                                           id="action-btn-exce" href="javascript:void(0)"
+                                                           onclick="addLineException()"
+                                                           shiro:hasPermission="device:devWorkOrder:edit"> <i></i>添加异常信息</a><br/>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script>
+    /**
+     * 系统时间
+     */
+    getCode();
+
+    function getCode() {
+        var i = self.setInterval("countdown()", 1000);
+    }
+
+    function countdown() {
+        var myDate = new Date();
+        //获取当前年
+        var year = myDate.getFullYear();
+        //获取当前月
+        var month = myDate.getMonth() + 1;
+        //获取当前日
+        var date = myDate.getDate();
+        var h = myDate.getHours();       //获取当前小时数(0-23)
+        var m = myDate.getMinutes();     //获取当前分钟数(0-59)
+        var s = myDate.getSeconds();
+        var now = year + '-' + getNow(month) + "-" + getNow(date) + " " + getNow(h) + ':' + getNow(m) + ":" + getNow(s);
+        // 赋值给展示时间
+        $('#now_time').text("系统时间:" + now);
+    }
+
+    // 获取当前时间
+    function getNow(s) {
+        return s < 10 ? '0' + s : s;
+    }
+</script>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('production:workExceptionList:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('production:workExceptionList:remove')}]];
+    var prefix = ctx + "device/devWorkOrder";
+    var prefix1 = ctx + "production/workExceptionList";
+
+    /**
+     * 初始化对应的表格
+     */
+    function initTable(options, id) {
+        $.table._option = options;
+        $.table._params = $.common.isEmpty(options.queryParams) ? $.table.queryParams : options.queryParams;
+        _sortOrder = $.common.isEmpty(options.sortOrder) ? "asc" : options.sortOrder;
+        _sortName = $.common.isEmpty(options.sortName) ? "" : options.sortName;
+        _pageSize = $.common.isEmpty(options.pageSize) ? 3 : options.pageSize;
+        _striped = $.common.isEmpty(options.striped) ? false : options.striped;
+        _escape = $.common.isEmpty(options.escape) ? false : options.escape;
+        _showFooter = $.common.isEmpty(options.showFooter) ? false : options.showFooter;
+        _fixedColumns = $.common.isEmpty(options.fixedColumns) ? false : options.fixedColumns;
+        _fixedNumber = $.common.isEmpty(options.fixedNumber) ? 0 : options.fixedNumber;
+        _rightFixedColumns = $.common.isEmpty(options.rightFixedColumns) ? false : options.rightFixedColumns;
+        _rightFixedNumber = $.common.isEmpty(options.rightFixedNumber) ? 0 : options.rightFixedNumber;
+        $('#' + id).bootstrapTable({
+            url: options.url,                                   // 请求后台的URL（*）
+            contentType: "application/x-www-form-urlencoded",   // 编码类型
+            method: 'post',                                     // 请求方式（*）
+            cache: false,                                       // 是否使用缓存
+            striped: _striped,                                  // 是否显示行间隔色
+            sortable: true,                                     // 是否启用排序
+            sortStable: true,                                   // 设置为 true 将获得稳定的排序
+            sortName: _sortName,                                // 排序列名称
+            sortOrder: _sortOrder,                              // 排序方式  asc 或者 desc
+            pagination: $.common.visible(options.pagination),   // 是否显示分页（*）
+            pageNumber: 1,                                      // 初始化加载第一页，默认第一页
+            pageSize: 3,                                // 每页的记录行数（*）
+            pageList: [3, 6],                             // 可供选择的每页的行数（*）
+            escape: _escape,                                    // 转义HTML字符串
+            showFooter: _showFooter,                            // 是否显示表尾
+            iconSize: 'outline',                                // 图标大小：undefined默认的按钮尺寸 xs超小按钮sm小按钮lg大按钮
+            toolbar: '#toolbar',                                // 指定工作栏
+            sidePagination: "server",                           // 启用服务端分页
+            search: $.common.visible(options.search),           // 是否显示搜索框功能
+            showSearch: $.common.visible(options.showSearch),   // 是否显示检索信息
+            showRefresh: $.common.visible(options.showRefresh), // 是否显示刷新按钮
+            showColumns: $.common.visible(options.showColumns), // 是否显示隐藏某列下拉框
+            showToggle: $.common.visible(options.showToggle),   // 是否显示详细视图和列表视图的切换按钮
+            showExport: $.common.visible(options.showExport),   // 是否支持导出文件
+            fixedColumns: _fixedColumns,                        // 是否启用冻结列（左侧）
+            fixedNumber: _fixedNumber,                          // 列冻结的个数（左侧）
+            rightFixedColumns: _rightFixedColumns,              // 是否启用冻结列（右侧）
+            rightFixedNumber: _rightFixedNumber,                // 列冻结的个数（右侧）
+            queryParams: $.table._params,                       // 传递参数（*）
+            columns: options.columns,                           // 显示列信息（*）
+        });
+    }
+    var data = {
+        lineId: [[${line.id}]],
+        pageSize: 3,
+        pageNum: 1
+    }
+    var data1={
+        workId:0,
+        pageSize:3,
+        pageNum:1
+    }
+    $(function () {
+        /** 初始化工单列表 */
+        var options = {
+            url: prefix + "/list",
+            updateUrl: prefix + "/edit/{id}",
+            modalName: "工单",
+            sortName: "productionStart",
+            sortOrder: 'asc',
+            search: false,
+            showSearch: false,
+            showExport: false,
+            showRefresh: false,
+            showColumns: false,
+            showToggle: false,
+            queryParams: function (p) {
+                var params = {};
+                params.beginTime = $("#startTime").val();
+                params.endTime = $("#endTime").val();
+                var search = {};
+                search.lineId = data.lineId;
+                search.abolish = 0;
+                search.params = params;
+                search.workorderNumber = $("#workorderNumber").val();
+                search.workorderStatus = $("#workorderStatus").val();
+                search.pageSize = p.limit;
+                search.pageNum = p.offset / p.limit + 1;
+                search.searchValue = p.search;
+                search.orderByColumn = p.sort;
+                search.isAsc = p.order;
+                return search;
+            },
+            columns: [
+                {
+                    field: 'id',
+                    title: '',
+                    visible: false
+                },
+                {
+                    field: 'workorderNumber',
+                    title: '工单号',
+                    sortable: true
+                },
+                {
+                    field: 'ecnStatus',
+                    title: 'ECN',
+                    width:30,
+                    formatter: function (value, row, index) {
+                        if (row.abolish == 0) {
+                            if (value == 0) {
+                                return '<a class="btn btn-default btn-xs" href="#" onclick="ecnView(' + row.id + ')">无</a>';
+                            }
+                            return '<a class="btn btn-primary btn-xs " href="#" onclick="ecnView(' + row.id + ')">有</a>';
+                        }
+                        return "-";
+
+                    }
+                },
+                {
+                    title: '管理',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.workorderStatus == 0) {
+                            actions.push('<span style="font-weight: bold;color: #1E0FBE">未进行</span> ');
+                        } else if (row.workorderStatus == 1) {
+                            actions.push('<span style="font-weight: bold;color: green">进行中</span> ');
+                        } else if (row.workorderStatus == 2) {
+                            actions.push('<span style="font-weight: bold;color: red">已完成</span> ');
+                        }
+                        if (row.workSign != 1) {
+                            actions.push('<a class="btn btn-primary btn-xs " href="javascript:void(0)" onclick="order(' + row.id + ',0,1)"><i></i>操作</a> ');
+                        } else {
+                            actions.push('<a class="btn btn-primary btn-xs " href="javascript:void(0)"  disabled="true"><i></i>操作</a> ');
+                        }
+                        return actions.join('');
+                    }
+                },
+                {
+                    field: 'productCode',
+                    title: '产品编码',
+                    sortable: true
+                },
+                {
+                    field: 'productName',
+                    title: '产品名称',
+                    sortable: true
+                },
+                {
+                    field: 'productionStart',
+                    title: '开始时间',
+                    sortable: true
+                },
+                {
+                    field: 'productionEnd',
+                    title: '结束时间',
+                    sortable: true
+                },
+                {
+                    field: 'startTime',
+                    title: '实际开始时间',
+                    sortable: true
+                },
+                {
+                    field: 'endTime',
+                    title: '实际结束时间',
+                    sortable: true
+                }]
+        };
+        /** 初始化工单信息 */
+        initTable(options, "bootstrap-table1");
+        /** 工单异常信息 */
+        var options1 = {
+            url: "/production/workExceptionList/list",
+            createUrl: prefix1 + "/add",
+            removeUrl: prefix1 + "/remove",
+            modalName: "工单异常情况记录",
+            search: false,
+            showSearch:false,
+            showExport: false,
+            showRefresh:false,
+            showColumns:false,
+            showToggle:false,
+            sortName:"createTime",
+            sortOrder:'desc',
+            queryParams:data1,
+            columns: [
+                {
+                    field: 'id',
+                    title: '',
+                    visible: false
+                },
+                {
+                    field: 'devWorkOrder.workorderNumber',
+                    title: '工单号'
+                },
+                {
+                    field: 'workExceptionType.typeName',
+                    title: '异常类型'
+                },
+                {
+                    field: 'remark',
+                    title: '备注信息',
+                    sortable: true
+                },
+                {
+                    field: 'handleContent',
+                    title: '处理信息',
+                    sortable: true
+                },
+                {
+                    field: 'exceStatut',
+                    title: '异常状态',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        if (row.exceStatut == 0) {
+                            return '<span class="badge badge-warning">待处理</span>';
+                        } else if (row.exceStatut == 1) {
+                            return '<span class="badge badge-primary">处理中</span>';
+                        } else if (row.exceStatut == 2) {
+                            return '<span class="badge badge-success">已解决</span>';
+                        }
+                    }
+                },
+                {
+                    field: 'createTime',
+                    title: '异常时间',
+                    sortable: true
+                },
+                {
+                    field: 'handleUser',
+                    title: '处理者',
+                    sortable: true
+                },
+                {
+                    field: 'handleTime',
+                    title: '处理时间',
+                    sortable: true
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.exceStatut == 2) { // 异常工单已经处理完成，不能进行编辑和操作
+                            actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" disabled="true"><i></i>编辑</a> ');
+                            actions.push('<a class="btn btn-danger btn-xs" href="javascript:void(0)" disabled="true"><i></i>删除</a>');
+                        } else {
+                            actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.id + '\')"><i></i>编辑</a> ');
+                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i></i>删除</a>');
+                        }
+                        return actions.join('');
+                    }
+                },
+                {
+                    title: '异常处理',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        if (row.exceStatut == 0) {
+                            return '<a class="btn btn-warning btn-xs '+ editFlag +'" href="#" onclick="handleWorkExcp(\'' + row.id + '\')"><i></i>待处理</a> ';
+                        } else if (row.exceStatut == 1) {
+                            return '<a class="btn btn-primary btn-xs '+ editFlag +'" href="#" onclick="handleWorkExcp(\'' + row.id + '\')"><i></i>处理中</a> ';
+                        } else if (row.exceStatut == 2) {
+                            return '<a class="btn btn-success btn-xs" href="javascript:void(0)" disabled="true"><i></i>已解决</a> ';
+                        }
+                    }
+                }
+            ]
+        };
+        /** 初始化工单异常数据表格 **/
+        initTable(options1,"bootstrap-table");
+    });
+
+    /** 查询工单信息 */
+    function searchWork() {
+        var params = $("#bootstrap-table1").bootstrapTable('getOptions');
+        params.queryParams = function (p) {
+            var params = {};
+            params.beginTime = $("#startTime").val();
+            params.endTime = $("#endTime").val();
+            var search = {};
+            search.lineId = data.lineId;
+            search.abolish = 0;
+            search.params = params;
+            search.workorderNumber = $("#workorderNumber").val();
+            search.workorderStatus = $("#workorderStatus").val();
+            search.pageSize = p.limit;
+            search.pageNum = p.offset / p.limit + 1;
+            search.searchValue = p.search;
+            search.orderByColumn = p.sort;
+            search.isAsc = p.order;
+            return search;
+        }
+        $("#bootstrap-table1").bootstrapTable('refresh', params);
+    }
+
+    /**
+     * 查询工单ecn
+     * @param id
+     */
+    function ecnView(id) {
+        $.modal.open("ECN详情", prefix + "/workecn?workId=" + id, 800, 400)
+    }
+
+    /** 控制对应的操作按钮 */
+    function controllerButtn(o) {
+        if (o) {
+            /** 未进行控制 只显示开始按钮 */
+            if (o.workorderStatus == 0) {
+                $("#line-live-work-gdzt").text("未进行")//工单状态
+                $("#action-btn-start").css('display', 'inline-block');//开始按钮
+                $("#action-btn-end").css('display', 'none');//结束按钮
+                $("#action-btn-save").css('display', 'none');//刷新数据
+                $("#action-btn-stop").css('display', 'none');//暂停按钮
+                $("#action-btn-exce").css('display', 'none');//添加异常信息
+            }
+            else if (o.workorderStatus == 1) {
+                /** 进行中按钮控制 */
+                if (o.operationStatus == 0 || o.operationStatus == 2) {//暂停中
+                    $("#action-btn-start").css('display', 'inline-block');//开始按钮
+                    $("#action-btn-stop").css('display', 'none');//暂停按钮
+                    $("#action-btn-end").css('display', 'inline-block');//结束按钮
+                    $("#action-btn-save").css('display', 'inline-block');//刷新数据
+                } else if (o.operationStatus == 1) {//开始中
+                    $("#action-btn-start").css('display', 'none');//开始按钮
+                    $("#action-btn-stop").css('display', 'inline-block');//暂停按钮
+                    $("#action-btn-end").css('display', 'inline-block');//结束按钮
+                    $("#action-btn-save").css('display', 'inline-block');//刷新数据
+                }
+                $("#line-live-work-gdzt").text("进行中");//工单状态
+                $("#action-btn-exce").css('display', 'inline-block');//添加异常信息
+            } else if (o.workorderStatus == 2) {
+                $("#action-btn-start").css('display', 'none');
+                $("#action-btn-stop").css('display', 'none');
+                $("#action-btn-end").css('display', 'none');
+                $("#line-live-work-gdzt").text("已完成");
+                $("#action-btn-exce").css('display', 'inline-block');
+                $("#action-btn-submit").css('display', 'inline-block');
+                if(o.workSign == 0){
+                    $("#action-btn-save").css('display', 'inline-block');//刷新数据
+                }else{
+                    $("#action-btn-save").css('display', 'none');//刷新数据
+                    $("#action-btn-exce").css('display', 'none');
+                }
+            }
+        }
+    }
+
+    /**
+     * 选择对应的工单数据
+     * @param id
+     */
+    function order(id,s,tag) {
+        $.post("/device/devWorkOrder/findWorkInfoById", {work_id: id}, function (data) {
+            if (data.code) {
+                var item = data.code;
+                /** 控制操作按钮 */
+                controllerButtn(item);
+                if(s == 0){
+                    if (item.ecnStatus == 1 && tag == 1) {
+                        $.modal.alertWarning(item.ecnText);
+                    }
+                    /** 进行数据填充 */
+                    fillData(item,id);
+                    searchYc(id);
+                }
+            }
+        })
+    }
+    /** 填充数据 */
+    function  fillData(item,id) {
+        $("#work-id").val(id);
+        $("#work-id2").val(id);
+        $("#line-live-work-id").val(item.workorderNumber);
+        $("#line-live-work-num").val(item.productNumber);
+        $("#line-live-work-product-code").val(item.productCode);
+        $("#line-live-work-product-name").val(item.productName);
+        $("#line-live-work-stadard-hour").val(item.productStandardHour);
+        $("#line-live-work-cumulative").val(item.cumulativeNumber);//累计产量
+        $("#line-live-work-rk").val(item.actualWarehouseNum);//入库数量
+        $("#line-live-work-bf").val(item.scrapNum);//报废数量
+        $("#line-live-work-ztl").val(item.directPassRate == null?0:item.directPassRate);//直通率
+        $("#line-live-work-dcl").val(item.reachRate);//工单达成率
+        $("#line-live-work-zcgs").val(item.workingHour);//正常工时
+        $("#line-live-work-tzgs").val(item.manualTime);//调整工时
+        $("#line-live-work-gbgs").val(item.overtimeHour);//加班工时
+        $("#line-live-work-gbbl").val(item.overtimeRace == null?1.5:item.overtimeRace)//加班倍率
+        $("#line-live-work-ygrs").val(item.peopleNumber);//用工人数
+        $("#line-live-work-trcl").val(item.putIntoNumber);//用工人数
+        $("#line-live-work-scgs").val(item.signHuor.toFixed(2));//用工人数
+        if(item.startTime){
+            $("#start-time").text("实际开始时间:"+item.startTime);//时间开始时
+        }else{
+            $("#start-time").text("");//时间开始时间
+        }
+    }
+
+    /**
+     * 开始/暂停 工单
+     * @param id
+     */
+    function editStatus(id) {
+        if ($("#work-id").val() == 0 || $("#line-live-work-id").val() == "") {
+            $.modal.alertWarning("请选择需要操作的工单...");
+            return;
+        }
+        var msg1 = "确认开始吗";
+        var msg2 = "工单已经开始了...";
+        if (id == 0) {
+            var msg1 = "确认暂停吗";
+            var msg2 = "工单已经暂停了...";
+        }
+        $.modal.confirm(msg1, function () {
+            $.modal.alertWarning(msg2);
+            $.ajax({
+                cache: true,
+                type: "POST",
+                dataType: 'json',
+                url: prefix + "/editWorkerOrderById", // 一点击开始，工单数据进行初始化
+                data: {
+                    "id": $("#work-id").val(),
+                },
+                async: false,
+                error: function (request) {
+                    $.modal.alertError("系统错误");
+                },
+                success: function (data) {
+                    if (data.code == 0) {
+                        //状态修改
+                        order( $("#work-id").val(),1,0);
+                        //查询工单列表数据
+                        searchWork();
+                    } else {
+                        $.modal.alertError(data.msg);
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * 工单完成操作，点击完成工单不可进行修改
+     * @param id
+     */
+    function finishWorkerOrder() {
+        if ($("#work-id").val() == 0 || $("#line-live-work-id").val() == "") {
+            $.modal.alertWarning("请选择需要操作的工单...");
+            return;
+        }
+        $.modal.confirm("结束工单可进行修改，确认执行该操作吗？", function () {
+            $.ajax({
+                type: 'POST',
+                url: prefix + '/finishWorkerOrder',
+                dataType: 'json',
+                data: {
+                    id: $("#work-id").val()
+                },
+                async: true,  //同步请求，
+                success: function (result) {
+                    if (result.code == 0) {
+                        $.modal.alertWarning("工单已经结束了...");
+                        //更新按钮
+                        order($("#work-id").val(),1,0);
+                        //保存数据
+                        save();
+                        //查询对应工单列表数据
+                        searchWork()
+                    } else {
+                        $.modal.alertError(result.msg);
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * 保存信息
+     */
+    function save() {
+        if ($("#work-id").val() == 0 || $("#line-live-work-id").val() == "") {
+            $.modal.alertWarning("请选择需要操作的工单....");
+            return;
+        }
+        var data = {
+            id: $("#work-id").val(),
+            productNumber: $("#line-live-work-num").val(),//工单数量
+            productStandardHour: $("#line-live-work-stadard-hour").val(),//标准工时
+            cumulativeNumber: $("#line-live-work-cumulative").val(),//累计产量
+            actualWarehouseNum: $("#line-live-work-rk").val(),//入库数量
+            scrapNum: $("#line-live-work-bf").val(),//报废数量
+            directPassRate: $("#line-live-work-ztl").val(),//直通率
+            workingHour: $("#line-live-work-zcgs").val(),//正常工时
+            manualTime: $("#line-live-work-tzgs").val(),//手动调整工时
+            overtimeHour: $("#line-live-work-gbgs").val(),//加班工时
+            overtimeRace: $("#line-live-work-gbbl").val(),//加班倍率
+            peopleNumber: $("#line-live-work-ygrs").val(),//用工人数
+            putIntoNumber: $("#line-live-work-trcl").val(),//投入产量
+        }
+        var config = [];
+        data.paramConfig = JSON.stringify(config);
+        $.ajax({
+            cache: true,
+            type: "POST",
+            url: ctx + "device/devWorkOrder/edit",
+            data: data,
+            async: false,
+            error: function (request) {
+                $.modal.alertError("系统错误");
+            },
+            success: function (data) {
+                $.modal.msg("保存成功,正在刷新数据请稍后……", modal_status.SUCCESS);
+                order($("#work-id").val(),0,0);
+            }
+        });
+    }
+    /** 提交数据 */
+    function submitWorkOrder() {
+        if ($("#work-id").val() == 0 || $("#line-live-work-id").val() == "") {
+            $.modal.alertWarning("请选择需要操作的工单....");
+            return;
+        }
+        $.modal.confirm("提交工单不可进行修改删除，确认执行该操作吗？", function () {
+            save();
+            $.ajax({
+                type: 'POST',
+                url: prefix + '/submitWorkOrder',
+                dataType: 'json',
+                data: {
+                    id: $("#work-id").val()
+                },
+                async: false,  //同步请求，
+                success: function (result) {
+                    if (result.code == 0) {
+                        $.modal.alertWarning("工单已经提交了");
+                        // $.table.refresh();
+                        order($("#work-id").val(),1,0);
+                    } else {
+                        $.modal.alertError(result.msg);
+                    }
+                }
+            });
+        });
+    }
+    /**
+     * 刷新异常
+     * @param id
+     */
+    function searchYc(id) {
+        var params = $("#bootstrap-table").bootstrapTable('getOptions');
+        params.queryParams = function (params) {
+            var search = {};
+            search.workId = id;
+            search.pageSize = params.limit;
+            search.pageNum = params.offset / params.limit + 1;
+            search.searchValue = params.search;
+            search.orderByColumn = params.sort;
+            search.isAsc = params.order;
+            return search;
+        }
+        $("#bootstrap-table").bootstrapTable('refresh', params);
+    }
+
+    /**
+     * 添加异常
+     */
+    function addLineException() {
+        if ($("#work-id").val() == 0 || $("#line-live-work-id").val() == "") {
+            $.modal.alertWarning("请选择需要操作的工单....");
+            return;
+        }
+        var url = "/production/workExceptionList/add2?lineId=" + data.lineId + "&workId=" + $("#work-id").val();
+        $.modal.open("添加工单异常", url, 800, 300);
+    }
+
+    /**
+     * 修改
+     * @param id
+     */
+    function edit(id) {
+        var url = prefix1 + "/edit/" + id;
+        $.modal.open("修改异常记录", url, 800, 520);
+    }
+
+    /**
+     * 处理异常信息
+     * @param id
+     */
+    function handleWorkExcp(id) {
+        var url = prefix1 + "/handleExcp/" + id;
+        $.modal.open("异常处理描述", url, 800, 520);
+    }
+</script>
+<div class="wrapper wrapper-content animated fadeInRight ibox-content" style="display: none" id="add-work-exception">
+    <form class="form-horizontal m" id="form-workExceptionList-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">异常类型：</label>
+            <div class="col-sm-8">
+                <input name="workId" id="work-id2" value="0" class="form-control" type="hidden">
+                <select id="exceType" name="exceType" class="form-control"
+                        th:with="exceTypeAll=${@exceType.findExceTypeAll(#httpServletRequest.getCookies())}">
+                    <option value="">选择异常</option>
+                    <option th:each="exceType : ${exceTypeAll}" th:text="${exceType.typeName}"
+                            th:value="${exceType.Id}">
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">备注信息：</label>
+            <div class="col-sm-8">
+                <textarea id="remark" name="remark" rows="4" class="form-control" type="text"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

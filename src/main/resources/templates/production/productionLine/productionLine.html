@@ -1,0 +1,167 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								名称：<input type="text" name="lineName" style="width: 160px"/>
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="params[beginTime]"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="params[endTime]"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-success" onclick="add()" shiro:hasPermission="production:productionLine:add">
+					<i class="fa fa-plus"></i> 添加
+				</a>
+				<a class="btn btn-primary btn-edit disabled" onclick="edit()" shiro:hasPermission="production:productionLine:add">
+					<i class="fa fa-edit"></i> 修改
+				</a>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('production:productionLine:add')}]];
+        var removeFlag = [[${@permission.hasPermi('production:productionLine:remove')}]];
+        var prefix = ctx + "production/productionLine";
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                modalName: "生产线",
+				sortName:'createTime',
+				sortOrder:'desc',
+				search: false,
+				showExport: false,
+				showSearch:true,
+				showRefresh:true,
+				showColumns:false,
+				showToggle:true,
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'id', 
+					title : '',
+					visible: false
+				},
+				{
+					field : 'lineName', 
+					title : '产线名称',
+					sortable: true,
+				},
+				{
+					field : 'deviceLiable', 
+					title : '责任人1',
+					sortable: true,
+					formatter:function (value, row, index) {
+						if(row.deviceLiableName)return row.deviceLiableName;
+						return "-"
+					}
+				},
+				{
+					field : 'deviceLiable1',
+					title : '责任人2',
+					sortable: true,
+					formatter:function (value, row, index) {
+						if(row.deviceLiableTowName)return row.deviceLiableTowName;
+						return "-"
+					}
+				},
+				{
+					field : 'remark', 
+					title : '备注信息',
+					sortable: true
+				},
+				{
+					field : 'createTime',
+					title : '创建时间',
+					sortable: true
+				},
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+						return actions.join('');
+		            }
+		        }]
+            };
+            $.table.init(options);
+        });
+        /** 添加生产线 */
+        function add() {
+			$.modal.open("添加产线",prefix+"/add",800,420);
+		}
+		/** 编辑产线 */
+		function edit(id) {
+			var url = prefix+"/edit/{id}";
+			if ($.common.isNotEmpty(id)) {
+				url = $.table._option.updateUrl.replace("{id}", id);
+			} else {
+				var id = $.common.isEmpty($.table._option.uniqueId) ? $.table.selectFirstColumns() : $.table.selectColumns($.table._option.uniqueId);
+				if (id.length == 0) {
+					$.modal.alertWarning("请至少选择一条记录");
+					return;
+				}
+				url = $.table._option.updateUrl.replace("{id}", id);
+			}
+			$.modal.open("修改产线",url,800,420);
+		}
+
+		function config(id) {
+			var url = prefix+"/devcnfig/"+id;
+			createMenuItem(url, "硬件绑定");
+		}
+
+
+		/**
+		 * 跳转到产线实况页面
+		 * @param id
+		 */
+		function liveStatus(id,lineName) {
+			var url = prefix+"/live/"+id;
+			createMenuItem(url,lineName+'--产线实况')
+		}
+		function remove(id) {
+			$.modal.confirm("确定删除该条" + $.table._option.modalName + "信息吗", function () {
+				var url =  $.table._option.removeUrl.replace("{id}", id);
+				var data = {id: id};
+				$.operate.submit(url, "post", "json", data);
+			});
+		}
+
+
+		// 关闭窗口
+		function submitHandler() {
+			$.modal.close();
+		}
+    </script>
+</body>
+</html>

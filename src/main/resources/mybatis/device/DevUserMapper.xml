@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.device.devUser.mapper.DevUserMapper">
+    
+    <resultMap type="DevUser" id="DevUserResult">
+        <result property="id"    column="id"    />
+        <result property="phoneNumber"    column="phone_number"    />
+        <result property="password"    column="password"    />
+        <result property="userName"    column="user_name"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+	
+	<sql id="selectDevUserVo">
+        select id, phone_number, password, user_name, create_time from dev_user
+    </sql>
+	
+    <select id="selectDevUserList" parameterType="DevUser" resultMap="DevUserResult">
+        <include refid="selectDevUserVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="phoneNumber != null  and phoneNumber != '' "> and phone_number = #{phoneNumber}</if>
+             <if test="password != null  and password != '' "> and password = #{password}</if>
+             <if test="userName != null  and userName != '' "> and user_name = #{userName}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectDevUserById" parameterType="Integer" resultMap="DevUserResult">
+        <include refid="selectDevUserVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDevUser" parameterType="DevUser" useGeneratedKeys="true" keyProperty="id">
+        insert into dev_user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="phoneNumber != null  and phoneNumber != ''  ">phone_number,</if>
+			<if test="password != null  and password != ''  ">password,</if>
+			<if test="userName != null  and userName != ''  ">user_name,</if>
+			<if test="createTime != null  ">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="phoneNumber != null  and phoneNumber != ''  ">#{phoneNumber},</if>
+			<if test="password != null  and password != ''  ">#{password},</if>
+			<if test="userName != null  and userName != ''  ">#{userName},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateDevUser" parameterType="DevUser">
+        update dev_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="phoneNumber != null  and phoneNumber != ''  ">phone_number = #{phoneNumber},</if>
+            <if test="password != null  and password != ''  ">password = #{password},</if>
+            <if test="userName != null  and userName != ''  ">user_name = #{userName},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteDevUserById" parameterType="Integer">
+        delete from dev_user where id = #{id}
+    </delete>
+	
+    <delete id="deleteDevUserByIds" parameterType="String">
+        delete from dev_user where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <select id="selectLogin" parameterType="Map" resultMap="DevUserResult">
+        <include refid="selectDevUserVo"/>
+        where phone_number = #{phoneNumber}
+        and password = #{password}
+    </select>
+    
+    <select id="selectByMobile" parameterType="Map" resultMap="DevUserResult">
+        <include refid="selectDevUserVo"/>
+        where phone_number = #{phoneNumber}
+    </select>
+    
+</mapper>

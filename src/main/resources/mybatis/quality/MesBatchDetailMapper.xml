@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.quality.mesBatch.mapper.MesBatchDetailMapper">
+    
+    <resultMap type="MesBatchDetail" id="MesBatchDetailResult">
+        <result property="id"    column="id"    />
+        <result property="bId"    column="b_id"    />
+        <result property="materielCode"    column="materiel_code"    />
+        <result property="batchCode"    column="batch_code"    />
+        <result property="proBatchCode"    column="pro_batch_code"    />
+        <result property="cTime"    column="c_time"    />
+        <result property="dTag"    column="d_tag"    />
+        <result property="dType"    column="d_type"    />
+        <result property="mesNumber"    column="mes_number"    />
+        <result property="ruleOrder"    column="rule_order"    />
+    </resultMap>
+	
+	<sql id="selectMesBatchDetailVo">
+        select id, b_id, materiel_code, batch_code,pro_batch_code, c_time,d_tag,d_type,mes_number,rule_order from tab_mes_batch_detail
+    </sql>
+	
+    <select id="selectMesBatchDetailList" parameterType="MesBatchDetail" resultMap="MesBatchDetailResult">
+        <include refid="selectMesBatchDetailVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="bId != null "> and b_id = #{bId}</if>
+             <if test="materielCode != null  and materielCode != '' "> and materiel_code = #{materielCode}</if>
+             <if test="batchCode != null  and batchCode != '' "> and batch_code = #{batchCode}</if>
+             <if test="cTime != null "> and c_time = #{cTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectMesBatchDetailById" parameterType="Integer" resultMap="MesBatchDetailResult">
+        <include refid="selectMesBatchDetailVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMesBatchDetail" parameterType="MesBatchDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_mes_batch_detail
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bId != null  ">b_id,</if>
+			<if test="materielCode != null  and materielCode != ''  ">materiel_code,</if>
+			<if test="batchCode != null  and batchCode != ''  ">batch_code,</if>
+            <if test="proBatchCode != null  and proBatchCode != ''  ">pro_batch_code,</if>
+			<if test="cTime != null  ">c_time,</if>
+            <if test="dTag != null  ">d_tag,</if>
+            <if test="dType != null  ">d_type,</if>
+            <if test="mesNumber != null  ">mes_number,</if>
+            <if test="ruleOrder != null  ">rule_order,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="bId != null  ">#{bId},</if>
+			<if test="materielCode != null  and materielCode != ''  ">#{materielCode},</if>
+			<if test="batchCode != null  and batchCode != ''  ">#{batchCode},</if>
+            <if test="proBatchCode != null  and proBatchCode != ''  ">#{proBatchCode},</if>
+			<if test="cTime != null  ">#{cTime},</if>
+            <if test="dTag != null  ">#{dTag},</if>
+            <if test="dType != null  ">#{dType},</if>
+            <if test="mesNumber != null  ">#{mesNumber},</if>
+            <if test="ruleOrder != null  ">#{ruleOrder},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateMesBatchDetail" parameterType="MesBatchDetail">
+        update tab_mes_batch_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="bId != null  ">b_id = #{bId},</if>
+            <if test="materielCode != null  and materielCode != ''  ">materiel_code = #{materielCode},</if>
+            <if test="batchCode != null  and batchCode != ''  ">batch_code = #{batchCode},</if>
+            <if test="proBatchCode != null  and proBatchCode != ''  ">pro_batch_code = #{proBatchCode},</if>
+            <if test="cTime != null  ">c_time = #{cTime},</if>
+            <if test="dTag != null  ">d_tag = #{dTag},</if>
+            <if test="dType != null  ">d_type = #{dType},</if>
+            <if test="mesNumber != null  ">mes_number = #{mesNumber},</if>
+            <if test="ruleOrder != null  ">rule_order = #{ruleOrder},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteMesBatchDetailById" parameterType="Integer">
+        delete from tab_mes_batch_detail where id = #{id}
+    </delete>
+	
+    <delete id="deleteMesBatchDetailByIds" parameterType="String">
+        delete from tab_mes_batch_detail where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过主表id查询mes批次明细列表-->
+    <select id="selectMesBatchDetailByBId" resultMap="MesBatchDetailResult">
+        SELECT * FROM tab_mes_batch_detail where b_id = #{bId}
+    </select>
+
+    <!--排序查询mes批次明细列表-->
+    <select id="selectMesBatchDetailByBIdOrder" resultMap="MesBatchDetailResult">
+        SELECT * FROM tab_mes_batch_detail where b_id = #{bId} order by rule_order asc
+    </select>
+
+    <!--通过mes追踪主表id删除明细信息-->
+    <delete id="deleteMesBatchDetailByBId" parameterType="Integer">
+        delete from tab_mes_batch_detail where b_id = #{bId}
+    </delete>
+
+    <!--通过批次号查询MES列表信息-->
+    <select id="selectMesBatchDetailByBatchCode" resultMap="MesBatchDetailResult">
+        SELECT * FROM tab_mes_batch_detail where batch_code = #{batchCode}
+    </select>
+
+    <!--通过批次查询总的记录数-->
+    <select id="selectMesBatchTotal" resultType="Integer">
+         SELECT COUNT(*) FROM tab_mes_batch_detail where batch_code = #{batchCode}
+    </select>
+
+    <!--通过工单查询物料用料信息-->
+    <select id="selectMesBatchTotalByWorkCode" resultType="com.ruoyi.project.quality.mesBatch.domain.MesBatchDetail">
+        select a.materiel_code as materielCode,COALESCE(SUM(mes_number),0) as totalNum from tab_mes_batch_detail as a, tab_mes_batch as b where a.b_id = b.id
+        and b.work_code = #{workCode} and a.mes_number >0 group by a.materiel_code;
+    </select>
+    
+</mapper>

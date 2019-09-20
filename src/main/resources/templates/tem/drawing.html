@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org"  xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:utext="${info.pageName}"></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css">
+    <link th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
+    <!-- bootstrap-table 表格插件样式 -->
+    <link th:href="@{/ajax/libs/bootstrap-table/bootstrap-table.min.css}" rel="stylesheet"/>
+    <link th:href="@{/ajax/libs/bootstrap-treetable/bootstrap-treetable.css}" rel="stylesheet"/>
+    <link th:href="@{/ajax/libs/bootstrap-table/extensions/columns/bootstrap-table-fixed-columns.css}" rel="stylesheet"/>
+    <link th:href="@{/ajax/libs/select/select2.css}" rel="stylesheet"/>
+    <link th:href="@{/ruoyi/css/ry-ui.css}" rel="stylesheet"/>
+    <style type="text/css">
+        .page-header ul li{
+            text-align: center;
+            color: #fff;
+        }
+        .list-group-item{
+            padding: 3px 15px;
+        }
+        .list-group{
+            margin-bottom: 0px !important;
+        }
+        .container{
+            min-height: 98vh;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
+        .jumbotron{
+            background-color:transparent;
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+        }
+        .demo_paidan{
+            padding: 0px;
+            margin: 0px;
+            list-style: none;
+        }
+        .news-item {
+            padding: 4px;
+            margin: 0;
+            border-bottom: 1px dotted #555;
+        }
+        .panel{
+            margin-bottom: 10px !important;
+        }
+        .nav>li>a{
+            padding: 5px !important;
+        }
+        .panel-heading {
+            padding: 5px 15px !important;
+        }
+        #gd-info .my-panel-body{
+            padding: 0px 15px !important;
+        }
+    </style>
+</head>
+<body>
+<div id="wrapper" class="container"
+     th:style="${#strings.isEmpty(info.pageBackImg)?'background-image: url(/js/bk.jpg)':'background-image: url('+info.pageBackImg+')'} ">
+    <div class="page-header" style="padding-bottom:0px;margin: 10px;">
+        <input type="hidden" th:value="${code}" id="page-code">
+        <ul class="nav nav-pills nav-justified">
+            <li role="presentation">
+                <img th:if="${not #strings.isEmpty(company.comLogo)}" th:src="${company.comLogo}" width="120" height="60px" />
+
+            </li>
+            <li role="presentation">
+                <span style="font-size: 22px" th:utext="${company.comName}"></span>
+                <h4 th:utext="${info.pageName}"></h4>
+            </li>
+            <li role="presentation" >
+                <span id="now_time">当前系统时间:2019-04-01 17:08:09</span> &nbsp;&nbsp;<span style="cursor: pointer;font-size: 22px;" id="fullScreen"><i class="fa fa-arrows-alt"></i>全屏</span>
+            </li>
+        </ul>
+    </div>
+    <div class="jumbotron">
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading" style="text-align:center">
+                        <span th:if="${not #lists.isEmpty(info.configs) and info.configs[0].line != null}" th:utext="${info.configs[0].line.lineName}"></span>
+                    </div>
+                    <div class="panel-body">
+                        <div id="main" style="width: 100%;min-height:600px;">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <form id="formId">
+                                        <div class="select-list">
+                                            <ul>
+                                                <li>
+                                                    工单:<select onchange="orderChange(this)" name="saveId" th:if="${not #lists.isEmpty(info.workOrder)}">
+                                                        <option th:each="item:${info.workOrder}" th:value="${item.id}" th:text="${item.workorderNumber}">所有</option>
+                                                    </select>
+                                                    <input type="hidden" name="saveType" value="5"/>
+                                                    <input type="hidden" name="companyId" th:value="${info.companyId}"/>
+                                                </li>
+                                                <li>
+                                                    <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </form>
+                                     <span style="float: right;margin-right: 10px">
+
+                                    </span>
+                                    <div style="clear: both"></div>
+                                    <table id="bootstrap-table" ></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+<div th:include="include :: footer"></div>
+<script th:src="@{/js/jquery.bootstrap.newsbox.min.js}"></script>
+<script th:src="@{/ajax/libs/fullscreen/jquery.fullscreen.js}"></script>
+<script>
+    getCode();
+    function getCode() {
+        var i = self.setInterval("countdown()", 1000);
+    }
+    function countdown() {
+        var myDate = new Date();
+        //获取当前年
+        var year = myDate.getFullYear();
+        //获取当前月
+        var month = myDate.getMonth() + 1;
+        //获取当前日
+        var date = myDate.getDate();
+        var h = myDate.getHours();       //获取当前小时数(0-23)
+        var m = myDate.getMinutes();     //获取当前分钟数(0-59)
+        var s = myDate.getSeconds();
+        var now = year + '-' + getNow(month) + "-" + getNow(date) + " " + getNow(h) + ':' + getNow(m) + ":" + getNow(s);
+        // 赋值给展示时间
+        $('#now_time').text('当前系统时间:' + now);
+    }
+    // 获取当前时间
+    function getNow(s) {
+        return s < 10 ? '0' + s : s;
+    }
+    // 全屏显示
+    $('#fullScreen').on('click', function () {
+        $('#wrapper').fullScreen();
+    });
+    $(function () {
+        $("select").select2({
+            width:"200px",
+        });
+    })
+</script>
+<script th:inline="javascript">
+    var prefix =  "/t/file";
+    $(function() {
+        var options = {
+            url: prefix + "/list",
+            modalName: "文件素材管理",
+            sortOrder:"desc",
+            sortName:"createTime",
+            pageSize: 6 ,
+            pageList: [6, 12, 20],
+            search: false,
+            showExport: true,
+            showSearch:false,
+            showRefresh:false,
+            showColumns:false,
+            showToggle:false,
+            showExport:false,
+            columns: [
+                {
+                    field : 'id',
+                    title : '主键，自增长',
+                    visible: false
+                },
+                {
+                    field : 'filePath',
+                    title : '文件',
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        if(row.fileType == 1){
+                            return "<a href='"+value+"' target='_blank'><img src='"+value+"' width='100' height='80' style='border-radius: 10px;'/></a>"
+                        }else{
+                            return "<a href='"+value+"'>"+row.fileName+"</a>"
+                        }
+                    }
+                },
+                {
+                    field : 'fileName',
+                    title : '文件名称',
+                    sortable: true,
+                },
+                {
+                    field : 'fileType',
+                    title : '文件类型',
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        if(value == 1){
+                            return "图片";
+                        }else if(value == 2){
+                            return "文件";
+                        }else{
+                            return "未知";
+                        }
+                    }
+                },
+                {
+                    field : 'createTime',
+                    title : '上传时间',
+                    sortable: true
+                }]
+        };
+        $.table.init(options);
+        $.table.search()
+    });
+    function orderChange(val) {
+        $.table.search()
+    }
+</script>
+</body>
+
+</html>

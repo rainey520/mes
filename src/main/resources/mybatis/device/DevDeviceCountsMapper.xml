@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.device.devDeviceCounts.mapper.DevDeviceCountsMapper">
+    
+    <resultMap type="DevDeviceCounts" id="DevDeviceCountsResult">
+        <result property="id"    column="id"    />
+        <result property="iemi"    column="iemi"    />
+        <result property="ioname"    column="ioname"    />
+        <result property="counts"    column="counts"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+	
+	<sql id="selectDevDeviceCountsVo">
+        select id, iemi, ioname, counts, create_time from dev_device_counts
+    </sql>
+	
+    <select id="selectDevDeviceCountsList" parameterType="DevDeviceCounts" resultMap="DevDeviceCountsResult">
+        <include refid="selectDevDeviceCountsVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="iemi != null  and iemi != '' "> and iemi = #{iemi}</if>
+             <if test="ioname != null  and ioname != '' "> and ioname = #{ioname}</if>
+             <if test="counts != null "> and counts = #{counts}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectDevDeviceCountsById" parameterType="Long" resultMap="DevDeviceCountsResult">
+        <include refid="selectDevDeviceCountsVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDevDeviceCounts" parameterType="DevDeviceCounts" useGeneratedKeys="true" keyProperty="id">
+        insert into dev_device_counts
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="iemi != null  and iemi != ''  ">iemi,</if>
+			<if test="ioname != null  and ioname != ''  ">ioname,</if>
+			<if test="counts != null  ">counts,</if>
+			<if test="createTime != null  ">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="iemi != null  and iemi != ''  ">#{iemi},</if>
+			<if test="ioname != null  and ioname != ''  ">#{ioname},</if>
+			<if test="counts != null  ">#{counts},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateDevDeviceCounts" parameterType="DevDeviceCounts">
+        update dev_device_counts
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="iemi != null  and iemi != ''  ">iemi = #{iemi},</if>
+            <if test="ioname != null  and ioname != ''  ">ioname = #{ioname},</if>
+            <if test="counts != null  ">counts = #{counts},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteDevDeviceCountsById" parameterType="Long">
+        delete from dev_device_counts where id = #{id}
+    </delete>
+	
+    <delete id="deleteDevDeviceCountsByIds" parameterType="String">
+        delete from dev_device_counts where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

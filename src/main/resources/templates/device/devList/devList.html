@@ -1,0 +1,237 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								硬件编号：<input type="text" name="deviceId"/>
+							</li>
+
+							<li>
+								硬件名称：<input type="text" name="deviceName"/>
+							</li>
+
+							<!--<li>-->
+								<!--状态：<select name="deviceStatus" style="width: 80px">-->
+								<!--<option value="-1">所有</option>-->
+								<!--<option  value="1">可用</option>-->
+								<!--<option  value="0">禁用</option>-->
+								<!--</select>-->
+							<!--</li>-->
+							<li>
+								配置状态：<select name="sign" style="width: 80px">
+								<option value="-1">所有</option>
+								<option  value="1">已配置</option>
+								<option  value="0">未配置</option>
+							</select>
+							</li>
+
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间" name="params[beginTime]"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间" name="params[endTime]"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="device:devList:export">
+						<i class="fa fa-download"></i> 导出
+				 </a>
+				<a class="btn btn-success" onclick="createCode()" shiro:hasPermission="device:devList:createCode">
+					<i class="fa fa-plus"></i> 生成硬件编码
+				</a>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('device:devList:edit')}]];
+        var prefix = ctx + "device/devList";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "硬件",
+				search: false,
+		        showExport: true,
+				sortName:'configDate',
+				sortOrder:'desc',
+                columns: [
+				{
+					field : 'id', 
+					title : '',
+					visible: false
+				},
+				{
+					field : 'deviceId', 
+					title : '硬件编号',
+					sortable: true,
+					formatter:function (value, row, index) {
+						return value;
+					}
+				},
+				// {
+				// 	field : 'deviceStatus',
+				// 	title : '可用状态',
+				// 	sortable: true,
+				// 	formatter:function (value,row,index) {
+				// 		return statusTools(row);
+				// 	}
+				// },
+					{
+						field : 'sign',
+						title : '配置状态',
+						sortable: true,
+						formatter:function (value,row,index) {
+							if(value == 1){
+								return '<span style="color: green;font-weight: bold">已配置</span>'
+							}
+							return '<span style="font-weight: bold;color: red">未配置</span>';
+						}
+					},
+				{
+					field : 'deviceName', 
+					title : '硬件名称',
+					sortable: true
+				},
+				{
+					field : 'remark', 
+					title : '备注信息',
+					sortable: true
+				},
+				{
+					field : 'createDate', 
+					title : '添加时间',
+					sortable: true
+				},
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+		            	actions.push('<a class="btn btn-success btn-xs " href="#" onclick="devRqCode(\'' + row.id + '\')"><i class="fa fa-edit"></i>扫码</a> ');
+						return actions.join('');
+		            }
+		        }]
+            };
+            $.table.init(options);
+        });
+		/* 状态显示 */
+		function statusTools(row) {
+			if (row.deviceStatus == 0) {
+				return '<i class=\"fa fa-toggle-off text-info fa-2x\" onclick="enable(\'' + row.id + '\')"></i> ';
+			} else {
+				return '<i class=\"fa fa-toggle-on text-info fa-2x\" onclick="disable(\'' + row.id + '\')"></i>';
+			}
+		}
+		/**
+		 * 添加
+		 */
+		function add() {
+        	var url = prefix +"/add"
+			$.modal.confirm('确定添加硬件信息吗？将自动生成30条信息',function () {
+				$.modal.open("添加硬件",url,340,270);
+			})
+		}
+		/**
+		 * 用户添加硬件信息
+		 */
+		function add1() {
+			var url = prefix +"/add1";
+			$.modal.open("添加硬件",url,800,400);
+		}
+		/**
+		 * 生成硬件编号
+		 */
+		function createCode() {
+			$.modal.confirm("确定需要生成硬件编号吗?",function (e) {
+				if(e){
+					$.modal.loading("正在生成中，请稍等...");
+					$.modal.disable();
+					$.post("/device/devList/createCode",function (data) {
+						if(data.code == 0){
+							$.modal.alertSuccess("操作成功");
+							$.table.refresh();
+						}else{
+							$.modal.alertError(data.msg);
+						}
+						$.modal.closeLoading();
+						$.modal.enable();
+					})
+				}
+			})
+		}
+		/**
+		 * 修改
+		 */
+		function edit(id) {
+			var url = prefix+"/edit/{id}";
+			if ($.common.isNotEmpty(id)) {
+				url = $.table._option.updateUrl.replace("{id}", id);
+			} else {
+				var id = $.common.isEmpty($.table._option.uniqueId) ? $.table.selectFirstColumns() : $.table.selectColumns($.table._option.uniqueId);
+				if (id.length == 0) {
+					$.modal.alertWarning("请至少选择一条记录");
+					return;
+				}
+				url = $.table._option.updateUrl.replace("{id}", id);
+			}
+			$.modal.open("修改" + $.table._option.modalName, url,800,370);
+		}
+		/* 用户管理-停用 */
+		function disable(id) {
+			$.modal.confirm("确认要停用硬件吗？", function() {
+				$.operate.post(prefix + "/changeStatus", { "id": id, "deviceStatus": 0 });
+			})
+		}
+
+		/* 用户管理启用 */
+		function enable(id) {
+			$.modal.confirm("确认要启用硬件吗？", function() {
+				$.operate.post(prefix + "/changeStatus", { "id": id, "deviceStatus": 1 });
+			})
+		}
+
+		/*字典列表-详细*/
+		function detail(devId) {
+			var url = '/device/devIo/' + devId;
+			createMenuItem(url, "模块配置");
+		}
+		function config(id) {
+			$.modal.open("配置硬件",'/device/devList/code?id='+id,360,300);
+		}
+
+		function devRqCode(id) {
+			$.modal.open("扫码录入", "/device/devList/rqcode/"+id,440,360);
+		}
+    </script>
+</body>
+<form id="editDevConfig"  class="mt20 mb10" style="display: none;">
+	<div class="col-xs-offset-1">
+		<input type="hidden" id="id" name="id"/>
+		<img id="bcode" style="width: 200px">
+	</div>
+</form>
+</html>

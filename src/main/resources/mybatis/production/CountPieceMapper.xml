@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.production.countPiece.mapper.CountPieceMapper">
+    
+    <resultMap type="CountPiece" id="CountPieceResult">
+        <result property="cpId"    column="cp_id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="cpUserId"    column="cp_user_id"    />
+        <result property="cpDate"    column="cp_date"    />
+        <result property="workId"    column="work_id"    />
+        <result property="workNumber"    column="work_number"    />
+        <result property="workPrice"    column="work_price"    />
+        <result property="cpNumber"    column="cp_number"    />
+        <result property="totalPrice"    column="total_price"    />
+        <result property="cpBadNumber"    column="cp_bad_number"    />
+        <result property="cpRemark"    column="cp_remark"    />
+        <result property="cpLastUpdate"    column="cp_last_update"    />
+        <result property="cpLastId"    column="cp_last_id"    />
+        <association property="cpUserName" column="cp_user_id" select="selectCpName">
+            <result property="cpUserName" column="user_id"/>
+        </association>
+        <association property="cpLastName" column="cp_last_id" select="selectCpLastName">
+            <result property="cpLastName" column="user_id"/>
+        </association>
+    </resultMap>
+	
+	<sql id="selectCountPieceVo">
+        select cp_id, company_id, cp_user_id, cp_date, work_id, work_number, work_price, cp_number, total_price, cp_bad_number, cp_remark, cp_last_update, cp_last_id from tab_count_piece
+    </sql>
+
+    <!--查询全部计件统计列表-->
+    <select id="selectCountPieceList" parameterType="CountPiece" resultMap="CountPieceResult">
+        select * ,sum(cp_number) as sumCpNumber,sum(cp_bad_number) as sumCpBadNumber,sum(total_price)  as sumTotalPrice from tab_count_piece
+        where company_id = #{companyId}
+        <if test="cpUserId != null and cpUserId != -1">
+            and cp_user_id = #{cpUserId}
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(cp_date,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(cp_date,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+        </if>
+        group by cp_user_id order by cp_date desc
+    </select>
+
+    <!--查询计件明细列表-->
+    <select id="selectCountPieceListDetail" parameterType="CountPiece" resultMap="CountPieceResult">
+        <include refid="selectCountPieceVo"/>
+        <where>
+            <if test="companyId != null "> and company_id = #{companyId}</if>
+            <if test="cpUserId != null and cpUserId != -1">
+                and cp_user_id = #{cpUserId}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(cp_date,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(cp_date,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+            <if test="workId != null and workId != -1"> AND work_id = #{workId}</if>
+            <if test="cpLastId != null and cpLastId != -1 "> and cp_last_id = #{cpLastId}</if>
+        </where>
+        order by cp_date desc
+    </select>
+
+    <!--查看指定日起的计件明细-->
+    <select id="selectCountPieceListByDate" parameterType="CountPiece" resultMap="CountPieceResult">
+        <include refid="selectCountPieceVo"/>
+        <where>
+            <if test="cpDate != null  ">
+                AND date_format(cp_date,'%y%m%d') = date_format(#{cpDate},'%y%m%d')
+            </if>
+            <if test="companyId != null "> and company_id = #{companyId}</if>
+            <if test="cpUserId != null and cpUserId != -1">
+                and cp_user_id = #{cpUserId}
+            </if>
+            <if test="workId != null and workId != -1"> AND work_id = #{workId}</if>
+            <if test="cpLastId != null and cpLastId != -1 "> and cp_last_id = #{cpLastId}</if>
+        </where>
+    </select>
+
+    <!--查询计件归属人的姓名-->
+    <select id="selectCpName" resultType="java.lang.String">
+        SELECT user_name FROM sys_user where user_id = #{cpUserId}
+    </select>
+    <!--查询计件最后修改人的姓名-->
+    <select id="selectCpLastName" resultType="java.lang.String">
+        SELECT user_name FROM sys_user where user_id = #{cpLastId}
+    </select>
+    
+    <select id="selectCountPieceById" parameterType="Integer" resultMap="CountPieceResult">
+        <include refid="selectCountPieceVo"/>
+        where cp_id = #{cpId}
+    </select>
+        
+    <insert id="insertCountPiece" parameterType="CountPiece" useGeneratedKeys="true" keyProperty="cpId">
+        insert into tab_count_piece
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="cpUserId != null  ">cp_user_id,</if>
+			<if test="cpDate != null  ">cp_date,</if>
+			<if test="workId != null  ">work_id,</if>
+			<if test="workNumber != null  and workNumber != ''  ">work_number,</if>
+			<if test="workPrice != null  ">work_price,</if>
+			<if test="cpNumber != null  ">cp_number,</if>
+			<if test="totalPrice != null  ">total_price,</if>
+			<if test="cpBadNumber != null  ">cp_bad_number,</if>
+			<if test="cpRemark != null  and cpRemark != ''  ">cp_remark,</if>
+			<if test="cpLastUpdate != null  ">cp_last_update,</if>
+			<if test="cpLastId != null  ">cp_last_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="cpUserId != null  ">#{cpUserId},</if>
+			<if test="cpDate != null  ">#{cpDate},</if>
+			<if test="workId != null  ">#{workId},</if>
+			<if test="workNumber != null  and workNumber != ''  ">#{workNumber},</if>
+			<if test="workPrice != null  ">#{workPrice},</if>
+			<if test="cpNumber != null  ">#{cpNumber},</if>
+			<if test="totalPrice != null  ">#{totalPrice},</if>
+			<if test="cpBadNumber != null  ">#{cpBadNumber},</if>
+			<if test="cpRemark != null  and cpRemark != ''  ">#{cpRemark},</if>
+			<if test="cpLastUpdate != null  ">#{cpLastUpdate},</if>
+			<if test="cpLastId != null  ">#{cpLastId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateCountPiece" parameterType="CountPiece">
+        update tab_count_piece
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="cpUserId != null  ">cp_user_id = #{cpUserId},</if>
+            <if test="cpDate != null  ">cp_date = #{cpDate},</if>
+            <if test="workId != null  ">work_id = #{workId},</if>
+            <if test="workNumber != null  and workNumber != ''  ">work_number = #{workNumber},</if>
+            <if test="workPrice != null  ">work_price = #{workPrice},</if>
+            <if test="cpNumber != null  ">cp_number = #{cpNumber},</if>
+            <if test="totalPrice != null  ">total_price = #{totalPrice},</if>
+            <if test="cpBadNumber != null  ">cp_bad_number = #{cpBadNumber},</if>
+            <if test="cpRemark != null  and cpRemark != ''  ">cp_remark = #{cpRemark},</if>
+            <if test="cpLastUpdate != null  ">cp_last_update = #{cpLastUpdate},</if>
+            <if test="cpLastId != null  ">cp_last_id = #{cpLastId},</if>
+        </trim>
+        where cp_id = #{cpId}
+    </update>
+
+	<delete id="deleteCountPieceById" parameterType="Integer">
+        delete from tab_count_piece where cp_id = #{cpId}
+    </delete>
+	
+    <delete id="deleteCountPieceByIds" parameterType="String">
+        delete from tab_count_piece where cp_id in 
+        <foreach item="cpId" collection="array" open="(" separator="," close=")">
+            #{cpId}
+        </foreach>
+    </delete>
+
+    <!--通过工单id查询个人计件信息-->
+    <select id="selectPieceByWorkIdAndUid" resultMap="CountPieceResult">
+        SELECT * FROM tab_count_piece where company_id = #{companyId} and cp_user_id = #{cpUserId} and work_id = #{workId} and cp_date = #{cpDate}
+    </select>
+
+    <!--根据工单id查询对应的计件数量-->
+    <select id="selectPieceByWorkId" resultType="com.ruoyi.project.production.countPiece.domain.CountPiece">
+       SELECT coalesce(sum(cp_number),0) as cpNumber,coalesce(sum(cp_bad_number),0) as cpBadNumber,work_price as workPrice
+        FROM tab_count_piece where work_id = #{workid}
+        <if test="cpUserId != null and cpUserId > 0">
+            and cp_user_id = #{cpUserId}
+        </if>
+    </select>
+</mapper>

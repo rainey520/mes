@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title th:utext="${data != null ? data.fileSize:'作业指导书'}"></title>
+        <link th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
+        <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+        <script src="http://www.jq22.com/demo/jquerypdf201808150005/js/jquery.media.js"></script>
+        <script th:src="@{/ajax/libs/fullscreen/jquery.fullscreen.js}"></script>
+        <script th:src="@{/ajax/libs/jquery.media.js}"></script>
+        <style type="text/css">
+            html,body { height: 100%;margin: 0; padding: 0;}
+            .header{
+                position: fixed;
+                top: 0px;
+                right: 0px;
+                left: 0px;
+                text-align: center;
+                background-color: #0d8ddb;
+                height: 40px;
+                border-radius: 4px;
+                box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 1px 5px rgba(0,0,0,.075);
+                line-height: 35px;
+                color: #fff;
+            }
+        </style>
+        <script type="text/javascript" th:inline="javascript">
+            var isoId = [[${msg == null && data != null?data.isoId:0}]];
+            getCode();
+            function getCode() {
+                var i = self.setInterval("countdown()", 1000);
+            }
+            function countdown() {
+                var myDate = new Date();
+                //获取当前年
+                var year = myDate.getFullYear();
+                //获取当前月
+                var month = myDate.getMonth() + 1;
+                //获取当前日
+                var date = myDate.getDate();
+                var h = myDate.getHours();       //获取当前小时数(0-23)
+                var m = myDate.getMinutes();     //获取当前分钟数(0-59)
+                var s = myDate.getSeconds();
+                var now = year + '-' + getNow(month) + "-" + getNow(date) + " " + getNow(h) + ':' + getNow(m) + ":" + getNow(s);
+                // 赋值给展示时间
+                $('#now_time').text(now);
+            }
+            // 获取当前时间
+            function getNow(s) {
+                return s < 10 ? '0' + s : s;
+            }
+            function full() {
+                $('#wrapper').fullScreen();
+            }
+            $(document).ready(function() {
+                setInterval(getData, 15*1000);
+            });
+            function getData() {
+                $.post("/c/d/"+[[${code}]],function (res) {
+                    if(res.code == 0 && res.data){
+                        if(res.data.isoId != isoId){
+                            isoId = res.data.isoId;
+                            $("#center").children().remove();
+                            if(res.data.cId == 1){
+                                var data = '<div class="media" style="background-color: rgb(255, 255, 255); width: 100%;height: 100%">' +
+                                    '<iframe width="98%" height="100%" ' +
+                                    'src="'+res.data.path+'"></iframe></div>'
+                                $("#center").append(data);
+                            }else{
+                                var item = '<img src="'+res.data.path+'" width="100%" height="100%"/>';
+                                $("#center").append(item);
+                            }
+                            $("#title-span").text(res.data.fileSize);
+                            $("title").text(res.data.fileSize);
+                        }
+                    }else{
+                        $("#center").children().remove();
+                        var item ='<h1>'+res.msg+'</h1>'
+                        $("#center").append(item);
+                        isoId =0;
+                        $("#title-span").text("作业指导书");
+                        $("title").text("作业指导书");
+                    }
+                });
+            }
+        </script>
+    </head>
+    <body>
+       <div style="height:100%" id="wrapper">
+           <div class="header">
+               <span id="now_time" style="position: fixed;top: 0px;left: 10px;font-size: 18px;"></span>
+               <span style="font-size: 20px;font-weight: bold;"
+                     th:utext="${data != null ? data.fileSize:'作业指导书'}"></span>
+               <span style="cursor: pointer;font-size: 26px;position: fixed;right: 30px;" onclick="full()" ><i class="fa fa-arrows-alt"></i></span>
+           </div>
+           <div style="height: 100%;background-color: #e0e0e0;">
+               <div id="center" style="padding-top: 40px;height: 94%;text-align: center">
+                   <h1 th:if="${msg != null}" th:utext="${msg}"></h1>
+                   <div th:if="${msg == null && data != null and data.cId == 1}" class="media" style="background-color: rgb(255, 255, 255); width: 100%;height: 100%">
+                       <iframe width="98%" height="100%" id="view"
+                               th:src="${data.path}"></iframe>
+                   </div>
+                   <img id="view" th:if="${msg == null && data != null and data.cId == 0}" th:src="${data.path}" width="100%" height="100%"/>
+               </div>
+           </div>
+       </div>
+    </body>
+</html>

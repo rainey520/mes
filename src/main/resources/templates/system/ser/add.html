@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-ser-add">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">服务器名称：</label>
+				<div class="col-sm-8">
+					<input id="sname" name="sname" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">服务器密码：</label>
+				<div class="col-sm-8">
+					<input id="pwd" name="pwd" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">服务器IP：</label>
+				<div class="col-sm-8">
+					<input id="sip" name="sip" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">服务器路径：</label>
+				<div class="col-sm-8">
+					<input id="spath" name="spath" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">最大用户数：</label>
+				<div class="col-sm-8">
+					<input id="maxNum" name="maxNum" class="form-control" type="number" min="1">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">备注信息：</label>
+				<div class="col-sm-8">
+					<textarea id="remark" name="remark" rows="5" class="form-control" type="text"></textarea>
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "system/ser"
+		$("#form-ser-add").validate({
+			rules:{
+				sname:{
+					required:true,
+				},
+				pwd:{
+					required:true,
+				},
+				sip:{
+					required:true,
+				},
+				spath:{
+					required:true,
+				},
+				maxNum:{
+					required:true,
+				},
+			},messages:{
+				sname:{
+					required:"请填写服务器名称"
+				},
+				pwd:{
+					required:"请填写服务器密码"
+				},
+				sip:{
+					required:"请填写服务器IP"
+				},
+				spath:{
+					required:"请填写服务器地址"
+				},
+				maxNum:{
+					required:"请填写最大用户数量"
+				}
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/add", $('#form-ser-add').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

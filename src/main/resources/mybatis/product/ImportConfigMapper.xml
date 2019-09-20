@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.product.importConfig.mapper.ImportConfigMapper">
+    
+    <resultMap type="ImportConfig" id="ImportConfigResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="con1"    column="con1"    />
+        <result property="con2"    column="con2"    />
+        <result property="con3"    column="con3"    />
+        <result property="price"    column="price"    />
+        <result property="con4"    column="con4"    />
+        <result property="con5"    column="con5"    />
+        <result property="cType"    column="c_type"    />
+        <result property="cTime"    column="c_time"    />
+        <result property="unit"    column="unit"    />
+        <result property="rowIndex"    column="row_index"    />
+        <result property="cSign"    column="c_sign"    />
+        <result property="appId"    column="app_id"    />
+        <result property="apiKey"    column="api_key"    />
+        <result property="secretKey"    column="secret_key"    />
+    </resultMap>
+	
+	<sql id="selectImportConfigVo">
+        select id, company_id, con1, con2, con3, price, con4, con5, c_type, c_time, unit, row_index,c_sign,app_id,api_key,secret_key from tab_import_config
+    </sql>
+
+    
+    <select id="selectImportConfigByType" parameterType="Integer" resultMap="ImportConfigResult">
+        <include refid="selectImportConfigVo"/>
+        where c_type = #{cType} and company_id = #{companyId} limit 1
+    </select>
+        
+    <insert id="insertImportConfig" parameterType="ImportConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_import_config
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="con1 != null  ">con1,</if>
+			<if test="con2 != null  ">con2,</if>
+			<if test="con3 != null  ">con3,</if>
+			<if test="price != null  ">price,</if>
+			<if test="con4 != null  ">con4,</if>
+			<if test="con5 != null  ">con5,</if>
+			<if test="cType != null  ">c_type,</if>
+			<if test="cTime != null  ">c_time,</if>
+			<if test="unit != null  ">unit,</if>
+			<if test="rowIndex != null  ">row_index,</if>
+			<if test="cSign != null  ">c_sign,</if>
+			<if test="appId != null  ">app_id,</if>
+			<if test="apiKey != null  ">api_key,</if>
+			<if test="secretKey != null  ">secret_key,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="con1 != null  ">#{con1},</if>
+			<if test="con2 != null  ">#{con2},</if>
+			<if test="con3 != null  ">#{con3},</if>
+			<if test="price != null  ">#{price},</if>
+			<if test="con4 != null  ">#{con4},</if>
+			<if test="con5 != null  ">#{con5},</if>
+			<if test="cType != null  ">#{cType},</if>
+			<if test="cTime != null  ">#{cTime},</if>
+			<if test="unit != null  ">#{unit},</if>
+			<if test="rowIndex != null  ">#{rowIndex},</if>
+            <if test="cSign != null  ">#{cSign},</if>
+            <if test="appId != null  ">#{appId},</if>
+            <if test="apiKey != null  ">#{apiKey},</if>
+            <if test="secretKey != null  ">#{secretKey},</if>
+         </trim>
+    </insert>
+	 
+
+	<delete id="deleteImportConfigByType" parameterType="Integer">
+        delete from tab_import_config where c_type = #{cType} and company_id = #{companyId} limit 1
+    </delete>
+	
+
+    
+</mapper>

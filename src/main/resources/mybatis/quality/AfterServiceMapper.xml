@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.quality.afterService.mapper.AfterServiceMapper">
+    
+    <resultMap type="AfterService" id="AfterServiceResult">
+        <result property="id"    column="id"    />
+        <result property="inputBatchInfo"    column="input_batch_info"    />
+        <result property="inputTime"    column="input_time"    />
+        <result property="inputUserId"    column="input_user_id"    />
+        <result property="batchCode"    column="batch_code"    />
+        <result property="companyId"    column="company_id"    />
+        <association property="inputUserName" column="input_user_id" select="selectInputName">
+            <result property="inputUserName" column="user_id"/>
+        </association>
+    </resultMap>
+	
+	<sql id="selectAfterServiceVo">
+        select id, input_batch_info, input_time, input_user_id, batch_code,company_id from tab_after_service
+    </sql>
+	
+    <select id="selectAfterServiceList" parameterType="AfterService" resultMap="AfterServiceResult">
+        <include refid="selectAfterServiceVo"/>
+        <where>
+            <if test="companyId != null and companyId >0 "> and company_id = #{companyId}</if>
+             <if test="inputBatchInfo != null  and inputBatchInfo != '' ">
+              and input_batch_info like concat ('%',#{inputBatchInfo},'%')
+              </if>
+             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(input_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+             </if>
+             <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(input_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+             </if>
+         </where>
+         order by input_time desc
+    </select>
+
+    <!--通过搜索条件查询记录列表-->
+    <select id="selectAfterServiceListBySearchItems" resultMap="AfterServiceResult">
+        <include refid="selectAfterServiceVo"/>
+        <where>
+            <if test="searchItems != null">
+                AND
+                <foreach collection="searchItems" item="searchItems" open="(" close=")" separator="or">
+                    input_batch_info LIKE CONCAT(CONCAT('%', #{searchItems}), '%')
+                </foreach>
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(input_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(input_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
+
+    <!--查询录入者名称-->
+    <select id="selectInputName" resultType="java.lang.String">
+        SELECT user_name FROM sys_user where user_id = #{input_user_id};
+    </select>
+
+    <select id="selectAfterServiceById" parameterType="Integer" resultMap="AfterServiceResult">
+        <include refid="selectAfterServiceVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertAfterService" parameterType="AfterService" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_after_service
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="inputBatchInfo != null  and inputBatchInfo != ''  ">input_batch_info,</if>
+            <if test="companyId != null ">company_id,</if>
+			<if test="inputTime != null  ">input_time,</if>
+			<if test="inputUserId != null  ">input_user_id,</if>
+			<if test="batchCode != null  and batchCode != ''  ">batch_code,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="inputBatchInfo != null  and inputBatchInfo != ''  ">#{inputBatchInfo},</if>
+            <if test="companyId != null ">#{companyId},</if>
+			<if test="inputTime != null  ">#{inputTime},</if>
+			<if test="inputUserId != null  ">#{inputUserId},</if>
+			<if test="batchCode != null  and batchCode != ''  ">#{batchCode},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateAfterService" parameterType="AfterService">
+        update tab_after_service
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="inputBatchInfo != null  and inputBatchInfo != ''  ">input_batch_info = #{inputBatchInfo},</if>
+            <if test="companyId != null ">company_id = #{companyId},</if>
+            <if test="inputTime != null  ">input_time = #{inputTime},</if>
+            <if test="inputUserId != null  ">input_user_id = #{inputUserId},</if>
+            <if test="batchCode != null  and batchCode != ''  ">batch_code = #{batchCode},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteAfterServiceById" parameterType="Integer">
+        delete from tab_after_service where id = #{id}
+    </delete>
+	
+    <delete id="deleteAfterServiceByIds" parameterType="String">
+        delete from tab_after_service where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过搜索条件查询所有的录入者姓名-->
+    <select id="selectListBySearchInfoUserName" resultType="java.lang.String">
+        select GROUP_CONCAT(b.user_name) AS inputUserName from (SELECT * from tab_after_service where input_batch_info like concat ('%',#{searchItem},'%')
+        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(input_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(input_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+        </if>
+         group by input_user_id) as a,sys_user as b where a.input_user_id = b.user_id
+    </select>
+
+    <!--通过搜索条件查询售后服务列表-->
+    <select id="selectListByBatchInfo"  resultType="com.ruoyi.project.quality.afterService.domain.AfterServiceItem">
+        SELECT count(*) as totalNum, min(input_time) as sTime,max(input_time) as eTime from tab_after_service where input_batch_info like concat ('%',#{searchItem},'%')
+        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(input_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(input_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+        </if>;
+    </select>
+
+</mapper>

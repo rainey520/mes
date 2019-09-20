@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-materiel-add">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">物料编码：</label>
+				<div class="col-sm-8">
+					<input id="materielCode" name="materielCode" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">物料型号：</label>
+				<div class="col-sm-8">
+					<input id="materielModel" name="materielModel" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">物料名称：</label>
+				<div class="col-sm-8">
+					<input id="materielName" name="materielName" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">单价(含税)：</label>
+				<div class="col-sm-8">
+					<input id="price" name="price" class="form-control" type="number">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">备注信息：</label>
+				<div class="col-sm-8">
+					<textarea id="remark" rows="4" name="remark" class="form-control" type="text"></textarea>
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "erp/materiel"
+		$("#form-materiel-add").validate({
+			rules:{
+                materielCode:{
+					required:true,
+                    remote: {
+                        url: prefix + "/checkMaterielCodeUnique",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            name: function () {
+                                return $.common.trim($("#materielCode").val());
+                            }
+                        },
+                        dataFilter: function (data, type) {
+                            return $.validate.unique(data);
+                        }
+                    }
+				},
+                materielModel:{
+                    required:true,
+                },
+                price:{
+                    required:true,
+                },
+			},
+            messages: {
+                "materielCode": {
+                    remote: "物料编码已经存在"
+                },
+            }
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/add", $('#form-materiel-add').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

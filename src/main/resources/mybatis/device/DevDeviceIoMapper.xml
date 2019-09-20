@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.device.devDeviceIo.mapper.DevDeviceIoMapper">
+    
+    <resultMap type="DevDeviceIo" id="DevDeviceIoResult">
+        <result property="id"    column="id"    />
+        <result property="devId"    column="dev_id"    />
+        <result property="ioname"    column="ioname"    />
+        <result property="ioposition"    column="ioposition"    />
+        <result property="note"    column="note"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+	
+	<sql id="selectDevDeviceIoVo">
+        select id, dev_id, ioname, ioposition, note, create_time from dev_device_io
+    </sql>
+	
+    <select id="selectDevDeviceIoList" parameterType="DevDeviceIo" resultMap="DevDeviceIoResult">
+        <include refid="selectDevDeviceIoVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="devId != null "> and dev_id = #{devId}</if>
+             <if test="ioname != null  and ioname != '' "> and ioname = #{ioname}</if>
+             <if test="ioposition != null "> and ioposition = #{ioposition}</if>
+             <if test="note != null  and note != '' "> and note = #{note}</if>
+             <if test="createTime != null "> and create_time = #{createTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectDevDeviceIoById" parameterType="Integer" resultMap="DevDeviceIoResult">
+        <include refid="selectDevDeviceIoVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDevDeviceIo" parameterType="DevDeviceIo" useGeneratedKeys="true" keyProperty="id">
+        insert into dev_device_io
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="devId != null  ">dev_id,</if>
+			<if test="ioname != null  and ioname != ''  ">ioname,</if>
+			<if test="ioposition != null  ">ioposition,</if>
+			<if test="note != null  and note != ''  ">note,</if>
+			<if test="createTime != null  ">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="devId != null  ">#{devId},</if>
+			<if test="ioname != null  and ioname != ''  ">#{ioname},</if>
+			<if test="ioposition != null  ">#{ioposition},</if>
+			<if test="note != null  and note != ''  ">#{note},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateDevDeviceIo" parameterType="DevDeviceIo">
+        update dev_device_io
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="devId != null  ">dev_id = #{devId},</if>
+            <if test="ioname != null  and ioname != ''  ">ioname = #{ioname},</if>
+            <if test="ioposition != null  ">ioposition = #{ioposition},</if>
+            <if test="note != null  and note != ''  ">note = #{note},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteDevDeviceIoById" parameterType="Integer">
+        delete from dev_device_io where id = #{id}
+    </delete>
+	
+    <delete id="deleteDevDeviceIoByIds" parameterType="String">
+        delete from dev_device_io where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <select id="selectDeviceIoByDevId" parameterType="Integer" resultType="Map">
+        select ioname, ioposition from dev_device_io
+        where dev_id = #{devId}
+    </select>
+    
+</mapper>

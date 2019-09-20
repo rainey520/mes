@@ -1,0 +1,568 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            车间：
+                            <select name="single" class="kuan"
+                                    th:with="single=${@single.selectSingleWorkListSign0()}">
+                                <option value="">全部</option>
+                                <option th:each="s : ${single}" th:text="${s.workshopName}"
+                                        th:value="${s.id}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            产品/半成品：
+                            <select id="productName" name="productName"
+                                    th:with="productList=${@product.selectProductAllByCompanyId(-1)}">
+                                <option value="">全部</option>
+                                <option th:each="pro : ${productList}" th:text="${pro.productName +'-'+pro.productCode}"
+                                        th:value="${pro.productName}"></option>
+                            </select>
+                        </li>
+
+                        <li>
+                            创建者：
+                            <select style="width: 200px" id="createBy" name="createBy" class="kuan"
+                                    th:with="user=${@user.selectComAllUser()}">
+                                <option value="">全部</option>
+                                <option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userName}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            责任人：
+                            <select style="width: 200px" id="deviceLiable" name="deviceLiable" class="kuan"
+                                    th:with="user=${@user.selectComAllUser()}">
+                                <option value="">全部</option>
+                                <option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
+                            </select>
+                        </li>
+
+                        <li>
+                            <!--工单生产状态：<input type="text" name="workorderStatus" />-->
+                            生产状态：
+                            <select style="width: 200px" name="workorderStatus">
+                                <option value="">全部</option>
+                                <option value="0">未进行</option>
+                                <option value="1">进行中</option>
+                                <option value="2">已完成</option>
+                            </select>
+                        </li>
+                        <li>
+                            <!--工单生产状态：<input type="text" name="workorderStatus" />-->
+                            ECN：
+                            <select style="width: 100px" name="ecnStatus">
+                                <option value="">全部</option>
+                                <option value="0">无</option>
+                                <option value="1">有</option>
+                            </select>
+                        </li>
+                        <li>
+                            <!--工单生产状态：<input type="text" name="workorderStatus" />-->
+                            作废：
+                            <select style="width: 100px" name="abolish">
+                                <option value="">全部</option>
+                                <option value="0">否</option>
+                                <option value="1">是</option>
+                            </select>
+                        </li>
+                        <li>
+                            工单号：<input type="text" style="max-width: 200px" name="workorderNumber"/>
+                        </li>
+                        <li>
+                            订单：<input type="text" style="max-width: 200px" name="orderCode"/>
+                        </li>
+                        <li class="select-time">
+                            <label>创建时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="params[beginTime]"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间"
+                                   name="params[endTime]"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="formReset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <!--<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()"-->
+            <!--shiro:hasPermission="device:devWorkOrder:edit">-->
+            <!--<i class="fa fa-edit"></i> 修改-->
+            <!--</a>-->
+            <!--<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()"-->
+            <!--shiro:hasPermission="device:devWorkOrder:remove">-->
+            <!--<i class="fa fa-remove"></i> 删除-->
+            <!--</a>-->
+            <!--<a class="btn btn-danger btn-edit disabled btn-cd" onclick="dismantle()"-->
+            <!--shiro:hasPermission="device:devWorkOrder:edit">-->
+            <!--<i class="fa fa-random"></i> 拆单-->
+            <!--</a>-->
+            <!--<a class="btn btn-danger  btn-hd disabled" onclick="merge()"-->
+            <!--shiro:hasPermission="device:devWorkOrder:remove">-->
+            <!--<i class="fa fa-plus-square-o"></i> 合单-->
+            <!--</a>-->
+            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="device:devWorkOrder:export">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    $("select").select2({
+        width: 100
+    })
+    $(".kuan").select2({
+        width: 160
+    })
+    $("select[name='productName']").select2({
+        width: 200
+    })
+
+    // 重置搜索表单信息
+    function formReset() {
+        $('#formId')[0].reset();//input标签重置
+        $("select").val(null).trigger("change"); // select2标签重置
+    }
+
+    var editFlag = [[${@permission.hasPermi('device:devWorkOrder:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('device:devWorkOrder:remove')}]];
+    var workChange = [[${@permission.hasPermi('production:workOrderChange:list')}]];
+    var workSingle = [[${@permission.hasPermi('production:singleWorkOrder:list')}]];
+    var woMesFlag = [[${@permission.hasPermi('mes:mesBatch:add')}]];
+    var prefix = ctx + "device/devWorkOrder";
+
+    $(function () {
+        var options = {
+            url: prefix + "/list1",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "工单",
+            search: false,
+            showExport: false,
+            showSearch: true,
+            showRefresh: true,
+            showColumns: false,
+            showToggle: true,
+            sortName: 'createTime',
+            sortOrder: 'desc',
+            columns: [
+                {
+                    field: 'id',
+                    title: '',
+                    visible: false
+                },
+                {
+                    field: 'workSign',
+                    title: '',
+                    visible: false
+                },
+                {
+                    field: 'param1',
+                    title: '车间',
+                    formatter: function (value, row, index) {
+                        if (row.wlSign == 1 && workSingle == "") {
+                            return '<a class="btn btn-primary btn-xs" href="#" onclick="configSingle(' + row.id + ',' + row.lineId + ',\'' + value + '\')">' + value + '</a>';
+                        }
+                        return value;
+                    }
+                },
+                {
+                    field: 'orderCode',
+                    title: '订单',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        if (value) {
+                            return value;
+                        }
+                        return "-";
+                    }
+                },
+                {
+                    field: 'workorderNumber',
+                    title: '工单号',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        if (row.abolish == 1) {
+                            return '<a href="javascript:void(0)" onclick="showWorkOrderDetail(\'' + row.id + '\')"><span style="color: red;font-weight: bold">' + value + '</span></a>'
+                        }
+                        return '<a href="javascript:void(0)" onclick="showWorkOrderDetail(\'' + row.id + '\')"><span style="font-weight: bold;color:#1E0FBE">' + value + '</span></a>';
+                    }
+                },
+                {
+                    title: 'MES操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.abolish == 0) {
+                            actions.push('<a class="btn btn-primary btn-xs ' + woMesFlag + '" href="javascript:void(0)" onclick="woConfigMes(\'' + row.id + '\',\'' + row.workorderNumber + '\')"><i></i>配料</a> ');
+                            actions.push('<a class="btn btn-success btn-xs ' + woMesFlag + '" href="javascript:void(0)" onclick="mesProduce(\'' + row.id + '\',\'' + row.workorderNumber + '\')"><i></i>生产</a> ');
+                        }
+                        return actions.join('');
+                    }
+                },
+                {
+                    field: 'ecnStatus',
+                    title: 'ECN',
+                    formatter: function (value, row, index) {
+                        if (row.abolish == 0) {
+                            if (value == 0) {
+                                return '<a class="btn btn-default btn-xs" href="#" onclick="ecnView(' + row.id + ')">无</a>';
+                            }
+                            return '<a class="btn btn-primary btn-xs " href="#" onclick="ecnView(' + row.id + ')">有</a>';
+                        }
+                        return "-";
+
+                    }
+                },
+                {
+                    field: 'workorderStatus',
+                    title: '生产状态',
+                    formatter: function (value, row, index) {
+                        if (row.abolish == 1) {
+                            return '<span style="font-weight: bold;color: red">已作废</span>'
+                        }
+                        if (row.workorderStatus == 0) {
+                            return '<span style="font-weight: bold;color: blue">未进行</span>';
+                        } else if (row.workorderStatus == 1) {
+                            return '<span style="font-weight: bold;color: green">进行中</span>';
+                        } else if (row.workorderStatus == 2) {
+                            return '<span style="font-weight: bold;color: orangered">已完成</span>';
+                        }
+                    }
+                },
+                {
+                    field: 'productCode',
+                    title: '产品/半成品',
+                    sortable: true
+                },
+                {
+                    field: 'productNumber',
+                    title: '生产数量',
+                    sortable: true
+                },
+                {
+                    field: 'productStandardHour',
+                    title: 'PCS/H',
+                    width: 60,
+                    sortable: true
+                },
+                {
+                    // field: 'operationStatus',
+                    title: '状态管理',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.abolish == 0) {
+                            // 工单操作状态判断
+                            if (row.operationStatus == 0 || row.operationStatus == 2) {
+                                actions.push('<a class="btn btn-warning btn-xs ' + editFlag + '" id="editStatus' + row.id + '" href="javascript:void(0)" onclick="editStatus(' + row.id + ',' + row.lineId + ',\'' + row.param1 + '\')"><i></i>开始</a> ');
+                            } else if (row.operationStatus == 1) {
+                                actions.push('<a class="btn btn-primary btn-xs ' + editFlag + '" id="editStatus' + row.id + '" href="javascript:void(0)" onclick="editStatus(\'' + row.id + '\')"><i></i>暂停</a> ');
+                            } else if (row.operationStatus == 3) { // 工单结束，按钮不可点击
+                                actions.push('<a class="btn btn-danger btn-xs ' + editFlag + '" href="javascript:void(0)" disabled="true"><i></i>结束</a> ');
+                            }
+                            // 工单结束状态
+                            if (row.workorderStatus == 2 || row.workorderStatus == 0) { // 未开始和已经完成的工单完成不可点击
+                                actions.push('<a class="btn btn-danger btn-xs ' + editFlag + '" href="javascript:void(0)" disabled="true"><i></i>完成</a> ');
+                            } else {
+                                actions.push('<a class="btn btn-primary btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="finishWorkerOrder(\'' + row.id + '\')"><i></i>结束</a> ');
+                            }
+                        }
+                        return actions.join('');
+                    }
+                },
+                {
+                    title: '工单管理',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.abolish == 0) {
+                            // 工单提交状态 已经提交的工单不可修改和删除
+                            if (row.workSign == 0) {  // 工单还未提交可进行修改
+                                actions.push('<a class="btn btn-default btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="edit(' + row.id + ',' + row.wlSign + ')"><i></i>编辑</a> ');
+                                actions.push('<a class="btn btn-primary btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="submitWorkOrder(\'' + row.id + '\')"><i></i>提交</a> ');
+                            } else if (row.workSign == 1) { // 工单已经提交，不能修改
+                                actions.push('<a class="btn btn-default btn-xs ' + editFlag + '" href="javascript:void(0)" disabled="true"><i></i>编辑</a> ');
+                                actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" disabled="true"><i></i>已提</a> ');
+                                actions.push('<a class="btn btn-primary btn-xs ' + woMesFlag + '" href="javascript:void(0)" disabled="true"><i></i>MES</a> ');
+                            }
+                        }
+
+                        actions.push('<a class="btn btn-warning btn-xs ' + workChange + '"  href="javascript:void(0)" onclick="toChange(' + row.id + ',\'' + row.workorderNumber + '\')"><i></i>变更</a> ');
+                        // 只有生产状态处于未生产的工单才允许删除
+                        if (row.workorderStatus == 0) {
+                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i></i>删除</a> ');
+                        } else {
+                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" disabled="true"><i></i>删除</a> ');
+                        }
+                        return actions.join('');
+                    }
+                }
+            ]
+        };
+        $.table.init(options);
+    });
+
+    /**
+     * 跳转到添加页面
+     */
+    function toAdd() {
+        var url = prefix + "/add";
+        createMenuItem(url, "新建工单");
+    }
+
+
+    function showWorkOrderDetail(id) {
+        var url = prefix + "/showWorkOrderDetail/" + id;
+        $.modal.open("工单详情", url, 900, 620);
+    }
+
+    // 修改开始暂停状态
+    function editStatus(id, singleId, name) {
+        var x = document.getElementById("editStatus" + id);
+        // 通过.innerText获取不同的当前状态类型
+        if (x.innerText == "开始") {
+            $.modal.confirm("确认开始吗", function () {
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    dataType: 'json',
+                    url: prefix + "/editWorkerOrderById", // 一点击开始，工单数据进行初始化
+                    data: {
+                        "id": id,
+                    },
+                    async: false,
+                    error: function (request) {
+                        $.modal.alertError("系统错误");
+                    },
+                    success: function (data) {
+                        if (data.code == 0) {
+                            $.modal.alertWarning("工单已经开始了...");
+                            $.table.refresh(); // 重新刷新
+                        } else {
+                            if (data.msg == '该工单未分配，请先分配工单') {
+                                $.modal.confirm("该工单未分配，确认分配工单吗？", function (res) {
+                                    if (res) {
+                                        $.modal.open(name + " 单工位配置", "/production/singleWorkOrder?type=1&singleId=" + singleId + "&orderId=" + id, 800, 700);
+                                    }
+                                })
+                            } else {
+                                $.modal.alertError(data.msg);
+                            }
+                        }
+                    }
+                });
+            });
+        } else if (x.innerText == "暂停") {
+            $.modal.confirm("确认暂停吗", function () {
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    dataType: 'json',
+                    url: prefix + "/editWorkerOrderById",
+                    data: {
+                        "id": id,
+                    },
+                    async: false,
+                    error: function (request) {
+                        $.modal.alertError("系统错误");
+                    },
+                    success: function (data) {
+                        if (data.code == 0) {
+                            $.modal.alertWarning("工单已经暂停了...");
+                            $.table.refresh();
+                        } else {
+                            $.modal.alertError(data.msg);
+                        }
+                    }
+                });
+            });
+        }
+    }
+
+    /**
+     * 提交工单确认工单
+     * @param id
+     */
+    function submitWorkOrder(id) {
+        $.modal.confirm("提交工单不可进行修改删除，确认执行该操作吗？", function () {
+            $.ajax({
+                type: 'POST',
+                url: prefix + '/submitWorkOrder',
+                dataType: 'json',
+                data: {
+                    id: id
+                },
+                async: false,  //同步请求，
+                success: function (result) {
+                    if (result.code == 0) {
+                        $.modal.alertWarning("工单已经提交了");
+                        $.table.refresh();
+                    } else {
+                        $.modal.alertError(result.msg);
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * 结束工单
+     * @param id
+     */
+    function finishWorkerOrder(id) {
+        $.modal.confirm("结束工单可进行修改，确认执行该操作吗？", function () {
+
+            $.ajax({
+                type: 'POST',
+                url: prefix + '/finishWorkerOrder',
+                dataType: 'json',
+                data: {
+                    id: id
+                },
+                async: false,  //同步请求，
+                success: function (result) {
+                    if (result.code == 0) {
+                        $.modal.alertWarning("工单已经结束了");
+                        $.table.refresh();
+                    } else {
+                        $.modal.alertError(result.msg);
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * 工单变更
+     * @param id
+     */
+    function toChange(id, code) {
+        createMenuItem("/production/workOrderChange?order_id=" + id, "工单 " + code + " 变更")
+    }
+
+    /**
+     * 查询工单ecn
+     * @param id
+     */
+    function ecnView(id) {
+        $.modal.open("ECN详情", prefix + "/workecn?workId=" + id, 800, 400)
+    }
+
+    /**
+     * 工单合并
+     */
+    function merge() {
+        var rows = $.table.selectColumns("id");
+        $.modal.confirm("确定合并选中的工单吗", function (e) {
+            if (e) {
+                var config = {
+                    url: prefix + '/merge/verif',
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        workids: rows,
+                        type: 0,
+                    },
+                    beforeSend: function () {
+                        $.modal.loading("正在处理中，请稍后...");
+                        $.modal.disable();
+                    },
+                    success: function (result) {
+                        if (result.code == web_status.SUCCESS) {
+                            $.modal.open("工单合并", prefix + "/merge/page?workids=" + JSON.stringify(rows).replace("[", "").replace("]", ""));
+                        } else {
+                            $.modal.alertError(result.msg);
+                        }
+                        $.modal.closeLoading();
+                        $.modal.enable();
+                    }
+                };
+                $.ajax(config)
+            }
+        })
+    }
+
+    /**
+     * 拆单
+     */
+    function dismantle() {
+        var rows = $.table.selectColumns("id");
+        $.modal.confirm("确定将该工单拆除吗", function (e) {
+            if (e) {
+                var config = {
+                    url: prefix + '/merge/verif',
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        workids: rows,
+                        type: 1,
+                    },
+                    beforeSend: function () {
+                        $.modal.loading("正在处理中，请稍后...");
+                        $.modal.disable();
+                    },
+                    success: function (result) {
+                        if (result.code == web_status.SUCCESS) {
+                            createMenuItem(prefix + "/dismantle?id=" + rows[0], "拆除工单")
+                        } else {
+                            $.modal.alertError(result.msg);
+                        }
+                        $.modal.closeLoading();
+                        $.modal.enable();
+                    }
+                };
+                $.ajax(config)
+            }
+        })
+    }
+
+    function edit(id, sign) {
+        $.modal.open("修改工单", prefix + "/edit/" + id, 800, sign == 0 ? 800 : 400)
+    }
+
+    /**
+     * 工单单工位配置
+     * @param id
+     * @param name
+     */
+    function configSingle(id, singleId, name) {
+        $.modal.open(name + " 单工位配置", "/production/singleWorkOrder?type=1&singleId=" + singleId + "&orderId=" + id, 800, 700);
+    }
+
+    function woConfigMes(id, code) {
+        var url = prefix + "/woConfigMes?id=" + id;
+        createMenuItem(url, code + "配置MES批次追踪");
+    }
+    /**
+     * 工单MES生产
+     */
+    function mesProduce() {
+        var url = prefix + "/mesProduce?id=" + id;
+        createMenuItem(url, code + "--MES生产");
+    }
+
+</script>
+</body>
+</html>

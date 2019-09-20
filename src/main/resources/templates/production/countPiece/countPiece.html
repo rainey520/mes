@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/jquery-layout/jquery.layout-latest.css}" rel="stylesheet"/>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            计件归属人：
+                            <select id="cpUserId" name="cpUserId"
+                                    th:with="user=${@user.selectComAllUser()}">
+                                <option value="-1">请选择</option>
+                                <option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
+                            </select>
+                        </li>
+
+                        <li class="select-time">
+                            <label>计件日期： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="params[beginTime]"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间"
+                                   name="params[endTime]"/>
+                        </li>
+
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.operate.add()"
+               shiro:hasPermission="production:countPiece:add">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="production:countPiece:export">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:src="@{/ajax/libs/jquery-layout/jquery.layout-latest.js}"></script>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('production:countPiece:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('production:countPiece:remove')}]];
+    var prefix = ctx + "production/countPiece";
+
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "计件信息",
+            search: false,
+            showFooter: true,
+            showExport: false,
+            showSearch:true,
+            showRefresh:true,
+            showColumns:false,
+            showToggle:true,
+            columns: [
+                {
+                    field: 'cpId',
+                    title: '计件管理主键id',
+                    visible: false
+                },
+                // {
+                //     field: 'cpDate',
+                //     title: '计件日期',
+                //     sortable: true,
+                //     formatter: function (value, row, index) {
+                //         var date = new Date(row.cpDate);
+                //         var y = date.getFullYear();
+                //         var m = date.getMonth() + 1;
+                //         var d = date.getDate();
+                //         // return y + '-' +m + '-' + d;
+                //         return '<i class="fa fa-calendar" aria-hidden="true"></i> <a  href="javascript:void(0)" onclick="showDetaiByCpDate(\'' + y + '-' + m + '-' + d + '\')">' +
+                //             '<span style="font-weight: bold;color: blue">' + y + '-' + m + '-' + d + '</span></a>';
+                //     },
+                //
+                // },
+                {
+                    field: 'cpUserId',
+                    title: '计件归属人',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return '<i class="fa fa-user-circle-o" aria-hidden="true"></i> <a href="javascript:void(0)" onclick="showDetaiByUid(\'' + row.cpUserId + '\',\'' + row.cpUserName + '\')">' +
+                            '<span style="font-weight: bold;color: green">' + row.cpUserName + '</span></a>';
+                    },
+                    footerFormatter:function () {
+                        return "<span style='font-weight: bold;color: #1E0FBE'>总金额<span>";
+                    }
+                },
+                {
+                    field: 'sumCpNumber',
+                    title: '个人计件总数',
+                    formatter: function (value, row, index) {
+                        return '<span style="font-weight: bold;color: #00a65a">' + row.sumCpNumber + '</span>'
+                    }
+                },
+                {
+                    field: 'sumTotalPrice',
+                    title: '个人计件总价',
+                    formatter: function (value, row, index) {
+                        return '<span style="font-weight: bold;color:#e08e0b">' + row.sumTotalPrice + '</span>'
+                    },
+                    footerFormatter:function (value) {
+                        var sumBalance = 0;
+                        for (var i in value) {
+                            sumBalance += parseInt(value[i].sumTotalPrice);
+                        }
+                        return '<span style="font-weight: bold;color: #1E0FBE">' + sumBalance + '</span>';
+                    }
+                },
+                {
+                    field: 'sumCpBadNumber',
+                    title: '个人计件不良品数',
+                    formatter: function (value, row, index) {
+                        return '<span style="font-weight: bold;color:red">' + row.sumCpBadNumber + '</span>'
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+
+    /**
+     * 查询指定计件人的所有计件信息
+     */
+    function showDetaiByUid(cpUserId, cpUserName) {
+        var url = prefix + "/showDetaiByUid?cpUserId=" + cpUserId;
+        createMenuItem(url, "查看" + cpUserName + "的计件详情");
+    }
+
+    /**
+     * 查询指定日期的所有计件信息
+     */
+    function showDetaiByCpDate(cpDate) {
+        var url = prefix + "/showDetaiByCpDate?cpDate=" + cpDate;
+        createMenuItem(url, "查看" + cpDate + "的计件详情");
+    }
+</script>
+</body>
+</html>

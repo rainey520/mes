@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.production.workOrderChange.mapper.WorkOrderChangeMapper">
+    
+    <resultMap type="WorkOrderChange" id="WorkOrderChangeResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="orderCode"    column="order_code"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="lineName"    column="line_name"    />
+        <result property="deviceLiable"    column="device_liable"    />
+        <result property="deviceLiable2"    column="device_liable2"    />
+        <result property="productionStart"    column="production_start"    />
+        <result property="productionEnd"    column="production_end"    />
+        <result property="productNumber"    column="product_number"    />
+        <result property="createPeople"    column="create_people"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="cStatus"    column="c_status"    />
+        <result property="sign"    column="sign"    />
+        <result property="workPrice"    column="work_price"    />
+        <result property="orderCodeInfo"    column="order_code_info"    />
+    </resultMap>
+	
+	<sql id="selectWorkOrderChangeVo">
+        select id, company_id, order_id, order_code,remark, line_id, line_name, device_liable, device_liable2,
+         production_start, production_end, product_number, create_people, create_time,c_status,sign,work_price,order_code_info from dev_work_order_change
+    </sql>
+	
+    <select id="selectWorkOrderChangeList" parameterType="WorkOrderChange" resultMap="WorkOrderChangeResult">
+        <include refid="selectWorkOrderChangeVo"/>
+        <where>
+          company_id = #{companyId} and order_id = #{orderId}
+         </where>
+    </select>
+        
+    <insert id="insertWorkOrderChange" parameterType="WorkOrderChange" useGeneratedKeys="true" keyProperty="id">
+        insert into dev_work_order_change
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="orderId != null  ">order_id,</if>
+			<if test="orderCode != null  and orderCode != ''  ">order_code,</if>
+			<if test="lineId != null  ">line_id,</if>
+			<if test="lineName != null  and lineName != ''  ">line_name,</if>
+			<if test="deviceLiable != null  and deviceLiable != ''  ">device_liable,</if>
+			<if test="deviceLiable2 != null  and deviceLiable2 != ''  ">device_liable2,</if>
+			<if test="productionStart != null  ">production_start,</if>
+			<if test="productionEnd != null  ">production_end,</if>
+			<if test="productNumber != null  ">product_number,</if>
+			<if test="createPeople != null  and createPeople != ''  ">create_people,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="remark != null  ">remark,</if>
+			<if test="cStatus != null  ">c_status,</if>
+			<if test="sign != null  ">sign,</if>
+			<if test="workPrice != null  ">work_price,</if>
+			<if test="orderCodeInfo != null  ">order_code_info,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="orderId != null  ">#{orderId},</if>
+			<if test="orderCode != null  and orderCode != ''  ">#{orderCode},</if>
+			<if test="lineId != null  ">#{lineId},</if>
+			<if test="lineName != null  and lineName != ''  ">#{lineName},</if>
+			<if test="deviceLiable != null  and deviceLiable != ''  ">#{deviceLiable},</if>
+			<if test="deviceLiable2 != null  and deviceLiable2 != ''  ">#{deviceLiable2},</if>
+			<if test="productionStart != null  ">#{productionStart},</if>
+			<if test="productionEnd != null  ">#{productionEnd},</if>
+			<if test="productNumber != null  ">#{productNumber},</if>
+			<if test="createPeople != null  and createPeople != ''  ">#{createPeople},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="remark != null  ">#{remark},</if>
+			<if test="cStatus != null  ">#{cStatus},</if>
+			<if test="sign != null  ">#{sign},</if>
+			<if test="workPrice != null  ">#{workPrice},</if>
+			<if test="orderCodeInfo != null  ">#{orderCodeInfo},</if>
+         </trim>
+    </insert>
+</mapper>

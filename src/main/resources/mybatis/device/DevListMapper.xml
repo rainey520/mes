@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.device.devList.mapper.DevListMapper">
+    
+    <resultMap type="DevList" id="DevListResult">
+        <result property="id"    column="id"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceStatus"    column="device_status"    />
+        <result property="configStatus"    column="config_status"    />
+        <result property="deviceName"    column="device_name"    />
+        <result property="devModelId"    column="dev_model_id"    />
+        <result property="deviceUploadTime"    column="device_upload_time"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="remark"    column="remark"    />
+        <result property="defId"    column="def_id"    />
+        <result property="configDate"    column="config_date"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="sign"    column="sign"    />
+        <result property="devType"    column="dev_type"    />
+    </resultMap>
+	
+	<sql id="selectDevListVo">
+        select id, device_id, device_status,config_status, device_name, dev_model_id, device_upload_time,
+         company_id, remark, def_id, config_date, create_date,sign,dev_type from dev_list
+    </sql>
+	
+    <select id="selectDevListList" parameterType="DevList" resultMap="DevListResult">
+        <include refid="selectDevListVo"/>
+        <where>
+            and def_id = 0
+             <if test="deviceId != null  and deviceId != '' "> and device_id like concat(#{deviceId}, '%') </if>
+             <if test="deviceStatus != null and deviceStatus > -1 "> and device_status = #{deviceStatus}</if>
+             <if test="configStatus != null and configStatus > -1 "> and config_status = #{configStatus}</if>
+              and company_id = #{companyId}
+             <if test="deviceName != null  and deviceName != '' "> and device_name like concat(#{deviceName}, '%')</if>
+             <if test="devModelId > 0 "> and dev_model_id = #{devModelId}</if>
+             <if test="sign != null and sign > -1 "> and sign = #{sign}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_date,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_date,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+         </where>
+    </select>
+
+    <select id="selectDevModel" resultType="java.lang.String">
+        SELECT model_name FROM dev_model where id =#{dev_model_id}
+    </select>
+
+    <select id="selectDevListById" parameterType="Integer" resultMap="DevListResult">
+        <include refid="selectDevListVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectDevListByDevId" parameterType="java.lang.String" resultMap="DevListResult">
+        <include refid="selectDevListVo"/>
+        where device_id = #{device_id}
+    </select>
+        
+    <insert id="insertDevList" parameterType="DevList" useGeneratedKeys="true" keyProperty="id">
+        insert into dev_list
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''  ">id,</if>
+			<if test="deviceId != null  and deviceId != ''  ">device_id,</if>
+			<if test="deviceStatus != null  ">device_status,</if>
+			<if test="deviceName != null  and deviceName != ''  ">device_name,</if>
+			<if test="devModelId != null  ">dev_model_id,</if>
+			<if test="deviceUploadTime != null  ">device_upload_time,</if>
+			<if test="companyId != null  ">company_id,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+			<if test="defId != null  ">def_id,</if>
+			<if test="configDate != null  ">config_date,</if>
+			<if test="createDate != null  ">create_date,</if>
+            <if test="devType != null  ">dev_type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null  and id != ''  ">#{id},</if>
+			<if test="deviceId != null  and deviceId != ''  ">#{deviceId},</if>
+			<if test="deviceStatus != null  ">#{deviceStatus},</if>
+			<if test="deviceName != null  and deviceName != ''  ">#{deviceName},</if>
+			<if test="devModelId != null  ">#{devModelId},</if>
+			<if test="deviceUploadTime != null  ">#{deviceUploadTime},</if>
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+			<if test="defId != null  ">#{defId},</if>
+			<if test="configDate != null  ">#{configDate},</if>
+			<if test="createDate != null  ">#{createDate},</if>
+            <if test="devType != null  ">#{devType},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateDevList" parameterType="DevList">
+        update dev_list
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceId != null  and deviceId != ''  ">device_id = #{deviceId},</if>
+            <if test="deviceStatus != null  ">device_status = #{deviceStatus},</if>
+            <if test="configStatus != null  ">config_status = #{configStatus},</if>
+            device_name = #{deviceName},
+            remark = #{remark},
+            <if test="configDate != null  ">config_date = #{configDate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="updateDevSign" parameterType="DevList">
+        update dev_list set sign = #{sign},dev_type=#{devType},device_name = #{deviceName} where id = #{id}
+    </update>
+
+	<update id="deleteDevListById" parameterType="Integer">
+        update  dev_list set def_id =1  where id = #{id}
+    </update>
+	
+    <update id="deleteDevListByIds" parameterType="String">
+        update  dev_list set def_id =1 where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <resultMap id="DevListAndIo" type="com.ruoyi.project.device.devList.domain.DevList">
+        <result property="id"    column="id"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceName"    column="device_name"    />
+        <collection property="devIos" column="id" select="selectDevIoListByDevId" />
+    </resultMap>
+    <resultMap type="DevIo" id="devListDevIoResult">
+        <result property="id"    column="id"    />
+        <result property="devId"    column="dev_id"    />
+        <result property="ioOrder"    column="io_order"    />
+        <result property="ioName"    column="io_name"    />
+        <result property="lineId"    column="line_id"    />
+        <result property="isSign"    column="is_sign"    />
+        <result property="remark"    column="remark"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+    <select id="selectDevListAndIoById" resultMap="DevListAndIo">
+        SELECT id,device_id,device_name FROM dev_list where id =#{id};
+    </select>
+    <select id="selectDevIoListByDevId" resultMap="devListDevIoResult">
+        SELECT * FROM dev_io where dev_id =#{id};
+    </select>
+
+    <!--获取前20个未配置的硬件编号-->
+    <select id="selectNoConfigDevice" resultType="java.lang.String">
+        SELECT device_id FROM dev_list where company_id = 0 order by id asc  limit 20;
+    </select>
+
+    <select id="selectAll" resultType="com.ruoyi.project.device.devList.domain.DevList" >
+        SELECT id,device_name as deviceName  FROM dev_list where device_status = 1 and  company_id =#{company_id};
+    </select>
+
+    <!--根据硬件编号查询对应的硬件是否存在-->
+    <resultMap type="DevList" id="DevListResult1">
+        <result property="id"    column="id"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceStatus"    column="device_status"    />
+        <result property="configStatus"    column="config_status"    />
+        <result property="deviceName"    column="device_name"    />
+        <result property="devModelId"    column="dev_model_id"    />
+        <result property="deviceUploadTime"    column="device_upload_time"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="remark"    column="remark"    />
+        <result property="defId"    column="def_id"    />
+        <result property="configDate"    column="config_date"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="sign"    column="sign"    />
+        <result property="devType"    column="dev_type"    />
+    </resultMap>
+    <select id="selectDevListByCode" resultMap="DevListResult1">
+        SELECT * FROM dev_list where device_id = #{code} limit 1;
+    </select>
+
+    <!--用户添加硬件信息-->
+    <update id="addSave">
+        update dev_list set company_id = #{companyId},device_name=#{deviceName},remark=#{remark},config_date=now()  where device_id = #{deviceId};
+    </update>
+
+    <!--查询所以未配置的硬件信息-->
+    <select id="selectDevNotConfig" resultMap="DevListResult">
+        <include refid="selectDevListVo"/>
+        <where>
+            and def_id = 0  and sign = 0 and device_status = 1
+            <if test="companyId != null and companyId > 0"> and company_id = #{companyId}</if>
+        </where>
+    </select>
+
+    <!--通过硬件id更新硬件配置状态以及配置对象标记车间或者流水线-->
+    <update id="updateDevSignAndType1">
+        update dev_list set sign = #{sign},dev_type = #{devType},device_name=#{deviceName} where id = #{id} and company_id = #{companyId}
+    </update>
+
+    <!--通过硬件id更新硬件配置状态以及配置对象标记车间或者流水线-->
+    <update id="updateDevSignAndType">
+        update dev_list set sign = #{sign},dev_type = #{devType} where id = #{id} and company_id = #{companyId}
+    </update>
+
+    <!--查询硬件编码总数-->
+    <select id="countDevNum" resultType="java.lang.Integer">
+        SELECT count(*) FROM dev_list;
+    </select>
+
+    <!--通过硬件编号查询未被删除的硬件信息-->
+    <select id="selectDevListByComCode" resultMap="DevListResult1">
+         SELECT * FROM dev_list where device_id = #{code} and company_id = #{companyId} and def_id = 0 limit 1;
+    </select>
+</mapper>

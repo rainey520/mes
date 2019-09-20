@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								物料编码：
+								<select id="materielCode" name="materielCode" th:with="allMat=${@materiel.selectAllMatByComId()}">
+									<option value="">请选择</option>
+									<option th:each="mat:${allMat}" th:text="${mat.materielCode}" th:value="${mat.materielCode}"></option>
+								</select>
+							</li>
+							<li>
+								物料型号：
+								<select id="materielModel" name="materielModel" th:with="allMat=${@materiel.selectAllMatByComId()}">
+									<option value="">请选择</option>
+									<option th:each="mat:${allMat}" th:text="${mat.materielModel}" th:value="${mat.materielModel}"></option>
+								</select>
+							</li>
+							<li>
+								物料名称：
+								<select id="materielName" name="materielName" th:with="allMatName=${@materiel.selectAllMatNameByComId(#httpServletRequest.getCookies())}">
+									<option value="">请选择</option>
+									<option th:each="mat:${allMatName}" th:text="${mat.materielName}" th:value="${mat.materielName}"></option>
+								</select>
+							</li>
+							<li class="select-time">
+								<label>创建时间： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="开始时间"
+									   name="params[beginTime]"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="结束时间"
+									   name="params[endTime]"/>
+							</li>
+
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="formReset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-success" onclick="importConfig()" shiro:hasPermission="erp:materiel:export">
+					<i class="fa fa-gear"></i> 导入配置
+				</a>
+				<a class="btn btn-success" onclick="add()" shiro:hasPermission="erp:materiel:edit">
+					<i class="fa fa-plus"></i> 添加
+				</a>
+				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="erp:materiel:remove">
+					<i class="fa fa-remove"></i> 删除
+				</a>
+				<a class="btn btn-info" onclick="$.table.importExcel()" shiro:hasPermission="erp:materiel:export">
+					<i class="fa fa-download"></i> 导入
+				</a>
+				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="erp:materiel:export">
+						<i class="fa fa-upload"></i> 导出
+				 </a>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        $(function () {
+            $("select").select2({
+                width:"180px",
+                // placeholder:'请选择'
+            });
+        })
+        // 重置搜索表单信息
+        function formReset(params) {
+            $('#formId')[0].reset();//input标签重置
+            $("#materielCode").val(null).trigger("change"); // select2标签重置
+            $("#materielModel").val(null).trigger("change");
+            $("#materielName").val(null).trigger("change");
+        }
+        var editFlag = [[${@permission.hasPermi('erp:materiel:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('erp:materiel:remove')}]];
+        var viewFileFlag = [[${@permission.hasPermi('erp:fileSourceInfo:list')}]];
+        var prefix = ctx + "erp/materiel";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                importUrl: prefix + "/importData",
+                importTemplateUrl: prefix + "/importTemplate",
+                modalName: "物料",
+				sortName:'createTime',
+				sortOrder:'desc',
+				search: false,
+		        showExport: true,
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'id', 
+					title : '',
+                    visible: false
+				},
+				{
+					field : 'materielCode', 
+					title : '物料编码',
+                    sortable: true,
+				},
+				{
+					field : 'materielModel',
+					title : '物料型号',
+					sortable: true
+				},
+				{
+					field : 'materielName', 
+					title : '物料名称',
+					sortable: true
+				},
+				{
+					title: '操作',
+					align: 'center',
+					formatter: function(value, row, index) {
+						var actions = [];
+						actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.id + '\')"><i></i>编辑</a> ');
+						if (row.fileFlag == 1 ) { // 已经上传过文件
+                            actions.push('<a class="btn btn-warning btn-xs ' + viewFileFlag + '" href="#" onclick="viewFile(\'' + row.id + '\')"><i class="fa fa-eye"></i>文件管理</a> ');
+						} else { // 未上传文件
+                            actions.push('<a class="btn btn-default btn-xs ' + viewFileFlag + '" href="#" onclick="viewFile(\'' + row.id + '\')"><i class="fa fa-eye"></i>文件管理</a> ');
+						}
+						actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i></i>删除</a>');
+						return actions.join('');
+					}
+				},
+				{
+					field : 'price', 
+					title : '单价(含税)',
+					sortable: true
+				},
+					{
+						field : 'unit',
+						title : '单位',
+						sortable: true
+					},
+				{
+					field : 'remark',
+					title : '备注',
+					sortable: true
+				},
+				{
+					field : 'createTime', 
+					title : '创建时间',
+					sortable: true
+				}]
+            };
+            $.table.init(options);
+        });
+
+        /**
+         * 添加
+         */
+        function add() {
+            $.modal.open("添加物料",prefix+"/add",800,520);
+        }
+
+        /**
+		 * 关联供应商设置
+         * @param id
+         */
+        function connectSupplier(id) {
+            var url = '/erp/materielSupplier/connectSupplier/'+id;
+            $.modal.open("关联供应商",url,900,600)
+        }
+
+        function edit(id) {
+			var url = prefix + "/edit/"+id;
+			$.modal.open("修改物料",url,800,520);
+		}
+        /**
+         * 文件管理
+         */
+        function viewFile(id) {
+            $.modal.open("文件查看","/erp/fileSourceInfo?save_type=6&save_id="+id,900)
+        }
+
+		/**
+		 * 物料导入配置
+		 */
+		function importConfig() {
+			createMenuItem(prefix+"/importConfig?type=2","物料导入配置");
+		}
+    </script>
+</body>
+<form id="importForm" enctype="multipart/form-data" class="mt20 mb10" style="display: none;">
+	<div class="col-xs-offset-1">
+		<input type="file" id="file" name="file"/>
+		<div class="mt10 pt5">
+			<input type="checkbox" id="updateSupport" name="updateSupport" title="如果物料编码已经存在，更新这条数据。"> 是否更新已经存在的物料数据,以物料编码为标识
+			<!--&nbsp; <a onclick="$.table.importTemplate()" class="btn btn-default btn-xs"><i-->
+				<!--class="fa fa-file-excel-o"></i> 下载模板</a>-->
+		</div>
+		<font color="red" class="pull-left mt10">
+			提示：仅允许导入“xls”或“xlsx”格式文件！
+		</font>
+	</div>
+</form>
+</html>

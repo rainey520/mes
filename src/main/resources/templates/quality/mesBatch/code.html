@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+<body>
+<style>
+    * {margin: 0;padding: 0;box-sizing: border-box;}
+    h3 {text-align: center;font-size: 16px;margin: 10px;}
+    .box {text-align: center;}
+    #barcode {width: 200px;}
+</style>
+<div class="box">
+    <div id="container" >
+        <canvas  width="260" height="260"></canvas>
+    </div>
+    <img id="barcode" />
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/js/jqueryqr.js}"></script>
+<script th:src="@{/js/qrcode.js}"></script>
+</body>
+<script th:inline="javascript" >
+    initCode();
+    function initCode() {
+        $('#container').erweima({
+            fill:"#000",
+            size:230,
+            text:[[${code}]],
+            label:'请扫码'
+        });
+    }
+    function submitHandler(){
+        $.modal.close();
+    }
+</script>
+
+</html>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.quality.mesBatch.mapper.MesPartLogMapper">
+    
+    <resultMap type="MesPartLog" id="MesPartLogResult">
+        <result property="id"    column="id"    />
+        <result property="workCode"    column="work_code"    />
+        <result property="mesCode"    column="mes_code"    />
+        <result property="partCode"    column="part_code"    />
+        <result property="materielCode"    column="materiel_code"    />
+        <result property="batchCode"    column="batch_code"    />
+        <result property="cTime"    column="c_time"    />
+    </resultMap>
+	
+	<sql id="selectMesPartLogVo">
+        select id, work_code, mes_code,part_code, materiel_code, batch_code, c_time from tab_mes_part_log
+    </sql>
+	
+    <select id="selectMesPartLogList" parameterType="MesPartLog" resultMap="MesPartLogResult">
+        <include refid="selectMesPartLogVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="workCode != null  and workCode != '' "> and work_code = #{workCode}</if>
+             <if test="mesCode != null  and mesCode != '' "> and mes_code = #{mesCode}</if>
+             <if test="materielCode != null  and materielCode != '' "> and materiel_code = #{materielCode}</if>
+             <if test="batchCode != null  and batchCode != '' "> and batch_code = #{batchCode}</if>
+             <if test="cTime != null "> and c_time = #{cTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectMesPartLogById" parameterType="Integer" resultMap="MesPartLogResult">
+        <include refid="selectMesPartLogVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMesPartLog" parameterType="MesPartLog" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_mes_part_log
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="workCode != null  and workCode != ''  ">work_code,</if>
+			<if test="mesCode != null  and mesCode != ''  ">mes_code,</if>
+			<if test="materielCode != null  and materielCode != ''  ">materiel_code,</if>
+			<if test="batchCode != null  and batchCode != ''  ">batch_code,</if>
+			<if test="cTime != null  ">c_time,</if>
+            <if test="partCode != null  ">part_code,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="workCode != null  and workCode != ''  ">#{workCode},</if>
+			<if test="mesCode != null  and mesCode != ''  ">#{mesCode},</if>
+			<if test="materielCode != null  and materielCode != ''  ">#{materielCode},</if>
+			<if test="batchCode != null  and batchCode != ''  ">#{batchCode},</if>
+			<if test="cTime != null  ">#{cTime},</if>
+            <if test="partCode != null  ">#{partCode},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateMesPartLog" parameterType="MesPartLog">
+        update tab_mes_part_log
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workCode != null  and workCode != ''  ">work_code = #{workCode},</if>
+            <if test="mesCode != null  and mesCode != ''  ">mes_code = #{mesCode},</if>
+            <if test="materielCode != null  and materielCode != ''  ">materiel_code = #{materielCode},</if>
+            <if test="batchCode != null  and batchCode != ''  ">batch_code = #{batchCode},</if>
+            <if test="cTime != null  ">c_time = #{cTime},</if>
+            <if test="partCode != null  ">part_code = #{partCode},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteMesPartLogById" parameterType="Integer">
+        delete from tab_mes_part_log where id = #{id}
+    </delete>
+	
+    <delete id="deleteMesPartLogByIds" parameterType="String">
+        delete from tab_mes_part_log where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--查询半成品MES批次追踪列表-->
+    <select id="selectMesPartLogListByCode" parameterType="String" resultMap="MesPartLogResult">
+        <include refid="selectMesPartLogVo"/>
+        <where>
+            <if test="workCode != null  and workCode != '' "> and work_code = #{workCode}</if>
+            <if test="mesCode != null  and mesCode != '' "> and mes_code = #{mesCode}</if>
+            <if test="partCode != null  and partCode != '' "> and part_code = #{partCode}</if>
+        </where>
+    </select>
+
+    <!--删除MES记录-->
+    <delete id="deleteMesPartLogByCodes">
+         delete from tab_mes_part_log where work_code = #{workCode} and mes_code = #{mesCode} and part_code = #{partCode}
+    </delete>
+</mapper>

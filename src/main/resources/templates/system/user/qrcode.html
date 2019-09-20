@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <div class="row">
+        <div class="col-sm-12 search-collapse" style="position: fixed;top: 0px">
+            <form id="user-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            登录手机号
+                            <select id="loginName" name="loginName" th:with="allLoginName=${@user.selectComAllUser()}">
+                                <option value="">请选择</option>
+                                <option th:each="item:${allLoginName}" th:value="${item.loginName}" th:text="${item.loginName}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            用户名称：<input id="userName" type="text" name="userName" style="width: 180px"/>
+                        </li>
+                        <li>
+                            用户状态：<select id="status" name="status" th:with="type=${@dict.getType('sys_normal_disable')}" style="width: 100px">
+                            <option value="">所有</option>
+                            <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                    th:value="${dict.dictValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            每页：<select id="pageSize" name="status"  style="width: 100px">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        </li>
+                        <li class="select-time">
+                            <label>创建时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="params[beginTime]"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间"
+                                   name="params[endTime]"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="searchQrCode()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a id="shangyiye" style="display: none" class="btn btn-primary btn-rounded btn-sm" onclick="shangNum()"><i
+                                    class="fa fa-long-arrow-up"></i>&nbsp;上一页</a>
+                            <a id="xiayiye" class="btn btn-primary btn-rounded btn-sm" onclick="xiaNum()"><i
+                                    class="fa fa-long-arrow-down" ></i>&nbsp;下一页</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="dayin()"><i class="fa fa-file-code-o"></i>&nbsp;打印</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="qr-code-div" style="display: none">
+
+    </div>
+    <div id="qr-code-img" style="margin-top: 50px">
+
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:src="@{/js/jqueryqr.js}"></script>
+<script th:src="@{/js/qrcode.js}"></script>
+<script th:inline="javascript">
+    var pageNum =1;
+    var yeNum =1;
+    $(function () {
+        $("#loginName").select2({
+            width:140
+        })
+    })
+    function initData(item) {
+        if(item){
+            $("#qr-code-div").children().remove();
+            for(var i =0;i<item.length;i++){
+                var code = '<div id="container'+i+'" style="float: left;" >\n' +
+                    '        <canvas  width="260" height="260"></canvas>\n' +
+                    '    </div>'
+                $("#qr-code-div").append(code);
+            }
+            for(var i =0;i<item.length;i++){
+                var user ={id:item[i].id,userName:item[i].userName};
+                $('#container'+i).erweima({
+                    fill:"#000",
+                    size:230,
+                    // mode: 4,
+                    // mSize:30,
+                    text:JSON.stringify(user),
+                    // image: $("#imgLogo")[0]
+                    label:item[i].userName
+                });
+            }
+            $("#qr-code-img").children().remove();
+            $("#qr-code-div").find("canvas").each(function () {
+                var item ='<img src="'+$(this)[0].toDataURL()+'"/>';
+                $("#qr-code-img").append(item);
+            });
+        }
+    }
+    getQrCode(1);
+    //请求数据
+    function getQrCode(num) {
+        var params={
+            beginTime:$("#startTime").val(),
+            endTime:$("#endTime").val()
+        }
+        var data={
+            pageNum:num,
+            pageSize:$("#pageSize").val(),
+            loginName:$("#loginName").find("option:selected").val(),
+            userName:$("#userName").val(),
+            status:$("#status").val(),
+            params:params
+        }
+        var config = {
+            url: "/system/user/qrcode/list",
+            type: "post",
+            dataType: "json",
+            data: data,
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+                $.modal.disable();
+            },
+            success: function (result) {
+                if (result.code == web_status.SUCCESS) {
+                    initData(result.rows);
+                    pageNum = parseInt(result.total)%parseInt($("#pageSize").val()) == 0?
+                        parseInt(result.total)/parseInt($("#pageSize").val()):
+                        (parseInt(parseInt(result.total)/parseInt($("#pageSize").val()))+1);
+                } else {
+                    $.modal.alertError(result.msg);
+                }
+                $.modal.closeLoading();
+            }
+        };
+        $.ajax(config)
+    }
+
+    function searchQrCode() {
+        pageNum =1;
+        yeNum = 1;
+        getQrCode(1);
+    }
+
+    function shangNum() {
+        if(yeNum > 1){
+            yeNum = yeNum -1;
+            getQrCode(yeNum);
+            if(yeNum == 1){
+                $("#shangyiye").css("display","none");
+            }
+            $("#xiayiye").css("display","inline-block");
+        }else{
+            $("#shangyiye").css("display","none");
+        }
+    }
+    function xiaNum() {
+        if(yeNum < pageNum){
+            yeNum = yeNum + 1;
+            getQrCode(yeNum);
+            if(yeNum == pageNum){
+                $("#xiayiye").css("display","none");
+            }
+            $("#shangyiye").css("display","inline-block");
+        }else{
+            $("#xiayiye").css("display","none");
+        }
+    }
+    function dayin(){
+        var userAgent = navigator.userAgent.toLowerCase(); //取得浏览器的userAgent字符串
+        if (userAgent.indexOf("trident") > -1){
+            $.modal.aalertWarning("请使用google或者360浏览器打印");
+            return false;
+        }else if(userAgent.indexOf('msie')>-1){
+            var onlyChoseAlert = simpleAlert({
+                "content":"请使用Google或者360浏览器打印",
+                "buttons":{
+                    "确定":function () {
+                        onlyChoseAlert.close();
+                    }
+                }
+            })
+            $.modal.aalertWarning("请使用google或者360浏览器打印");
+            return false;
+        }else{//其它浏览器使用lodop
+            var oldstr = document.body.innerHTML;
+            var headstr = "<html><head><title></title></head><body>";
+            var footstr = "</body>";
+            //此处id换为你自己的id
+            var printData = document.getElementById("qr-code-img").innerHTML; //获得 div 里的所有 html 数据
+            document.body.innerHTML = headstr+printData+footstr;
+            window.print();
+            document.body.innerHTML = oldstr;
+            window.location.reload();
+        }
+    }
+</script>
+</body>
+
+</html>

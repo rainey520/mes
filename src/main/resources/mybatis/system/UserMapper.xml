@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.system.user.mapper.UserMapper">
+
+	<resultMap type="User" id="UserResult">
+		<id     property="userId"       column="user_id"      />
+		<result property="deptId"       column="dept_id"      />
+		<result property="loginName"    column="login_name"   />
+		<result property="userName"     column="user_name"    />
+		<result property="email"        column="email"        />
+		<result property="sex"          column="sex"          />
+		<result property="avatar"       column="avatar"       />
+		<result property="password"     column="password"     />
+		<result property="salt"         column="salt"         />
+		<result property="status"       column="status"       />
+		<result property="delFlag"      column="del_flag"     />
+		<result property="loginIp"      column="login_ip"     />
+		<result property="loginDate"    column="login_date"   />
+		<result property="createBy"     column="create_by"    />
+		<result property="createTime"   column="create_time"  />
+		<result property="updateBy"     column="update_by"    />
+		<result property="updateTime"   column="update_time"  />
+		<result property="remark"       column="remark"       />
+		<result property="companyId"    column="company_id"    />
+		<result property="tag"    column="tag"    />
+		<result property="userDepartment"    column="user_department"    />
+		<result property="userPosition"    column="user_position"    />
+		<result property="phonenumber"    column="phonenumber"    />
+		<result property="loginTag"    column="login_tag"    />
+		<result property="industry"    column="industry"    />
+		<result property="devType"    column="devType"    />
+		<result property="devCode"    column="devCode"    />
+		<result property="grade"    column="grade"    />
+		<result property="sign"    column="sign"    />
+		<association property="devCompany"    column="company_id" javaType="DevCompany" resultMap="DevCompanyResult" />
+		<association property="dept"    column="dept_id" javaType="Dept" resultMap="deptResult" />
+		<collection  property="roles"   javaType="java.util.List"        resultMap="RoleResult" />
+	</resultMap>
+
+	<resultMap id="deptResult" type="Dept">
+		<id     property="deptId"   column="dept_id"     />
+		<result property="parentId" column="parent_id"   />
+		<result property="deptName" column="dept_name"   />
+		<result property="orderNum" column="order_num"   />
+		<result property="status"   column="dept_status" />
+	</resultMap>
+
+	<resultMap id="RoleResult" type="Role">
+		<id     property="roleId"       column="role_id"        />
+		<result property="roleName"     column="role_name"      />
+		<result property="roleKey"      column="role_key"       />
+		<result property="roleSort"     column="role_sort"      />
+		<result property="dataScope"     column="data_scope"    />
+		<result property="status"       column="role_status"    />
+	</resultMap>
+
+	<resultMap type="DevCompany" id="DevCompanyResult">
+		<result property="companyId"    column="company_id"    />
+		<result property="comName"    column="com_name"    />
+		<result property="createTime"    column="create_time"    />
+		<result property="comAddress"    column="com_address"    />
+		<result property="comType"    column="com_type"    />
+		<result property="comLogo"    column="com_logo"    />
+		<result property="comPicture"    column="com_picture"    />
+	</resultMap>
+
+	<sql id="selectUserVo">
+        select  u.user_id,  u.login_name, u.user_name, u.email, u.sex, u.avatar, u.password,
+        u.salt, u.status, u.del_flag, u.login_ip, u.login_date, u.create_time, u.remark,
+        u.user_department,u.user_position,u.phonenumber,u.login_tag,u.sign,
+       		    r.role_id, r.role_name, r.role_key, r.role_sort, r.data_scope, r.status as role_status,
+       		    u.company_id,u.tag,u.create_by
+		from sys_user u
+			 left join sys_user_role ur on u.user_id = ur.user_id
+			 left join sys_role r on r.role_id = ur.role_id
+			 left join dev_company c on u.company_id = c.company_id
+    </sql>
+
+
+	<!--用户列表查询-->
+	<resultMap type="User" id="UserResult1">
+		<id     property="userId"       column="user_id"      />
+		<result property="deptId"       column="dept_id"      />
+		<result property="loginName"    column="login_name"   />
+		<result property="userName"     column="user_name"    />
+		<result property="email"        column="email"        />
+		<result property="sex"          column="sex"          />
+		<result property="avatar"       column="avatar"       />
+		<result property="password"     column="password"     />
+		<result property="salt"         column="salt"         />
+		<result property="status"       column="status"       />
+		<result property="delFlag"      column="del_flag"     />
+		<result property="loginIp"      column="login_ip"     />
+		<result property="loginDate"    column="login_date"   />
+		<result property="createBy"     column="create_by"    />
+		<result property="createTime"   column="create_time"  />
+		<result property="updateBy"     column="update_by"    />
+		<result property="updateTime"   column="update_time"  />
+		<result property="remark"       column="remark"       />
+		<result property="companyId"    column="company_id"    />
+		<result property="tag"    column="tag"    />
+		<result property="userDepartment"    column="user_department"    />
+		<result property="userPosition"    column="user_position"    />
+		<result property="phonenumber"    column="phonenumber"    />
+		<result property="loginTag"    column="login_tag"    />
+		<result property="industry"    column="industry"    />
+		<result property="devType"    column="devType"    />
+		<result property="devCode"    column="devCode"    />
+		<result property="grade"    column="grade"    />
+		<result property="sign"    column="sign"    />
+	</resultMap>
+
+	<select id="selectUserList" parameterType="User" resultMap="UserResult1">
+		select  user_id, login_name, user_name, email, password, sex,avatar, salt, status, del_flag, login_ip, login_date, create_by, create_time, remark,company_id,user_department,user_position,phonenumber,login_tag from sys_user
+		where  tag != '3' and  company_id = #{companyId}
+		<if test="loginName != null and loginName != ''">
+			AND login_name like concat('%', #{loginName}, '%')
+		</if>
+		<if test="userName != null and userName != ''">
+			AND user_name like concat('%', #{userName}, '%')
+		</if>
+		<if test="status != null and status != ''">
+			AND status = #{status}
+		</if>
+		<if test="sex != null and sex != ''">
+			AND sex = #{sex}
+		</if>
+		<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+		</if>
+		<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+		</if>
+		${params.dataScope}
+	</select>
+
+	<!--通过公司id查询用户信息-->
+	<select id="selectUserListByCompanyId" parameterType="map" resultMap="UserResult">
+		select c.com_name, u.user_id, u.login_name, u.user_name, u.email, u.password, u.sex, u.avatar, u.salt, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, u.company_id,u.user_department,u.user_position,u.phonenumber,u.login_tag from sys_user u
+		left join dev_company c on u.company_id = c.company_id
+		where u.del_flag = '0' AND u.tag = '0'
+		<if test="user.loginName != null and user.loginName != ''">
+			AND u.login_name like concat('%', #{user.loginName}, '%')
+		</if>
+		<if test="user.userName != null and user.userName != ''">
+			AND u.user_name like concat('%', #{user.userName}, '%')
+		</if>
+		<if test="companyId != null and companyId != ''">
+			AND u.company_id = #{companyId}
+		</if>
+		<if test="user.status != null and user.status != ''">
+			AND u.status = #{user.status}
+		</if>
+		<if test="user.sex != null and user.sex != ''">
+			AND u.sex = #{user.sex}
+		</if>
+		<if test="user.params.beginTime != null and user.params.beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(u.create_time,'%y%m%d') &gt;= date_format(#{user.params.beginTime},'%y%m%d')
+		</if>
+		<if test="user.params.endTime != null and user.params.endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(u.create_time,'%y%m%d') &lt;= date_format(#{user.params.endTime},'%y%m%d')
+		</if>
+
+		<!-- 数据范围过滤 -->
+		${user.params.dataScope}
+	</select>
+
+	<select id="selectUserByLoginName" parameterType="String" resultMap="UserResult">
+	    <include refid="selectUserVo"/>
+		where u.login_name = #{userName}
+	</select>
+
+	<select id="selectUserByPhoneNumber" parameterType="String" resultMap="UserResult">
+		<include refid="selectUserVo"/>
+		where u.phonenumber = #{phonenumber}
+	</select>
+
+	<select id="selectUserByEmail" parameterType="String" resultMap="UserResult">
+	    <include refid="selectUserVo"/>
+		where u.email = #{email}
+	</select>
+
+	<select id="checkLoginNameUnique" parameterType="String" resultType="int">
+		select count(1) from sys_user where login_name=#{loginName}
+	</select>
+
+	<select id="checkEmailUnique" parameterType="String" resultMap="UserResult">
+		select user_id, email from sys_user where email=#{email}
+	</select>
+
+	<select id="selectUserById" parameterType="Long" resultMap="UserResult">
+		<include refid="selectUserVo"/>
+		where u.user_id = #{userId}
+	</select>
+
+	<delete id="deleteUserById" parameterType="Long">
+ 		delete from sys_user where user_id = #{userId}
+ 	</delete>
+
+ 	<delete id="deleteUserByIds" parameterType="Long">
+		delete from sys_user where user_id in
+ 		<foreach collection="array" item="userId" open="(" separator="," close=")">
+ 			#{userId}
+        </foreach>
+ 	</delete>
+
+ 	<update id="updateUser" parameterType="User">
+ 		update sys_user
+ 		<set>
+ 			<if test="deptId != null and deptId != 0">dept_id = #{deptId},</if>
+ 			<if test="loginName != null and loginName != ''">login_name = #{loginName},</if>
+ 			<if test="userName != null and userName != ''">user_name = #{userName},</if>
+ 			<if test="email != null and email != ''">email = #{email},</if>
+ 			<if test="sex != null and sex != ''">sex = #{sex},</if>
+ 			<if test="avatar != null and avatar != ''">avatar = #{avatar},</if>
+ 			<if test="password != null and password != ''">password = #{password},</if>
+ 			<if test="salt != null and salt != ''">salt = #{salt},</if>
+ 			<if test="status != null and status != ''">status = #{status},</if>
+ 			<if test="loginIp != null and loginIp != ''">login_ip = #{loginIp},</if>
+ 			<if test="loginDate != null">login_date = #{loginDate},</if>
+ 			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+ 			<if test="remark != null and remark != ''">remark = #{remark},</if>
+			<if test="companyId != null  ">company_id = #{companyId},</if>
+			<if test="userDepartment != null  and userDepartment != ''  ">user_department = #{userDepartment},</if>
+			<if test="userPosition != null  and userPosition != ''  ">user_position = #{userPosition},</if>
+			<if test="phonenumber != null  and phonenumber != ''  ">phonenumber = #{phonenumber},</if>
+			<if test="loginTag != null  and loginTag != ''  ">login_tag = #{loginTag},</if>
+			<if test="industry != null  and industry != ''  ">industry = #{industry},</if>
+			<if test="devType != null  and devType != ''  ">devType = #{devType},</if>
+			<if test="devCode != null  and devCode != ''  ">devCode = #{devCode},</if>
+			<if test="grade != null  and grade != ''  ">grade = #{grade},</if>
+			<if test="sign != null  and sign != ''  ">sign = #{sign},</if>
+ 			update_time = sysdate()
+ 		</set>
+ 		where user_id = #{userId}
+	</update>
+
+	<!--通过登录手机号修改用户信息-->
+	<update id="updateUserByLoginName" parameterType="User">
+		update sys_user
+		<set>
+			<if test="deptId != null and deptId != 0">dept_id = #{deptId},</if>
+			<if test="userName != null and userName != ''">user_name = #{userName},</if>
+			<if test="email != null and email != ''">email = #{email},</if>
+			<if test="sex != null and sex != ''">sex = #{sex},</if>
+			<if test="avatar != null and avatar != ''">avatar = #{avatar},</if>
+			<if test="password != null and password != ''">password = #{password},</if>
+			<if test="salt != null and salt != ''">salt = #{salt},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			<if test="loginIp != null and loginIp != ''">login_ip = #{loginIp},</if>
+			<if test="loginDate != null">login_date = #{loginDate},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			<if test="remark != null and remark != ''">remark = #{remark},</if>
+			<if test="companyId != null  ">company_id = #{companyId},</if>
+			<if test="userDepartment != null  and userDepartment != ''  ">user_department = #{userDepartment},</if>
+			<if test="userPosition != null  and userPosition != ''  ">user_position = #{userPosition},</if>
+			<if test="phonenumber != null  and phonenumber != ''  ">phonenumber = #{phonenumber},</if>
+			<if test="loginTag != null  and loginTag != ''  ">login_tag = #{loginTag},</if>
+			update_time = sysdate()
+		</set>
+		where login_name = #{loginName}
+	</update>
+
+ 	<insert id="insertUser" parameterType="User" useGeneratedKeys="true" keyProperty="userId">
+ 		insert into sys_user(
+ 			<if test="userId != null and userId != 0">user_id,</if>
+ 			<if test="deptId != null and deptId != 0">dept_id,</if>
+ 			<if test="loginName != null and loginName != ''">login_name,</if>
+ 			<if test="userName != null and userName != ''">user_name,</if>
+ 			<if test="email != null and email != ''">email,</if>
+ 			<if test="sex != null and sex != ''">sex,</if>
+ 			<if test="password != null and password != ''">password,</if>
+ 			<if test="salt != null and salt != ''">salt,</if>
+ 			<if test="status != null and status != ''">status,</if>
+ 			<if test="createBy != null and createBy != ''">create_by,</if>
+ 			<if test="remark != null and remark != ''">remark,</if>
+		    <if test="companyId != null  ">company_id,</if>
+			<if test="tag != null  and tag != ''  ">tag,</if>
+			<if test="userDepartment != null  and userDepartment != ''  ">user_department,</if>
+			<if test="userPosition != null  and userPosition != ''  ">user_position,</if>
+			<if test="phonenumber != null  and phonenumber != ''  ">phonenumber,</if>
+			<if test="loginTag != null  and loginTag != ''  ">login_tag,</if>
+			<if test="industry != null  and industry != ''  ">industry,</if>
+			<if test="devType != null  and devType != ''  ">devType,</if>
+			<if test="devCode != null  and devCode != ''  ">devCode,</if>
+			<if test="grade != null  and grade != ''  ">grade,</if>
+			<if test="sign != null  and sign != ''  ">sign,</if>
+ 			create_time
+ 		)values(
+ 			<if test="userId != null and userId != ''">#{userId},</if>
+ 			<if test="deptId != null and deptId != ''">#{deptId},</if>
+ 			<if test="loginName != null and loginName != ''">#{loginName},</if>
+ 			<if test="userName != null and userName != ''">#{userName},</if>
+ 			<if test="email != null and email != ''">#{email},</if>
+ 			<if test="sex != null and sex != ''">#{sex},</if>
+ 			<if test="password != null and password != ''">#{password},</if>
+ 			<if test="salt != null and salt != ''">#{salt},</if>
+ 			<if test="status != null and status != ''">#{status},</if>
+ 			<if test="createBy != null and createBy != ''">#{createBy},</if>
+ 			<if test="remark != null and remark != ''">#{remark},</if>
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="tag != null  and tag != ''  ">#{tag},</if>
+			<if test="userDepartment != null  and userDepartment != ''  ">#{userDepartment},</if>
+			<if test="userPosition != null  and userPosition != ''  ">#{userPosition},</if>
+			<if test="phonenumber != null  and phonenumber != ''  ">#{phonenumber},</if>
+			<if test="loginTag != null  and loginTag != ''  ">#{loginTag},</if>
+			<if test="industry != null  and industry != ''  ">#{industry},</if>
+			<if test="devType != null  and devType != ''  ">#{devType},</if>
+			<if test="devCode != null  and devCode != ''  ">#{devCode},</if>
+			<if test="grade != null  and grade != ''  ">#{grade},</if>
+			<if test="sign != null  and sign != ''  ">#{sign},</if>
+ 			sysdate()
+ 		)
+	</insert>
+
+
+	<!--查询对应公司所以的员工信息-->
+	<select id="selectComAllUser" resultType="com.ruoyi.project.system.user.domain.User">
+		SELECT user_id as userId,user_name as userName,login_name as  loginName FROM
+		sys_user where  company_id = #{comid};
+	</select>
+
+	<!--根据用户编号查询用户基本信息-->
+	<select id="selectUserInfoById" resultType="com.ruoyi.project.system.user.domain.User">
+		SELECT user_id as userId,company_id as companyId,login_name as loginName,create_by as createBy,email as Email,
+		avatar as avatar,user_name as userName FROM sys_user where user_id =#{user_id}
+	</select>
+
+	<!--修改用户删除状态-->
+	<update id="updateUserDelFlag">
+		update sys_user set del_flag =0,company_id =#{companyId} where user_id = #{id}
+	</update>
+
+	<!--查询用户二维码信息-->
+	<select id="selectUserQrCode" resultType="com.ruoyi.project.system.user.domain.UserQrCode">
+			SELECT user_id as id,user_name as userName FROM sys_user
+		where del_flag = '0' AND tag = '0' and company_id = #{companyId}
+		<if test="loginName != null and loginName != ''">
+			AND login_name like concat('%', #{loginName}, '%')
+		</if>
+		<if test="userName != null and userName != ''">
+			AND user_name like concat('%', #{userName}, '%')
+		</if>
+
+		<if test="status != null and status != ''">
+			AND status = #{status}
+		</if>
+		<if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+			AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+		</if>
+		<if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+			AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+		</if>
+	</select>
+
+	<!--app交互查询用户列表-->
+	<select id="appSelectUserList" resultType="com.ruoyi.project.system.user.domain.UserApp">
+        SELECT user_id as uid,login_name as phone,user_name as userName FROM sys_user where company_id = #{companyId}
+	</select>
+</mapper>

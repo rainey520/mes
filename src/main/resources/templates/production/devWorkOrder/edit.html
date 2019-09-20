@@ -1,0 +1,169 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-devWorkOrder-edit" th:object="${devWorkOrder}">
+        <input id="id" name="id" th:field="*{id}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">工单号(唯一)：</label>
+            <div class="col-sm-8">
+                <input id="workorderNumber" name="workorderNumber" th:field="*{workorderNumber}" readonly="true"
+                       class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group" th:if="*{workorderStatus==0 and wlSign == 0}">
+            <label class="col-sm-3 control-label">产线：</label>
+            <input id="deviceLiable" name="deviceLiable" th:field="*{deviceLiable}" class="form-control" type="hidden">
+            <div class="col-sm-8">
+                <!--<input id="lineId" name="lineId" th:field="*{lineId}" class="form-control" type="text">-->
+                <select onchange="findDeviceLiableByLineId(this)" name="lineId" id="lineId" class="form-control"
+                        th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId()}">
+                    <option th:each="line : ${productionLine}" th:text="${line.lineName}"
+                            th:value="${line.Id}" th:selected="*{lineId}==${line.Id}?true:false"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group" th:if="*{wlSign == 0}">
+            <label class="col-sm-3 control-label">用工人数：</label>
+            <div class="col-sm-8">
+                <input id="peopleNumber" name="peopleNumber" th:field="*{peopleNumber}" class="form-control" type="number">
+            </div>
+        </div>
+        <div class="form-group" th:if="*{wlSign == 0}">
+            <label class="col-sm-3 control-label">正常工时：</label>
+            <div class="col-sm-8">
+                <input id="workingHour" name="workingHour" th:field="*{workingHour}" class="form-control" type="number">
+            </div>
+        </div>
+        <div class="form-group" th:if="*{wlSign == 0}">
+            <label class="col-sm-3 control-label" >加班工时：</label>
+            <div class="col-sm-8">
+                <input id="overtimeHour" name="overtimeHour" th:field="*{overtimeHour}" class="form-control"
+                       type="number">
+            </div>
+        </div>
+        <div class="form-group" th:if="*{wlSign == 0}">
+            <label class="col-sm-3 control-label">加班倍率：</label>
+            <div class="col-sm-8">
+                <div class="radio-box">
+                    <input type="radio" id="radio1" name="overtimeRace" value="1.5" th:checked="*{overtimeRace==1.5}">
+                    <label for="radio1">1.5倍</label>
+                </div>
+                <div class="radio-box">
+                    <input type="radio" id="radio2" name="overtimeRace" value="2" th:checked="*{overtimeRace==2}">
+                    <label for="radio2">2倍</label>
+                </div>
+                <div class="radio-box">
+                    <input type="radio" id="radio3" name="overtimeRace" value="3" th:checked="*{overtimeRace==3}">
+                    <label for="radio3">3倍</label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" th:if="*{wlSign == 0}">
+            <label class="col-sm-3 control-label">手动调整工时：</label>
+            <div class="col-sm-8">
+                <input id="manualTime" name="manualTime" th:field="*{manualTime}" class="form-control" type="number">
+            </div>
+        </div>
+        <div class="form-group" th:if="*{wlSign == 0}">
+            <label class="col-sm-3 control-label">报废品：</label>
+            <div class="col-sm-8">
+                <input id="scrapNum" name="scrapNum" th:field="*{scrapNum}" class="form-control" type="number">
+            </div>
+        </div>
+        <div class="form-group" th:if="*{wlSign == 0}">
+            <label class="col-sm-3 control-label">不良品数量：</label>
+            <div class="col-sm-8">
+                <input id="badNumber" name="badNumber" th:field="*{badNumber}"
+                       class="form-control" type="number">
+            </div>
+        </div>
+        <div class="form-group" th:if="*{wlSign == 0}">
+            <label class="col-sm-3 control-label">实际入库数量：</label>
+            <div class="col-sm-8">
+                <input id="actualWarehouseNum" name="actualWarehouseNum" th:field="*{actualWarehouseNum}"
+                       class="form-control" type="number">
+            </div>
+        </div>
+        <div class="form-group" th:if="*{workorderStatus==0 and wlSign == 1}">
+            <label class="col-sm-3 control-label">车间：</label>
+            <div class="col-sm-8">
+                <!--<input id="lineId" name="lineId" th:field="*{lineId}" class="form-control" type="text">-->
+                <select  name="lineId" id="lineId" class="form-control"
+                        th:with="single=${@single.selectSingleWorkListSign0()}">
+                    <option th:each="s : ${single}" th:text="${s.workshopName}"
+                            th:value="${s.id}" th:selected="*{lineId}==${s.id}?true:false"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group" th:if="*{wlSign == 1}">
+            <label class="col-sm-3 control-label">工价：</label>
+            <div class="col-sm-8">
+                <input id="workPrice" name="workPrice" th:value="${devWorkOrder.workPrice==null?0:devWorkOrder.workPrice}"
+                       class="form-control" type="number" th:readonly="${devWorkOrder.workorderStatus != 0 ? 'true':'false'}">
+            </div>
+        </div>
+        <div class="form-group" th:if="*{wlSign == 1}">
+            <label class="col-sm-3 control-label">生产数量：</label>
+            <div class="col-sm-8">
+                <input id="productNumber" name="productNumber" th:field="*{productNumber}"
+                       class="form-control" type="number">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">投入产量：</label>
+            <div class="col-sm-8">
+                <input id="putIntoNumber" name="putIntoNumber" th:field="*{putIntoNumber}"
+                       class="form-control" type="number">
+            </div>
+        </div>
+        <div class="form-group" th:if="*{wlSign == 1}">
+            <label class="col-sm-3 control-label">实际入库数量：</label>
+            <div class="col-sm-8">
+                <input name="actualWarehouseNum" th:field="*{actualWarehouseNum}"
+                       class="form-control" type="number">
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var prefix = ctx + "device/devWorkOrder";
+    $("#form-devWorkOrder-edit").validate({
+        rules: {
+            xxxx: {
+                required: true,
+            },
+        }
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/edit", $('#form-devWorkOrder-edit').serialize());
+        }
+    }
+
+    /**
+     * 点击产线查询产线责任人
+     */
+    function findDeviceLiableByLineId(value) {
+        var lineId = value.value;
+        $.ajax({
+            type: 'POST',
+            url: '/production/productionLine/findDeviceLiableByLineId',
+            data: {
+                "lineId": lineId,
+            },
+            dataType: 'json',
+            async: false,  //同步请求，
+            success: function (data) {
+                $("#userName").val(data.data.userName);
+                $("#deviceLiable").val(data.data.userId);
+            }
+        });
+    }
+</script>
+</body>
+</html>

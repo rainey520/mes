@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title th:utext="${info.pageName}"></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css">
+    <link th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
+    <style type="">
+        .page-header ul li{
+            text-align: center;
+            color: #fff;
+        }
+        .list-group-item{
+            padding: 3px 15px;
+        }
+        .list-group{
+            margin-bottom: 0px !important;
+        }
+        .container{
+            min-height: 98vh;
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
+        .jumbotron{
+            background-color:transparent;
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+        }
+        .demo_paidan{
+            padding: 0px;
+            margin: 0px;
+            list-style: none;
+        }
+        .news-item {
+            padding: 4px;
+            margin: 0;
+            border-bottom: 1px dotted #555;
+        }
+        .panel{
+            margin-bottom: 10px !important;
+        }
+        .panel-default>.panel-heading{
+            background-image: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper" class="container" th:style="${#strings.isEmpty(info.pageBackImg)?'background-image: url(/js/bk.jpg)':'background-image: url('+info.pageBackImg+')'} ">
+        <input type="hidden" th:value="${code}" id="page-code">
+        <div class="page-header" style="padding-bottom:0px;margin: 10px;">
+            <ul class="nav nav-pills nav-justified">
+                <li role="presentation">
+                    <img th:if="${not #strings.isEmpty(company.comLogo)}" th:src="${company.comLogo}" width="120" height="60px" />
+                </li>
+                <li role="presentation">
+                    <span style="font-size: 22px" th:utext="${company.comName}"></span>
+                    <h4 th:utext="${info.pageName}"></h4>
+                </li>
+                <li role="presentation" >
+                    <span id="now_time">当前系统时间:2019-04-01 17:08:09</span> &nbsp;&nbsp;<span style="cursor: pointer;font-size: 22px;" id="fullScreen"><i class="fa fa-arrows-alt"></i>全屏</span>
+                </li>
+            </ul>
+        </div>
+        <div class="jumbotron" style="" th:if="${not #lists.isEmpty(info.configs)}">
+            <div class="row" >
+                <div class="col-md-6 col-sm-12"  th:each="index:${#numbers.sequence(1,2)}">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"  style="text-align:center;padding: 5px 15px;"  th:utext="${info.configs[index - 1].lineName}"></div>
+                        <div class="panel-body" style="padding: 0px 15px;" th:date-jj-id="${index}">
+                            <div class="row">
+                                <div class="col-md-6" style="padding-right: 0px;padding-left: 0px;">
+                                    <ul class="list-group" data-gd-ul>
+                                        <li class="list-group-item">
+                                            <span th:if="${info.configs[index - 1].line != null and info.configs[index - 1].line.manual == 0}">
+                                                <span th:utext="${info.configs[index - 1].devName +'-'+info.configs[index - 1].ioName}"></span>：
+                                                <span style="font-size: 24px;font-weight: bold" th:date-cl-id="${index+'-1'}" th:utext="${info.configs[index - 1].idTotal == null ? '0':info.configs[index - 1].idTotal}"></span>
+                                            </span>
+                                            <span th:if="${info.configs[index - 1].line != null and info.configs[index - 1].line.manual == 1}">
+                                                <span th:utext="${info.configs[index - 1].line.lineName +'-累计产量'}"></span>：
+                                                <span style="font-size: 24px;font-weight: bold" th:date-cl-id="${index+'-1'}" th:utext="${info.configs[index - 1].devWorkOrder == null or info.configs[index - 1].devWorkOrder.cumulativeNumber == null  ? '0':info.configs[index - 1].devWorkOrder.cumulativeNumber}"></span></span>
+                                        </li>
+                                        <!--工单号-->
+                                        <li class="list-group-item" date-edit-gd-id th:style="${(info.configs[index - 1].ioConfig!= null and not info.configs[index - 1].ioConfig.containsKey('gd'))
+                                        or info.configs[index - 1].devWorkOrder == null?'color:#fff':''}"
+                                            th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('gd')
+                                             and info.configs[index - 1].devWorkOrder != null and not #strings.isEmpty(info.configs[index - 1].devWorkOrder.workorderNumber)?
+                                              '工单号：'+info.configs[index - 1].devWorkOrder.workorderNumber:';' }"></li>
+
+                                        <li class="list-group-item" date-edit-ygrs-id th:style="${(info.configs[index - 1].ioConfig!= null and not info.configs[index - 1].ioConfig.containsKey('ygrs'))
+                                        or info.configs[index - 1].devWorkOrder == null?'color:#fff':''}"
+                                            th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('ygrs')
+                                            and info.configs[index - 1].devWorkOrder != null and info.configs[index - 1].devWorkOrder.peopleNumber != null
+                                            ?'用工人数：'+info.configs[index - 1].devWorkOrder.peopleNumber:'用工人数：0'}"></li>
+
+                                        <li class="list-group-item" date-edit-zcgs-id  th:style="${(info.configs[index - 1].ioConfig!= null and not info.configs[index - 1].ioConfig.containsKey('zcgs'))
+                                        or info.configs[index - 1].devWorkOrder == null ?'color:#fff':''}"
+                                            th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('zcgs')
+                                            and info.configs[index - 1].devWorkOrder!= null and info.configs[index - 1].devWorkOrder.workingHour != null
+                                             ?'正常工时：'+info.configs[index - 1].devWorkOrder.workingHour:'正常工时：0'}"></li>
+
+                                        <li class="list-group-item" date-edit-jbgs-id th:style="${(info.configs[index - 1].ioConfig!= null and not info.configs[index - 1].ioConfig.containsKey('jbgs'))
+                                        or info.configs[index - 1].devWorkOrder ==null ?'color:#fff':''}"
+                                            th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('jbgs')
+                                            and info.configs[index - 1].devWorkOrder != null and info.configs[index - 1].devWorkOrder.overtimeHour != null
+                                            ?'加班工时：'+info.configs[index - 1].devWorkOrder.overtimeHour:'加班工时：0'}"></li>
+
+                                        <li class="list-group-item" date-edit-jbbl-id th:style="${(info.configs[index - 1].ioConfig!= null and not info.configs[index - 1].ioConfig.containsKey('jbbl'))
+                                        or info.configs[index - 1].devWorkOrder == null?'color:#fff':''}"
+                                            th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('jbbl')
+                                        and info.configs[index - 1].devWorkOrder != null and info.configs[index - 1].devWorkOrder.overtimeRace != null
+                                        ?'加班倍率：'+info.configs[index - 1].devWorkOrder.overtimeRace:'加班倍率：0'}"></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6" style="padding-right: 0px;padding-left: 0px;">
+                                    <ul class="list-group">
+                                        <li class="list-group-item" th:style="${info.configs[index - 1].line == null or info.configs[index - 1].line.manual == 1?'color:#fff':''}">
+                                            <span th:utext="${info.configs[index - 1].devName1 +'-'+info.configs[index - 1].ioName1}"></span>：
+                                            <span style="font-size: 24px;font-weight: bold" th:date-cl-id="${index+'-2'}"
+                                                  th:utext="${info.configs[index - 1].idTotal1 == null?'0':info.configs[index - 1].idTotal1}"></span>
+                                        </li>
+                                    </ul>
+                                    <ul class="list-group"  th:if="${info.configs[index - 1].devWorkOrder }" data-zdy-param >
+                                        <li class="list-group-item"  th:if="${info.configs[index - 1].devWorkOrder.pConfig != null }"
+                                            th:each="p:${info.configs[index - 1].devWorkOrder.pConfig}"><span th:utext="${p.get('k')}"></span><span th:utext="${p.v}"></span> </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6" style="padding-right: 0px;padding-left: 0px;">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" style="padding:0px;">
+                                            <span class="glyphicon glyphicon-list-alt"></span><b th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('dtgdjh')?'当天工单计划':''}"></b>
+                                        </div>
+                                        <div class="panel-body" style="overflow-y: hidden; height: 180px;">
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <ul class="demo_paidan" data-gd-ul-info th:if="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('dtgdjh')}">
+                                                        <li class="news-item" th:if="${not #lists.isEmpty(info.configs[index - 1].workOrderList)}" th:each="item:${info.configs[index - 1].workOrderList}" th:utext="${item}"></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" style="padding-right: 0px;padding-left: 0px;">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" style="padding:0px;">
+                                            <span class="glyphicon glyphicon-list-alt"></span><b th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('ycqk')?'异常情况':''}">异常情况</b>
+                                        </div>
+                                        <div class="panel-body" style="overflow-y: hidden; height: 180px;">
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <ul class="demo_paidan" data-ycqk-ul-info th:if="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('ycqk')}">
+                                                        <li class="news-item" th:if="${not #lists.isEmpty(info.configs[index - 1].workExceptionTypes)}" th:each="item:${info.configs[index - 1].workExceptionTypes}" th:utext="${item.typeName}"></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" th:if="${not #lists.isEmpty(info.configs) and info.layout != null and info.layout.layout_num == 3 and info.configs.size() == 3}" >
+                <div class="col-md-6 col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"  style="text-align:center;padding: 5px 15px;"  th:utext="${info.configs[2].lineName}"></div>
+                        <div class="panel-body" style="padding: 0px 15px;" date-jj-id="3">
+                            <div class="row">
+                                <div class="col-md-6" style="padding-right: 0px;padding-left: 0px;">
+                                    <ul class="list-group" data-gd-ul>
+                                        <li class="list-group-item">
+                                            <span th:if="${info.configs[2].line != null and info.configs[2].line.manual == 0}">
+                                                <span th:utext="${info.configs[2].devName +'-'+info.configs[2].ioName}"></span>：
+                                                <span style="font-size: 24px;font-weight: bold" date-cl-id="3-1" th:utext="${info.configs[2].idTotal == null ? '0':info.configs[2].idTotal}"></span>
+                                            </span>
+                                            <span th:if="${info.configs[2].line != null and info.configs[2].line.manual == 1}">
+                                                <span th:utext="${info.configs[2].line.lineName +'-累计产量'}"></span>：
+                                                <span style="font-size: 24px;font-weight: bold" date-cl-id="3-1" th:utext="${info.configs[2].devWorkOrder == null or info.configs[2].devWorkOrder.cumulativeNumber == null  ? '0':info.configs[2].devWorkOrder.cumulativeNumber}"></span></span>
+                                        </li>
+                                        <!--工单号-->
+                                        <li class="list-group-item" date-edit-gd-id th:style="${(info.configs[2].ioConfig!= null and not info.configs[2].ioConfig.containsKey('gd'))
+                                        or info.configs[2].devWorkOrder == null?'color:#fff':''}"
+                                            th:utext="${info.configs[2].ioConfig!= null and info.configs[2].ioConfig.containsKey('gd')
+                                             and info.configs[2].devWorkOrder != null and not #strings.isEmpty(info.configs[2].devWorkOrder.workorderNumber)?
+                                              '工单号：'+info.configs[2].devWorkOrder.workorderNumber:';' }"></li>
+
+                                        <li class="list-group-item" date-edit-ygrs-id th:style="${(info.configs[2].ioConfig!= null and not info.configs[2].ioConfig.containsKey('ygrs'))
+                                        or info.configs[2].devWorkOrder == null?'color:#fff':''}"
+                                            th:utext="${info.configs[2].ioConfig!= null and info.configs[2].ioConfig.containsKey('ygrs')
+                                            and info.configs[2].devWorkOrder != null and info.configs[2].devWorkOrder.peopleNumber != null
+                                            ?'用工人数：'+info.configs[2].devWorkOrder.peopleNumber:'用工人数：0'}"></li>
+
+                                        <li class="list-group-item" date-edit-zcgs-id  th:style="${(info.configs[2].ioConfig!= null and not info.configs[2].ioConfig.containsKey('zcgs'))
+                                        or info.configs[2].devWorkOrder == null ?'color:#fff':''}"
+                                            th:utext="${info.configs[2].ioConfig!= null and info.configs[2].ioConfig.containsKey('zcgs')
+                                            and info.configs[2].devWorkOrder!= null and info.configs[2].devWorkOrder.workingHour != null
+                                             ?'正常工时：'+info.configs[2].devWorkOrder.workingHour:'正常工时：0'}"></li>
+
+                                        <li class="list-group-item" date-edit-jbgs-id th:style="${(info.configs[2].ioConfig!= null and not info.configs[2].ioConfig.containsKey('jbgs'))
+                                        or info.configs[2].devWorkOrder ==null ?'color:#fff':''}"
+                                            th:utext="${info.configs[2].ioConfig!= null and info.configs[2].ioConfig.containsKey('jbgs')
+                                            and info.configs[2].devWorkOrder != null and info.configs[2].devWorkOrder.overtimeHour != null
+                                            ?'加班工时：'+info.configs[2].devWorkOrder.overtimeHour:'加班工时：0'}"></li>
+
+                                        <li class="list-group-item" date-edit-jbbl-id th:style="${(info.configs[2].ioConfig!= null and not info.configs[2].ioConfig.containsKey('jbbl'))
+                                        or info.configs[2].devWorkOrder == null?'color:#fff':''}"
+                                            th:utext="${info.configs[2].ioConfig!= null and info.configs[2].ioConfig.containsKey('jbbl')
+                                        and info.configs[2].devWorkOrder != null and info.configs[2].devWorkOrder.overtimeRace != null
+                                        ?'加班倍率：'+info.configs[2].devWorkOrder.overtimeRace:'加班倍率：0'}"></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6" style="padding-right: 0px;padding-left: 0px;">
+                                    <ul class="list-group">
+                                        <li class="list-group-item" th:style="${info.configs[2].line != null and info.configs[2].line.manual == 1?'color:#fff':''}">
+                                            <span th:utext="${info.configs[2].devName1 +'-'+info.configs[2].ioName1}"></span>：
+                                            <span style="font-size: 24px;font-weight: bold" date-cl-id="3-2"
+                                                  th:utext="${info.configs[2].idTotal1 == null?'0':info.configs[2].idTotal1}"></span>
+                                        </li>
+                                    </ul>
+                                    <ul class="list-group"  th:if="${info.configs[2].devWorkOrder }" data-zdy-param >
+                                        <li class="list-group-item"  th:if="${info.configs[2].devWorkOrder.pConfig != null }"
+                                            th:each="p:${info.configs[2].devWorkOrder.pConfig}"><span th:utext="${p.get('k')}"></span><span th:utext="${p.v}"></span> </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6" style="padding-right: 0px;padding-left: 0px;">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" style="padding:0px;">
+                                            <span class="glyphicon glyphicon-list-alt"></span><b th:utext="${info.configs[2].ioConfig!= null and info.configs[2].ioConfig.containsKey('dtgdjh')?'当天工单计划':''}"></b>
+                                        </div>
+                                        <div class="panel-body" style="overflow-y: hidden; height: 180px;">
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <ul class="demo_paidan" data-gd-ul-info th:if="${info.configs[2].ioConfig!= null and info.configs[2].ioConfig.containsKey('dtgdjh')}">
+                                                        <li class="news-item" th:if="${not #lists.isEmpty(info.configs[2].workOrderList)}" th:each="item:${info.configs[2].workOrderList}" th:utext="${item}"></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" style="padding-right: 0px;padding-left: 0px;">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" style="padding:0px;">
+                                            <span class="glyphicon glyphicon-list-alt"></span><b th:utext="${info.configs[2].ioConfig!= null and info.configs[2].ioConfig.containsKey('ycqk')?'异常情况':''}">异常情况</b>
+                                        </div>
+                                        <div class="panel-body" style="overflow-y: hidden; height: 180px;">
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <ul class="demo_paidan" data-ycqk-ul-info th:if="${info.configs[2].ioConfig!= null and info.configs[2].ioConfig.containsKey('ycqk')}">
+                                                        <li class="news-item" th:if="${not #lists.isEmpty(info.configs[2].workExceptionTypes)}" th:each="item:${info.configs[2].workExceptionTypes}" th:utext="${item.typeName}"></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" th:if="${not #lists.isEmpty(info.configs) and info.layout != null and info.layout.layout_num == 4 and info.configs.size() == 4}" >
+                <div class="col-md-6 col-sm-12"  th:each="index:${#numbers.sequence(3,4)}">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"  style="text-align:center;padding: 5px 15px;"  th:utext="${info.configs[index - 1].lineName}"></div>
+                        <div class="panel-body" style="padding: 0px 15px;" th:date-jj-id="${index}">
+                            <div class="row">
+                                <div class="col-md-6" style="padding-right: 0px;padding-left: 0px;">
+                                    <ul class="list-group" data-gd-ul>
+                                        <li class="list-group-item">
+                                            <span th:if="${info.configs[index - 1].line != null and info.configs[index - 1].line.manual == 0}">
+                                                <span th:utext="${info.configs[index - 1].devName +'-'+info.configs[index - 1].ioName}"></span>：
+                                                <span style="font-size: 24px;font-weight: bold" th:date-cl-id="${index+'-1'}" th:utext="${info.configs[index - 1].idTotal == null ? '0':info.configs[index - 1].idTotal}"></span>
+                                            </span>
+                                            <span th:if="${info.configs[index - 1].line != null and info.configs[index - 1].line.manual == 1}">
+                                                <span th:utext="${info.configs[index - 1].line.lineName +'-累计产量'}"></span>：
+                                                <span style="font-size: 24px;font-weight: bold" th:date-cl-id="${index+'-1'}" th:utext="${info.configs[index - 1].devWorkOrder == null or info.configs[index - 1].devWorkOrder.cumulativeNumber == null  ? '0':info.configs[index - 1].devWorkOrder.cumulativeNumber}"></span></span>
+                                        </li>
+                                        <!--工单号-->
+                                        <li class="list-group-item" date-edit-gd-id th:style="${(info.configs[index - 1].ioConfig!= null and not info.configs[index - 1].ioConfig.containsKey('gd'))
+                                        or info.configs[index - 1].devWorkOrder == null?'color:#fff':''}"
+                                            th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('gd')
+                                             and info.configs[index - 1].devWorkOrder != null and not #strings.isEmpty(info.configs[index - 1].devWorkOrder.workorderNumber)?
+                                              '工单号：'+info.configs[index - 1].devWorkOrder.workorderNumber:';' }"></li>
+
+                                        <li class="list-group-item" date-edit-ygrs-id th:style="${(info.configs[index - 1].ioConfig!= null and not info.configs[index - 1].ioConfig.containsKey('ygrs'))
+                                        or info.configs[index - 1].devWorkOrder == null?'color:#fff':''}"
+                                            th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('ygrs')
+                                            and info.configs[index - 1].devWorkOrder != null and info.configs[index - 1].devWorkOrder.peopleNumber != null
+                                            ?'用工人数：'+info.configs[index - 1].devWorkOrder.peopleNumber:'用工人数：0'}"></li>
+
+                                        <li class="list-group-item" date-edit-zcgs-id  th:style="${(info.configs[index - 1].ioConfig!= null and not info.configs[index - 1].ioConfig.containsKey('zcgs'))
+                                        or info.configs[index - 1].devWorkOrder == null ?'color:#fff':''}"
+                                            th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('zcgs')
+                                            and info.configs[index - 1].devWorkOrder!= null and info.configs[index - 1].devWorkOrder.workingHour != null
+                                             ?'正常工时：'+info.configs[index - 1].devWorkOrder.workingHour:'正常工时：0'}"></li>
+
+                                        <li class="list-group-item" date-edit-jbgs-id th:style="${(info.configs[index - 1].ioConfig!= null and not info.configs[index - 1].ioConfig.containsKey('jbgs'))
+                                        or info.configs[index - 1].devWorkOrder ==null ?'color:#fff':''}"
+                                            th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('jbgs')
+                                            and info.configs[index - 1].devWorkOrder != null and info.configs[index - 1].devWorkOrder.overtimeHour != null
+                                            ?'加班工时：'+info.configs[index - 1].devWorkOrder.overtimeHour:'加班工时：0'}"></li>
+
+                                        <li class="list-group-item" date-edit-jbbl-id th:style="${(info.configs[index - 1].ioConfig!= null and not info.configs[index - 1].ioConfig.containsKey('jbbl'))
+                                        or info.configs[index - 1].devWorkOrder == null?'color:#fff':''}"
+                                            th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('jbbl')
+                                        and info.configs[index - 1].devWorkOrder != null and info.configs[index - 1].devWorkOrder.overtimeRace != null
+                                        ?'加班倍率：'+info.configs[index - 1].devWorkOrder.overtimeRace:'加班倍率：0'}"></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6" style="padding-right: 0px;padding-left: 0px;">
+                                    <ul class="list-group">
+                                        <li class="list-group-item" th:style="${info.configs[index - 1].line != null and info.configs[index - 1].line.manual == 1?'color:#fff':''}">
+                                            <span th:utext="${info.configs[index - 1].devName1 +'-'+info.configs[index - 1].ioName1}"></span>：
+                                            <span style="font-size: 24px;font-weight: bold" th:date-cl-id="${index+'-2'}"
+                                                  th:utext="${info.configs[index - 1].idTotal1 == null?'0':info.configs[index - 1].idTotal1}"></span>
+                                        </li>
+                                    </ul>
+                                    <ul class="list-group"  th:if="${info.configs[index - 1].devWorkOrder }" data-zdy-param >
+                                        <li class="list-group-item"  th:if="${info.configs[index - 1].devWorkOrder.pConfig != null }"
+                                            th:each="p:${info.configs[index - 1].devWorkOrder.pConfig}"><span th:utext="${p.get('k')}"></span><span th:utext="${p.v}"></span> </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6" style="padding-right: 0px;padding-left: 0px;">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" style="padding:0px;">
+                                            <span class="glyphicon glyphicon-list-alt"></span><b th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('dtgdjh')?'当天工单计划':''}"></b>
+                                        </div>
+                                        <div class="panel-body" style="overflow-y: hidden; height: 180px;">
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <ul class="demo_paidan" data-gd-ul-info th:if="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('dtgdjh')}">
+                                                        <li class="news-item" th:if="${not #lists.isEmpty(info.configs[index - 1].workOrderList)}" th:each="item:${info.configs[index - 1].workOrderList}" th:utext="${item}"></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" style="padding-right: 0px;padding-left: 0px;">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading" style="padding:0px;">
+                                            <span class="glyphicon glyphicon-list-alt"></span><b th:utext="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('ycqk')?'异常情况':''}">异常情况</b>
+                                        </div>
+                                        <div class="panel-body" style="overflow-y: hidden; height: 180px;">
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    <ul class="demo_paidan" data-ycqk-ul-info th:if="${info.configs[index - 1].ioConfig!= null and info.configs[index - 1].ioConfig.containsKey('ycqk')}">
+                                                        <li class="news-item" th:if="${not #lists.isEmpty(info.configs[index - 1].workExceptionTypes)}" th:each="item:${info.configs[index - 1].workExceptionTypes}" th:utext="${item.typeName}"></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    <script th:src="@{/js/jquery.bootstrap.newsbox.min.js}"></script>
+    <script th:src="@{/ajax/libs/fullscreen/jquery.fullscreen.js}"></script>
+    <script>
+        getCode();
+        function getCode() {
+            var i = self.setInterval("countdown()", 1000);
+        }
+        function countdown() {
+            var myDate = new Date();
+            //获取当前年
+            var year = myDate.getFullYear();
+            //获取当前月
+            var month = myDate.getMonth() + 1;
+            //获取当前日
+            var date = myDate.getDate();
+            var h = myDate.getHours();       //获取当前小时数(0-23)
+            var m = myDate.getMinutes();     //获取当前分钟数(0-59)
+            var s = myDate.getSeconds();
+            var now = year + '-' + getNow(month) + "-" + getNow(date) + " " + getNow(h) + ':' + getNow(m) + ":" + getNow(s);
+            // 赋值给展示时间
+            $('#now_time').text('当前系统时间:' + now);
+        }
+        // 获取当前时间
+        function getNow(s) {
+            return s < 10 ? '0' + s : s;
+        }
+
+        // 全屏显示
+        $('#fullScreen').on('click', function () {
+            $('#wrapper').fullScreen();
+        });
+    </script>
+    <script>
+        $(function () {
+            $(".demo_paidan").bootstrapNews({
+                newsPerPage: 4,
+                autoplay: true,
+                pauseOnHover: true,
+                navigation: false,
+                direction: 'up',
+                newsTickerInterval: 2500,
+                onToDo: function () {
+                }
+            });
+        })
+        /**
+         * 定时执行
+         */
+        $(document).ready(function() {
+             setInterval(getData, 5*60*1000);
+        });
+        function getData() {
+            var code = $("#page-code").val();
+            if(code){
+                $.post("/t/gg",{"code":code},function (res) {
+                    if(res.code){
+                        for(var i = 0;i<res.code.length;i++){
+                            var j = i+1;
+                            //判断是否需要进行警戒显示
+                            if(res.code[i].vigilance){
+                                $("div[date-jj-id='"+j+"']").siblings("div[class='panel-heading']").css("background-color","red")
+                            }else{
+                                $("div[date-jj-id='"+j+"']").siblings("div[class='panel-heading']").css("background-color","#f5f5f5")
+                            }
+                            //更新累计产量信息
+                            if(res.code[i].line && res.code[i].line.manual == 1){
+                                $("div[date-jj-id='"+j+"']").find("span[date-cl-id='"+j+"-1']").text(0);
+                                if(res.code[i].devWorkOrder){
+                                    $("div[date-jj-id='"+j+"']").find("span[date-cl-id='"+j+"-1']").text(res.code[i].devWorkOrder.cumulativeNumber);
+                                }
+                                $("div[date-jj-id='"+j+"']").find("span[date-cl-id='"+j+"-2']").text(res.code[i].idTotal1);
+                            }else{
+                                $("div[date-jj-id='"+j+"']").find("span[date-cl-id='"+j+"-1']").text(res.code[i].idTotal);
+                                $("div[date-jj-id='"+j+"']").find("span[date-cl-id='"+j+"-2']").text(res.code[i].idTotal1);
+                            }
+                            //更新工单信息
+                            $("div[date-jj-id='"+j+"']").find("ul[data-gd-ul]").find("li:eq(0)").siblings().css("color","#fff");
+                            var key = JSON.parse(res.code[i].devIoConfig);
+                            if(res.code[i].devWorkOrder){
+                                if(key.hasOwnProperty("gd")){
+                                    $("div[date-jj-id='"+j+"']").find("li[date-edit-gd-id]").text("工单号："+res.code[i].devWorkOrder.workorderNumber).css("color","#000");
+                                }
+                                if(key.hasOwnProperty("ygrs")){
+                                    $("div[date-jj-id='"+j+"']").find("li[date-edit-ygrs-id]").text(isNum(res.code[i].devWorkOrder.peopleNumber)?'用工人数：0':'用工人数：'+res.code[i].devWorkOrder.peopleNumber).css("color","#000");
+                                }
+                                if(key.hasOwnProperty("zcgs")){
+                                    $("div[date-jj-id='"+j+"']").find("li[date-edit-zcgs-id]").text(isNum(res.code[i].devWorkOrder.workingHour)?'正常工时：0':'正常工时：'+res.code[i].devWorkOrder.workingHour).css("color","#000");
+                                }
+                                if(key.hasOwnProperty("jbgs")){
+                                    $("div[date-jj-id='"+j+"']").find("li[date-edit-jbgs-id]").text(isNum(res.code[i].devWorkOrder.overtimeHour)?'加班工时：0':'加班工时：'+res.code[i].devWorkOrder.overtimeHour).css("color","#000");
+                                }
+                                if(key.hasOwnProperty("jbbl")){
+                                    $("div[date-jj-id='"+j+"']").find("li[date-edit-jbbl-id]").text(isNum(res.code[i].devWorkOrder.overtimeRace)?'加班倍率：0':'加班倍率：'+res.code[i].devWorkOrder.overtimeRace).css("color","#000");
+                                }
+                                //清空自定参数
+
+                                $("div[date-jj-id='"+j+"']").find("ul[data-zdy-param]").find("li").remove();
+                                if(res.code[i].devWorkOrder.pConfig){
+                                    var item = res.code[i].devWorkOrder.pConfig;
+                                    var zdy =[];
+                                    for(var z =0;z<item.length;z++){
+                                        zdy.push("<li class=\"list-group-item\"><span>"+item[z].k+"</span><span>"+item[z].v+"</span> </li>")
+                                    }
+                                    $("div[date-jj-id='"+j+"']").find("ul[data-zdy-param]").append(zdy);
+                                }
+                            }
+                            $("div[date-jj-id='"+j+"']").find("ul[data-gd-ul-info]").find("li").remove();
+                            if(key.hasOwnProperty("dtgdjh") && res.code[i].workOrderList){
+                                var item = res.code[i].workOrderList;
+                                var gdList = [];
+                                for(var k =0;k< item.length;k++){
+                                    gdList.push("<li style class=\"news-item\">"+item[k]+"</li>")
+                                }
+                                $("div[date-jj-id='"+j+"']").find("ul[data-gd-ul-info]").append(gdList);
+                            }
+                            $("div[date-jj-id='"+j+"']").find("ul[data-ycqk-ul-info]").find("li").remove();
+                            if(key.hasOwnProperty("ycqk") && res.code[i].workExceptionTypes){
+                                var item = res.code[i].workExceptionTypes;
+                                var gdList = [];
+                                for(var k =0;k< item.length;k++){
+                                    gdList.push("<li  class=\"news-item\">"+item[k].typeName+"</li>")
+                                }
+                                $("div[date-jj-id='"+j+"']").find("ul[data-ycqk-ul-info]").append(gdList);
+                            }
+                        }
+                    }
+                })
+            }
+        }
+
+        function isNum(val) {
+            if(val){
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+
+</html>

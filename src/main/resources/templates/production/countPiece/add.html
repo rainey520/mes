@@ -1,0 +1,105 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-countPiece-add">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">计件归属人：</label>
+				<div class="col-sm-8">
+					<select id="cpUserId" name="cpUserId" class="form-control" th:with="user=${@user.selectComAllUser()}">
+						<option value="0">请选择</option>
+						<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">计件日期：</label>
+				<div class="col-sm-8">
+					<input id="cpDate" name="cpDate" class="form-control time-input" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">工单：</label>
+				<div class="col-sm-8">
+					<input type="hidden" name="workId" id="workId">
+					<select id="workNumber" name="workNumber" class="form-control" onchange="changeWork(this)" th:with="beInWork=${@workOrder.selectWorkListInWorkStatus(1)}">
+						<option value="0">请选择</option>
+						<option th:each="item:${beInWork}" th:text="${item.workorderNumber}" th:value="${item.workorderNumber}"
+								th:data-work-price="${item.workPrice}" th:data-work-id="${item.id}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">工价：</label>
+				<div class="col-sm-8">
+					<input id="workPrice" name="workPrice" class="form-control" type="number" readonly="readonly">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">计件数量：</label>
+				<div class="col-sm-8">
+					<input id="cpNumber" name="cpNumber" class="form-control" type="number" value="0">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">不良品：</label>
+				<div class="col-sm-8">
+					<input id="cpBadNumber" name="cpBadNumber" class="form-control" type="number" value="0">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">备注：</label>
+				<div class="col-sm-8">
+					<textarea rows="4" id="cpRemark" name="cpRemark" class="form-control" type="text"></textarea>
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script th:inline="javascript">
+		var prefix = ctx + "production/countPiece"
+		$("#form-countPiece-add").validate({
+			rules:{
+				cpDate:{
+					required:true,
+				},
+			},
+			messages:{
+				cpDate:{
+					required:"请选择计件日期",
+				},
+			}
+
+		});
+
+		/**
+		 * 工单下拉改变
+		 * @param value
+		 */
+		function changeWork(value){
+			$("#workPrice").val($(value).find("option:selected").attr("data-work-price"));
+			$("#workId").val($(value).find("option:selected").attr("data-work-id"));
+		}
+
+		function submitHandler() {
+	        if ($.validate.form()) {
+				//验证责任人
+				var cpUserId = $("#cpUserId").find("option:selected").val();
+				if (cpUserId <= 0) {
+					$.modal.alertWarning("请选择责任人");
+					return;
+				}
+				//验证工单
+				var workNumber = $("#workNumber").find("option:selected").val();
+				if (workNumber <= 0) {
+					$.modal.alertWarning("请选择工单");
+					return;
+				}
+	            $.operate.save(prefix + "/add", $('#form-countPiece-add').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

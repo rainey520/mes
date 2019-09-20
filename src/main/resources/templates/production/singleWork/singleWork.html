@@ -1,0 +1,309 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <input type="hidden" name="parentId" id="parentId" value="0">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            车间名称：<input type="text" name="workshopName"/>
+                        </li>
+
+                        <li>
+                            设备编号：
+                            <select id="imId" name="imId" th:with="allIm=${@im.selectAllIm(-1,-1)}">
+                                <option value="-1">所有</option>
+                                <option th:each="im:${allIm}" th:utext="${im.imCode}" th:value="${im.id}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            责任人/员工:
+                            <select id="liableOne" name="liableOne"
+                                    th:with="user=${@user.selectComAllUser()}">
+                                <option value="-1">请选择</option>
+                                <option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
+                            </select>
+                        </li>
+
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="formReset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a id="addHouse" class="btn btn-success" onclick="addHouse(0)"
+               shiro:hasPermission="production:singleWork:add">
+                <i class="fa fa-plus"></i> 新建车间
+            </a>
+            <a id="addIm" class="btn btn-primary" onclick="addIm()" shiro:hasPermission="production:singleWork:add"
+               style="display: none">
+                <i class="fa fa-gavel"></i> 新增设备
+            </a>
+            <a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()"
+               shiro:hasPermission="production:singleWork:remove">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+            <a id="goBackTag" class="btn btn-default" onclick="goBack()" style="display: none">
+                <i class="fa fa-mail-reply"></i> 返回上一级
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    $(function () {
+        $("select").select2({
+            width: "200px",
+            placeholder: '请选择'
+        });
+    })
+
+    // 重置搜索表单信息
+    function formReset(params) {
+        $('#formId')[0].reset();//input标签重置
+        $("#imId").val(null).trigger("change"); // select2标签重置
+        $("#liableOne").val(null).trigger("change");
+    }
+
+    var editFlag = [[${@permission.hasPermi('production:singleWork:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('production:singleWork:remove')}]];
+    var configDevFlag = [[${@permission.hasPermi('production:singleWork:configDev')}]];
+    var configSopFlag = [[${@permission.hasPermi('production:singleWork:configSop')}]];
+    var singleWork = [[${@permission.hasPermi('production:singleWorkOrder:list')}]];
+    var prefix = ctx + "production/singleWork";
+
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            createImUrl: prefix + "/addIm/{id}",
+            updateUrl: prefix + "/edit/{id}",
+            updateImUrl: prefix + "/editIm/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "单工位数据",
+            search: false,
+            showExport: false,
+            showSearch: true,
+            showRefresh: true,
+            showColumns: false,
+            showToggle: true,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'id',
+                    title: '单工位主键id',
+                    visible: false
+                },
+                {
+                    field: 'workshopName',
+                    title: '车间/单工位名称',
+                    formatter: function (value, row, index) {
+                        if (row.sign == 0) { // 车间
+                            return '<i class="fa fa-university"></i> <a class="nav-label" onclick="intoNext(\'' + row.id + '\')"><span style="font-weight: bold;color: blue;">' + row.workshopName + '</span></a>';
+                        } else { // 设备名称
+                            if (value == null) {
+                                return '<span>--</span>';
+                            } else {
+                                return '<span style="font-weight: bold;color: #1E0FBE">' + value + '</span>'
+                            }
+                        }
+                    }
+                },
+                {
+                    title: '设备编码',
+                    formatter: function (value, row, index) {
+                        if (row.sign == 0) { // 车间
+                            return '--';
+                        } else { // 设备名称
+                            return '<span style="color: green">' + row.imCode + '</span>';
+                        }
+                    }
+                },
+                {
+                    field: 'sign',
+                    title: '类型',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        if (row.sign == 0) {
+                            return "车间";
+                        } else {
+                            return "设备";
+                        }
+                    }
+                },
+                {
+                    field: 'liableOne',
+                    title: '负责人',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        if (row.sign == 0) {
+                            return row.liableOneName == null ? '-' : row.liableOneName + "/" + (row.liableTwoName == null ? '-' : row.liableTwoName);
+                        } else {
+                            return row.liableOneName == null ? '-' : row.liableOneName;
+                        }
+                    }
+                },
+                {
+                    field: 'cTime',
+                    title: '创建时间',
+                    sortable: true
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        // 单工位设备列表
+                        if (row.parentId != 0) {
+                            actions.push('<a class="btn btn-xs  btn-primary ' + configDevFlag + '" href="javascript:void(0)" onclick="configDev(\'' + row.id + '\')">配置硬件</a> ');
+                            actions.push('<a class="btn btn-xs  btn-primary ' + configSopFlag + '" href="javascript:void(0)" onclick="configSop(\'' + row.id + '\')">配置SOP</a> ');
+                            actions.push('<a class="btn btn-xs  btn-primary ' + singleWork + '" href="javascript:void(0)" onclick="configSingle(' + row.id + ',\'' + row.imCode + '\')">配置工单</a> ');
+                        }
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+        $.table.search("formId");
+    });
+
+    /**
+     * 创建车间
+     */
+    function addHouse(id) {
+        var url = $.common.isEmpty(id) ? $.table._option.createUrl : $.table._option.createUrl.replace("{id}", id);
+        $.modal.open("新建车间", url, 800, 500);
+    }
+
+    /**
+     * 进入车间下一级
+     */
+    function intoNext(parentId) {
+        $("#addHouse").hide();
+        $("#addIm").show();
+        $("#goBackTag").show();
+        $.form.reset();
+        $("#parentId").val(parentId);
+        $.table.search("formId");
+    }
+
+    /**
+     * 返回上一级
+     */
+    function goBack() {
+        $("#addHouse").show();
+        $("#addIm").hide();
+        $("#goBackTag").hide();
+        $.form.reset();
+        $("#parentId").val(0);
+        $.table.search("formId");
+    }
+
+    /**
+     * 新增设备
+     */
+    function addIm() {
+        var parentId = $("#parentId").val();
+        var url = $.common.isEmpty(parentId) ? $.table._option.createImUrl : $.table._option.createImUrl.replace("{id}", parentId);
+        $.modal.open("添加设备", url, 800, 500);
+    }
+
+    /**
+     * 修改
+     * @param id
+     */
+    function edit(id) {
+        var parentId = $("#parentId").val();
+        if (parentId == 0) {
+            var url = "/404.html";
+            if ($.common.isNotEmpty(id)) {
+                url = $.table._option.updateUrl.replace("{id}", id);
+            } else {
+                var id = $.common.isEmpty($.table._option.uniqueId) ? $.table.selectFirstColumns() : $.table.selectColumns($.table._option.uniqueId);
+                if (id.length == 0) {
+                    $.modal.alertWarning("请至少选择一条记录");
+                    return;
+                }
+                url = $.table._option.updateUrl.replace("{id}", id);
+            }
+            $.modal.open("修改车间信息", url, 800, 500);
+        } else {
+            var url = "/404.html";
+            if ($.common.isNotEmpty(id)) {
+                url = $.table._option.updateImUrl.replace("{id}", id);
+            } else {
+                var id = $.common.isEmpty($.table._option.uniqueId) ? $.table.selectFirstColumns() : $.table.selectColumns($.table._option.uniqueId);
+                if (id.length == 0) {
+                    $.modal.alertWarning("请至少选择一条记录");
+                    return;
+                }
+                url = $.table._option.updateImUrl.replace("{id}", id);
+            }
+            $.modal.open("修改单工位责任人", url, 800, 500);
+        }
+    }
+
+    /**
+     * 配置单工位设备硬件
+     */
+    function configDev(id) {
+        $.modal.open("单工位硬件配置", prefix + "/configDev?id=" + id, 800, 480);
+    }
+
+    /**
+     * 配置单工位SOP
+     */
+    function configSop(id) {
+        var parentId = $("#parentId").val();
+        createMenuItem(prefix + "/configSop?parentId=" + parentId + "&id=" + id, "配置单工位作业指导书");
+    }
+
+    /**
+     * 删除单工位配置
+     */
+    function remove(id) {
+        var parentId = $("#parentId").val();
+        var msg = '';
+        if (parentId != 0) {
+            msg = '单工位信息以及所有相关配置吗?'
+        } else {
+            msg = '车间信息吗?';
+        }
+        $.modal.confirm("确定删除该条" + msg, function () {
+            var url = $.common.isEmpty(id) ? $.table._option.removeUrl : $.table._option.removeUrl.replace("{id}", id);
+            var data = {"ids": id};
+            $.operate.submit(url, "post", "json", data);
+        });
+    }
+
+    /**
+     * 单工位工单配置
+     * @param id
+     * @param name
+     */
+    function configSingle(id, name) {
+        $.modal.open(name + " 工单配置", "/production/singleWorkOrder?type=0&orderId=0&singleId=" + id, 800, 700);
+    }
+</script>
+</body>
+</html>

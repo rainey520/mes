@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-devList-edit" th:object="${devList}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">硬件名称：</label>
+				<div class="col-sm-8">
+					<input id="deviceName" name="deviceName" th:field="*{deviceName}" class="form-control" type="text">
+				</div>
+			</div>
+			<!--<div class="form-group">	-->
+				<!--<label class="col-sm-3 control-label">状态：</label>-->
+				<!--<div class="col-sm-8">-->
+					<!--<div class="onoffswitch">-->
+						<!--<input type="checkbox" th:checked="${devList.deviceStatus == 1 ? true : false}"-->
+							   <!--class="onoffswitch-checkbox" id="deviceStatus" name="deviceStatus">-->
+						<!--<label class="onoffswitch-label" for="deviceStatus">-->
+							<!--<span class="onoffswitch-inner"></span>-->
+							<!--<span class="onoffswitch-switch"></span>-->
+						<!--</label>-->
+					<!--</div>-->
+				<!--</div>-->
+			<!--</div>-->
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">备注信息：</label>
+				<div class="col-sm-8">
+					<textarea id="remark" name="remark" rows="4" th:field="*{remark}" class="form-control" type="text"></textarea>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "device/devList";
+		$("#form-devList-edit").validate({
+			rules:{
+				// deviceName:{
+				// 	required:true,
+				// },
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+				edit()
+	        }
+	    }
+		function edit() {
+			var id = $("input[name='id']").val();
+			var deviceName = $("input[name='deviceName']").val();
+			var remark = $("textarea[name='remark']").val();
+			// var deviceStatus = $("input[name='deviceStatus']").is(':checked') == true ? 1 : 0;
+			$.ajax({
+				cache : true,
+				type : "POST",
+				url : ctx + "device/devList/edit",
+				data : {
+					"id": id,
+					"deviceName": deviceName,
+					"remark": remark,
+					// "deviceStatus": deviceStatus,
+				},
+				async : false,
+				error : function(request) {
+					$.modal.alertError("系统错误");
+				},
+				success : function(data) {
+					$.operate.successCallback(data);
+				}
+			});
+		}
+	</script>
+</body>
+</html>

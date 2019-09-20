@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>上传数据设置</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="panel-body">
+                        <div class="panel-group" id="accordion">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                            硬件列表 <a class="btn  btn-white btn-xs" style="float: right;margin-right: 10px;color: #1ab394" onclick="add1()" shiro:hasPermission="device:devList:addsave">
+                                            <i class="fa fa-plus"></i> 添加硬件
+                                        </a>
+                                        </div>
+                                        <div class="panel-body">
+                                            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="panel panel-primary">
+                                        <div class="panel-heading">
+                                            硬件绑定 <span>
+
+                                        </span>
+                                        </div>
+                                        <div class="panel-body">
+                                            <table id="config-table" style="width: 100%;line-height: 45px;"  cellspacing="5">
+                                                <thead>
+                                                <tr>
+                                                    <td align="center">
+                                                    </td>
+                                                    <td  align="center">
+                                                        <h3 th:text="${line.lineName}"></h3>
+                                                    </td>
+                                                    <td>
+                                                        <input type="hidden" id="line_id" th:value="${line.id}">
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td  align="center">硬件名称</td>
+                                                    <td  align="center">数据接入口</td>
+                                                    <td  align="center">警戒判断依据</td>
+                                                    <td  align="center">操作</td>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr th:each="c : ${config}">
+                                                    <td align="center">
+                                                        <select class="form-control m-b"  style="width: 100%" name="devList"  th:with="list=${@devList.selectAll(#httpServletRequest.getCookies())}">
+                                                            <option th:each="item : ${list}" th:selected="${c.dev_id == item.id?true:false}"  th:text="${item.deviceName}" th:value="${item.id}"></option>
+                                                        </select>
+                                                    </td>
+                                                    <td  align="center">
+                                                        <select class="form-control m-b" style="width: 100%" name="devIo" th:with="iolist=${@devIo.selectDevIoByDevId(c.dev_id,0)}" >
+                                                            <option th:value="${c.io_d}" th:text="${c.io_name}"></option>
+                                                            <option th:each="item : ${iolist}"  th:text="${item.ioName}" th:value="${item.id}"></option>
+                                                        </select>
+                                                    </td>
+                                                    <td  align="center">
+                                                        <input type="radio" name="is_sign" th:checked="${c.is_sign == 1?true:false}" style="width: 25px;height: 25px;">
+                                                    </td>
+                                                    <td  align="center">
+                                                        <button class="btn btn-danger btn-del btn-del" name="removeConfig" >
+                                                            <i class="fa fa-remove"></i> 移除
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                <tr>
+                                                    <td colspan="3" align="center">
+                                                        <a class="btn btn-success" onclick="add()">
+                                                            <i class="fa fa-plus"></i> 添加配置
+                                                        </a>
+                                                        <a class="btn btn-success" onclick="save()">
+                                                            <i class="fa fa-save"></i> 保存设置
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script type="text/javascript" th:inline="javascript">
+    function save() {
+            var data = {};
+            data.id=$("#line_id").val();
+            var io =[];
+            $("#config-table tbody").find("tr").each(function () {
+                io.push($(this).find("select[name='devIo']").find("option:selected").val());
+            })
+            data.devIo = io;
+            //寻找警戒线标记
+            var sign = $("input[name='is_sign']:checked");
+            var is_sign =0;
+            if($(sign).size() >0){
+                is_sign = $(sign).parent("td").prev("td").find("select[name='devIo']").find("option:selected").val();
+            }
+            data.isSign = is_sign;
+            $.ajax({
+                cache : true,
+                type : "POST",
+                contentType: 'application/json',
+                url : ctx + "production/productionLine/save/config",
+                data :JSON.stringify(data),
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(result) {
+                    if (result.code == web_status.SUCCESS) { // 成功
+                        layer.msg("保存成功,正在刷新数据请稍后……", {
+                                icon: $.modal.icon(modal_status.SUCCESS),
+                                time: 500,
+                                shade: [0.1, '#8F8F8F']
+                            },
+                            function () {
+                            });
+                    }else{
+                        $.modal.alertError(result.msg);
+                    }
+
+                }
+            });
+    }
+
+    /** 添加配置 */
+    function add() {
+        var devList = [];
+        var devItem =[];
+        $.post("/device/devList/all",function (data) {
+            if(data.code && data.code.length >0){
+                data.code.forEach(function (item) {
+                    devItem.push("<option  value="+item.id+">"+item.deviceName+"</option>");
+                    devList.push(item.id);
+                });
+                var devIoItem = [];
+                if(devList.length >= 1){
+                    var t = devList[0];
+                    $.post("/device/devIo/byDevId",{"id":t,"line_id":0},function (data) {
+                        if(data.rows){
+                            data.rows.forEach(function (io) {
+                                devIoItem.push("<option  value="+io.id+">"+io.ioName+"</option>")
+                            });
+                            $("#config-table tbody").append("<tr><td align=\"center\"><select class=\"form-control m-b\"  style=\"width: 100%\" name=\"devList\">"+devItem+"</select></td>" +
+                                "<td align=\"center\"><select class=\"form-control m-b\" style=\"width: 100%\" name=\"devIo\" >"+devIoItem+"</select></td>" +
+                                "<td align=\"center\"><input type=\"radio\" name=\"is_sign\" style=\"width: 25px;height: 25px;\"></td>" +
+                                "<td  align=\"center\"><button class=\"btn btn-danger btn-del btn-del\" name=\"removeConfig\" >\n" +
+                                " <i class=\"fa fa-remove\"></i> 移除</button></td></tr>")
+                        }else{
+                            layer.msg("操作异常……", {
+                                    icon: $.modal.icon(modal_status.FAIL),
+                                    time: 500,
+                                    shade: [0.1, '#8F8F8F']
+                                },
+                                function () {
+                                });
+                        }
+                    })
+                }
+            }else{
+               $.modal.alertWarning("请添加硬件信息...")
+            }
+        })
+    }
+    /**
+     * 配置绑定事件
+     */
+    $(function () {
+        $(document).on("change","select[name='devList']",function () {
+            var id = $(this).find("option:selected").val();
+            var than = this;
+            $.post("/device/devIo/byDevId",{"id":id,"line_id":$("#line_id").val()},function (data) {
+                if(data.rows){
+                    $(than).parent("td").next("td").find("select[name='devIo']").find("option").remove();
+                    var item = [];
+                    data.rows.forEach(function (io) {
+                        item.push("<option  value="+io.id+">"+io.ioName+"</option>")
+                    });
+                    $(than).parent("td").next("td").find("select[name='devIo']").append(item)
+                }
+            })
+        })
+        /** 移除配置 */
+        $(document).on("click","button[name='removeConfig']",function () {
+            $(this).parent("td").parent("tr").remove();
+        })
+    })
+</script>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('device:devList:edit')}]];
+    var prefix = ctx + "device/devList";
+    $(function() {
+        var options = {
+            url: prefix + "/list",
+            updateUrl: prefix + "/edit/{id}",
+            modalName: "硬件",
+            search: false,
+            showSearch:false,
+            showExport: false,
+            showRefresh:false,
+            showColumns:false,
+            showToggle:false,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field : 'id',
+                    title : '',
+                    visible: false
+                },
+                {
+                    field : 'deviceId',
+                    title : '硬件编号',
+                    sortable: true
+                },
+                {
+                    field : 'deviceName',
+                    title : '硬件名称',
+                    sortable: true
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="detail(\'' + row.id + '\')"><i class="fa fa-edit"></i>模块配置</a> ');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+    /**
+     * 硬件模块配置
+     */
+    function detail(devId) {
+        var url = '/device/devIo/two/' + devId;
+        $.modal.open("模块配置",url,800,500);
+    }
+
+    /**
+     * 添加硬件
+     */
+    function add1() {
+        var url = prefix +"/add1";
+        $.modal.open("添加硬件",url,800,400);
+    }
+</script>
+</body>
+</html>

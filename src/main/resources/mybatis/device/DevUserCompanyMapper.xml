@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.device.devUserCompany.mapper.DevUserCompanyMapper">
+    
+    <resultMap type="DevUserCompany" id="DevUserCompanyResult">
+        <result property="companyId"    column="company_id"    />
+        <result property="userId"    column="user_id"    />
+    </resultMap>
+	
+	<sql id="selectDevUserCompanyVo">
+        select company_id, user_id from dev_user_company
+    </sql>
+	
+    <select id="selectDevUserCompanyList" parameterType="DevUserCompany" resultMap="DevUserCompanyResult">
+        <include refid="selectDevUserCompanyVo"/>
+        <where>  
+            <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="userId != null "> and user_id = #{userId}</if>
+         </where>
+    </select>
+    
+    <select id="selectDevUserCompanyById" parameterType="Integer" resultMap="DevUserCompanyResult">
+        <include refid="selectDevUserCompanyVo"/>
+        where company_id = #{companyId}
+    </select>
+        
+    <insert id="insertDevUserCompany" parameterType="DevUserCompany">
+        insert into dev_user_company
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="userId != null  ">user_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="userId != null  ">#{userId},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateDevUserCompany" parameterType="DevUserCompany">
+        update dev_user_company
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null  ">user_id = #{userId},</if>
+        </trim>
+        where company_id = #{companyId}
+    </update>
+
+	<delete id="deleteDevUserCompanyById" parameterType="Integer">
+        delete from dev_user_company where company_id = #{companyId}
+    </delete>
+	
+    <delete id="deleteDevUserCompanyByIds" parameterType="String">
+        delete from dev_user_company where company_id in 
+        <foreach item="companyId" collection="array" open="(" separator="," close=")">
+            #{companyId}
+        </foreach>
+    </delete>
+    
+</mapper>

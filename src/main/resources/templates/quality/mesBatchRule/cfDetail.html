@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+<div class="container-div ui-layout-center">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <input type="hidden" name="ruleId" id="ruleId" th:value="${ruleId}">
+                <input type="hidden" name="sign" id="sign" th:value="${pType}">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <span th:if="${pType==0}">产品编码：</span>
+                            <span th:if="${pType==1}">半成品编码：</span>
+                            <select id="id" name="id">
+                                <option value="0">请选择</option>
+                                <option th:each="pro:${proList}" th:text="${pro.productCode}" th:value="${pro.Id}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-success btn-rounded btn-sm" onclick="addMesCf()" shiro:hasPermission="mes:mesBatchRule:add">
+                                <i class="fa fa-plus"></i> 添加
+                            </a>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="formReset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    $(function () {
+        $("select").select2({
+            width:"160px",
+            placeholder:'请选择'
+        });
+    })
+    // 重置搜索表单信息
+    function formReset(params) {
+        $('#formId')[0].reset();//input标签重置
+        $("#id").val(0).trigger("change"); // select2标签重置
+    }
+    var prefix = ctx + "product";
+    var removeFlag = [[${@permission.hasPermi('mes:mesBatch:remove')}]];
+    $(function () {
+        var options = {
+            url: prefix + "/mesCfList",
+            modalName: "产品",
+            sortName: "createTime",
+            sortOrder: "desc",
+            search: false,
+            showExport: false,
+            showSearch:false,
+            showRefresh:false,
+            showColumns:false,
+            showToggle:false,
+            columns: [
+                {
+                    field : 'id',
+                    title : '编号',
+                    visible: false
+                },
+                {
+                    field : 'productCode',
+                    title : '产品编码',
+                    sortable: true
+                },
+                {
+                    field : 'productModel',
+                    title : '产品型号',
+                    sortable: true
+                },
+                {
+                    field : 'productName',
+                    title : '产品名称',
+                    sortable: true
+                },
+                {
+                    field : 'price',
+                    title : '单价',
+                    sortable: true
+                },
+                {
+                    field : 'unit',
+                    title : '单位',
+                    sortable: true
+                },
+                {
+                    field : 'standardHourYield',
+                    title : '标准工时[UPH]',
+                    sortable: true
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="cancelMes(\'' + row.id + '\')"><i class="fa fa-remove"></i>取消MES配置</a> ');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+        $.table.search('formId');
+    })
+
+
+
+    /**
+     * 添加MES规则配置
+     */
+    function addMesCf() {
+        var id = $("#id").find("option:selected").val();
+        if (id <= 0 ) {
+            $.modal.alertWarning("请选择添加规格的产品");
+            return;
+        }
+        $.modal.confirm("确认添加该规则配置吗？",function (res) {
+            $.post(prefix+"/saveMesRule",{id:id,ruleId:[[${ruleId}]]},function (result) {
+                if (result.code == web_status.SUCCESS) {
+                    $.modal.msg("保存成功,正在刷新数据请稍后……", modal_status.SUCCESS);
+                    formReset();
+                    $.table.refresh();
+                } else {
+                    $.modal.alertError(result.msg);
+                }
+                $.modal.closeLoading();
+            })
+        })
+    }
+
+    /**
+     * 取消产品MES规则配置
+     */
+    function cancelMes(id) {
+        $.modal.confirm("确定取消MES规则配置吗",function (e) {
+            if(e){
+                var config = {
+                    url: prefix+"/cancelMes",
+                    type: "post",
+                    dataType: "json",
+                    data: {id:id},
+                    beforeSend: function () {
+                        $.modal.loading("正在处理中，请稍后...");
+                        $.modal.disable();
+                    },
+                    success: function (result) {
+                        if (result.code == web_status.SUCCESS) {
+                            $.table.refresh();
+                        } else {
+                            $.modal.alertError(result.msg);
+                        }
+                        $.modal.closeLoading();
+                        $.modal.enable();
+                    }
+                };
+                $.ajax(config)
+            }
+        })
+    }
+
+    function submitHandler() {
+        $.modal.close();
+        window.parent.$.table.refresh();
+    }
+</script>
+</body>
+</html>

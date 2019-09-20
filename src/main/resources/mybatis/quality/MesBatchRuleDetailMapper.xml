@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.quality.mesBatchRule.mapper.MesBatchRuleDetailMapper">
+    
+    <resultMap type="MesBatchRuleDetail" id="MesBatchRuleDetailResult">
+        <result property="id"    column="id"    />
+        <result property="ruleId"    column="rule_id"    />
+        <result property="dType"    column="d_type"    />
+        <result property="dCode"    column="d_code"    />
+        <result property="dTag"    column="d_tag"    />
+        <result property="ruleOrder"    column="rule_order"    />
+    </resultMap>
+	
+	<sql id="selectMesBatchRuleDetailVo">
+        select id, rule_id, d_type, d_code, d_tag,rule_order from tab_mes_batch_rule_detail
+    </sql>
+	
+    <select id="selectMesBatchRuleDetailList" parameterType="MesBatchRuleDetail" resultMap="MesBatchRuleDetailResult">
+        <include refid="selectMesBatchRuleDetailVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="ruleId != null "> and rule_id = #{ruleId}</if>
+             <if test="dType != null "> and d_type = #{dType}</if>
+             <if test="dCode != null  and dCode != '' "> and d_code = #{dCode}</if>
+             <if test="dTag != null "> and d_tag = #{dTag}</if>
+         </where>
+    </select>
+    
+    <select id="selectMesBatchRuleDetailById" parameterType="Integer" resultMap="MesBatchRuleDetailResult">
+        <include refid="selectMesBatchRuleDetailVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMesBatchRuleDetail" parameterType="MesBatchRuleDetail" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_mes_batch_rule_detail
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="ruleId != null  ">rule_id,</if>
+			<if test="dType != null  ">d_type,</if>
+			<if test="dCode != null  and dCode != ''  ">d_code,</if>
+			<if test="dTag != null  ">d_tag,</if>
+            <if test="ruleOrder != null and ruleOrder != 0 ">rule_order,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="ruleId != null  ">#{ruleId},</if>
+			<if test="dType != null  ">#{dType},</if>
+			<if test="dCode != null  and dCode != ''  ">#{dCode},</if>
+			<if test="dTag != null  ">#{dTag},</if>
+            <if test="ruleOrder != null and ruleOrder != 0 ">#{ruleOrder},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateMesBatchRuleDetail" parameterType="MesBatchRuleDetail">
+        update tab_mes_batch_rule_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ruleId != null  ">rule_id = #{ruleId},</if>
+            <if test="dType != null  ">d_type = #{dType},</if>
+            <if test="dCode != null  and dCode != ''  ">d_code = #{dCode},</if>
+            <if test="dTag != null  ">d_tag = #{dTag},</if>
+            <if test="ruleOrder != null and ruleOrder != 0 ">rule_order = #{ruleOrder},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteMesBatchRuleDetailById" parameterType="Integer">
+        delete from tab_mes_batch_rule_detail where id = #{id}
+    </delete>
+	
+    <delete id="deleteMesBatchRuleDetailByIds" parameterType="String">
+        delete from tab_mes_batch_rule_detail where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过规则主id删除规则明细信息-->
+    <delete id="deleteMesBatchRuleDetailByRuleId" parameterType="Integer">
+        delete from tab_mes_batch_rule_detail where rule_id = #{ruleId}
+    </delete>
+
+    <!--通过规则主表id查询规则明细列表-->
+    <select id="selectMesBatchRuleDetailByRuleId" parameterType="Integer" resultMap="MesBatchRuleDetailResult">
+        <include refid="selectMesBatchRuleDetailVo"/>
+        where rule_id = #{ruleId}
+    </select>
+
+    <!--更新半成品是否配置信息-->
+    <update id="updateMesBatchRuleDetailTag">
+         update tab_mes_batch_rule_detail set d_tag = #{dTag} where d_code = #{dCode} and d_type = 1
+    </update>
+    
+</mapper>

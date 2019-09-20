@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.production.nectWorkSingle.mapper.NectWorkSingleMapper">
+    
+    <resultMap type="NectWorkSingle" id="NectWorkSingleResult">
+        <result property="id"    column="id"    />
+        <result property="workId"    column="work_id"    />
+        <result property="swId"    column="sw_id"    />
+        <result property="cTime"    column="c_time"    />
+    </resultMap>
+	
+	<sql id="selectNectWorkSingleVo">
+        select id, work_id, sw_id, c_time from tab_nect_work_single
+    </sql>
+	
+    <select id="selectNectWorkSingleList" parameterType="NectWorkSingle" resultMap="NectWorkSingleResult">
+        <include refid="selectNectWorkSingleVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="workId != null "> and work_id = #{workId}</if>
+             <if test="swId != null "> and sw_id = #{swId}</if>
+             <if test="cTime != null "> and c_time = #{cTime}</if>
+         </where>
+    </select>
+    
+    <select id="selectNectWorkSingleById" parameterType="Integer" resultMap="NectWorkSingleResult">
+        <include refid="selectNectWorkSingleVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertNectWorkSingle" parameterType="NectWorkSingle" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_nect_work_single
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="workId != null  ">work_id,</if>
+			<if test="swId != null  ">sw_id,</if>
+			<if test="cTime != null  ">c_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="workId != null  ">#{workId},</if>
+			<if test="swId != null  ">#{swId},</if>
+			<if test="cTime != null  ">#{cTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateNectWorkSingle" parameterType="NectWorkSingle">
+        update tab_nect_work_single
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workId != null  ">work_id = #{workId},</if>
+            <if test="swId != null  ">sw_id = #{swId},</if>
+            <if test="cTime != null  ">c_time = #{cTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteNectWorkSingleById" parameterType="Integer">
+        delete from tab_nect_work_single where id = #{id}
+    </delete>
+	
+    <delete id="deleteNectWorkSingleByIds" parameterType="String">
+        delete from tab_nect_work_single where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

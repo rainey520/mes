@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>基本数据</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="panel-body">
+                        <div class="panel-group" id="accordion1">
+                            <form role="form">
+                                <div class="form-group">
+                                    <label>页面名称</label>
+                                    <input type="email" placeholder="请输入页面名称" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>布局类型</label>
+                                    <select id="layout_type" class="form-control m-b" name="account">
+                                        <option value="1">详情页面</option>
+                                        <option value="2">二宫格</option>
+                                        <option value="3">三宫格</option>
+                                        <option value="4">四宫格</option>
+                                        <option value="5">轮播页面</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <button class="btn btn-primary btn-rounded btn-block" >
+                                        <i class="fa fa-upload"></i> 上传背景图片
+                                    </button>
+                                    <div class="text-center">
+                                        <p><img width="120" height="120" src="/img/profile.jpg"></p>
+                                        <p><a href="javascript:avatar()">修改头像</a></p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button  class="btn btn-primary btn-rounded btn-block" >
+                                        <i class="fa fa-save"></i> 保存
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>页面布局</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="panel-body">
+                        <div class="panel-group" id="accordion">
+                            <!--详情页面-->
+                            <div id="detail_pane">
+                                <div data-detail="1">
+                                    <div class="col-sm-5">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading">
+                                                        模块名称
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <ul class="list-group list-group-striped">
+                                                            <li class="list-group-item">
+                                                                <b class="font-noraml">实时产量：</b>
+                                                                <p class="pull-right">222</p>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="margin-top: 10px;">
+                                            <div class="col-sm-12">
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading">
+                                                        详情数据
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="form-group">
+                                                            <label>工单号：</label>
+                                                            <input type="text" placeholder="请输入工单号" class="form-control">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>实时产量：</label>
+                                                            <input type="text" placeholder="请输入实时产量" class="form-control">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>用工人数：</label>
+                                                            <input type="text" placeholder="请输入用工人数" class="form-control">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>正常工时：</label>
+                                                            <input type="text" placeholder="请输入正常工时" class="form-control">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>加班工时：</label>
+                                                            <input type="text" placeholder="请输入加班工时" class="form-control">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>异常情况：</label>
+                                                            <textarea rows="4" type="text" placeholder="请输入异常情况" class="form-control"></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <div class="panel panel-primary" style="min-height: 700px;">
+                                            <div class="panel-heading">
+                                                工单计划排版
+                                            </div>
+                                            <div class="panel-body">
+                                                <ul class="list-group list-group-striped">
+                                                    <li class="list-group-item">
+                                                        <i class="fa fa-genderless"></i>
+                                                        工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版工单计划排版
+                                                        工单计划排版工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        <i class="fa fa-genderless"></i>
+                                                        工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版工单计划排版
+                                                        工单计划排版工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版
+                                                    </li>
+                                                    <li class="list-group-item">
+                                                        <i class="fa fa-genderless"></i>
+                                                        工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版工单计划排版
+                                                        工单计划排版工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版 工单计划排版
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-detail="2">
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading">
+                                                        宮格一
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="form-group">
+                                                            <label>模板名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">模板一</option>
+                                                                <option value="2">模板二</option>
+                                                                <option value="3">模板三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>采样数据名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">采样数据一</option>
+                                                                <option value="2">采样数据二</option>
+                                                                <option value="3">采样数据三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1" id="inlineCheckbox1">工单号</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2" id="inlineCheckbox2">实时产量</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3" id="inlineCheckbox3">用工人数</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1" id="inlineCheckbo4">正常工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2" id="inlineCheckbox5">加班工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3" id="inlineCheckbox6">异常情况</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3" id="inlineCheckbox7">当天工单计划</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading">
+                                                        宮格二
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="form-group">
+                                                            <label>模板名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">模板一</option>
+                                                                <option value="2">模板二</option>
+                                                                <option value="3">模板三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>采样数据名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">采样数据一</option>
+                                                                <option value="2">采样数据二</option>
+                                                                <option value="3">采样数据三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">工单号</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">实时产量</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">用工人数</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">正常工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">加班工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">异常情况</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">当天工单计划</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-detail="3">
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading">
+                                                        宮格一
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="form-group">
+                                                            <label>模板名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">模板一</option>
+                                                                <option value="2">模板二</option>
+                                                                <option value="3">模板三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>采样数据名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">采样数据一</option>
+                                                                <option value="2">采样数据二</option>
+                                                                <option value="3">采样数据三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">工单号</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">实时产量</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">用工人数</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">正常工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">加班工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">异常情况</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">当天工单计划</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading">
+                                                        宮格二
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="form-group">
+                                                            <label>模板名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">模板一</option>
+                                                                <option value="2">模板二</option>
+                                                                <option value="3">模板三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>采样数据名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">采样数据一</option>
+                                                                <option value="2">采样数据二</option>
+                                                                <option value="3">采样数据三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">工单号</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">实时产量</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">用工人数</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">正常工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">加班工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">异常情况</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">当天工单计划</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="margin-top:10px">
+                                            <div class="col-sm-6">
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading">
+                                                        宮格三
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="form-group">
+                                                            <label>模板名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">模板一</option>
+                                                                <option value="2">模板二</option>
+                                                                <option value="3">模板三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>采样数据名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">采样数据一</option>
+                                                                <option value="2">采样数据二</option>
+                                                                <option value="3">采样数据三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">工单号</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">实时产量</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">用工人数</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">正常工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">加班工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">异常情况</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">当天工单计划</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div data-detail="4">
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading">
+                                                        宮格一
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="form-group">
+                                                            <label>模板名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">模板一</option>
+                                                                <option value="2">模板二</option>
+                                                                <option value="3">模板三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>采样数据名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">采样数据一</option>
+                                                                <option value="2">采样数据二</option>
+                                                                <option value="3">采样数据三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">工单号</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">实时产量</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">用工人数</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">正常工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">加班工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">异常情况</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">当天工单计划</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading">
+                                                        宮格二
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="form-group">
+                                                            <label>模板名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">模板一</option>
+                                                                <option value="2">模板二</option>
+                                                                <option value="3">模板三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>采样数据名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">采样数据一</option>
+                                                                <option value="2">采样数据二</option>
+                                                                <option value="3">采样数据三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">工单号</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">实时产量</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">用工人数</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">正常工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">加班工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">异常情况</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">当天工单计划</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row" style="margin-top:10px">
+                                            <div class="col-sm-6">
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading">
+                                                        宮格三
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="form-group">
+                                                            <label>模板名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">模板一</option>
+                                                                <option value="2">模板二</option>
+                                                                <option value="3">模板三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>采样数据名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">采样数据一</option>
+                                                                <option value="2">采样数据二</option>
+                                                                <option value="3">采样数据三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">工单号</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">实时产量</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">用工人数</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">正常工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">加班工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">异常情况</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">当天工单计划</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="panel panel-primary">
+                                                    <div class="panel-heading">
+                                                        宮格四
+                                                    </div>
+                                                    <div class="panel-body">
+                                                        <div class="form-group">
+                                                            <label>模板名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">模板一</option>
+                                                                <option value="2">模板二</option>
+                                                                <option value="3">模板三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>采样数据名称</label>
+                                                            <select  class="form-control m-b" name="account">
+                                                                <option value="1">采样数据一</option>
+                                                                <option value="2">采样数据二</option>
+                                                                <option value="3">采样数据三</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <div class="col-sm-12">
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">工单号</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">实时产量</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">用工人数</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option1">正常工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option2">加班工时</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">异常情况</label>
+                                                                <label class="checkbox-inline">
+                                                                    <input type="checkbox" value="option3">当天工单计划</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script>
+   $(function () {
+       $("#detail_pane").find("div[data-detail]").hide();
+       $("#detail_pane").find("div[data-detail='1']").show();
+       $("#layout_type").change(function (e) {
+           var id = $(this).val();
+           $("#detail_pane").find("div[data-detail]").hide();
+           $("#detail_pane").find("div[data-detail="+id+"]").show();
+       })
+   })
+</script>
+<!--统计代码，可删除-->
+
+
+</body>
+</html>

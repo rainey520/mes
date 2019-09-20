@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.device.devModel.mapper.DevModelMapper">
+    
+    <resultMap type="DevModel" id="DevModelResult">
+        <result property="id"    column="id"    />
+        <result property="modelName"    column="model_name"    />
+        <result property="defId"    column="def_id"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+	
+	<sql id="selectDevModelVo">
+        select id, model_name, def_id, create_time from dev_model
+    </sql>
+	
+    <select id="selectDevModelList" parameterType="DevModel" resultMap="DevModelResult">
+        <include refid="selectDevModelVo"/>
+        <where>
+            and def_id = 0
+           <if test="modelName != null  and modelName != '' "> and model_name  like concat(#{modelName}, '%') </if>
+         </where>
+    </select>
+    
+    <select id="selectDevModelById" parameterType="Integer" resultMap="DevModelResult">
+        <include refid="selectDevModelVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDevModel" parameterType="DevModel" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `dev_model`(`model_name`,`def_id`,`create_time`)
+        VALUES(#{modelName},0,now());
+    </insert>
+	 
+    <update id="updateDevModel" parameterType="DevModel">
+        update dev_model
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="modelName != null  and modelName != ''  ">model_name = #{modelName},</if>
+            <if test="defId != null  ">def_id = #{defId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteDevModelById" parameterType="Integer">
+         update  dev_model set def_id =1 where id = #{id}
+    </delete>
+	
+    <update id="deleteDevModelByIds" parameterType="String">
+        update  dev_model set def_id =1 where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    
+</mapper>

@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.product.materiel.mapper.MaterielMapper">
+    
+    <resultMap type="Materiel" id="MaterielResult">
+        <result property="id"    column="id"    />
+        <result property="companyId"    column="company_id"    />
+        <result property="materielCode"    column="materiel_code"    />
+        <result property="materielName"    column="materiel_name"    />
+        <result property="materielModel"    column="materiel_model"    />
+        <result property="price"    column="price"    />
+        <result property="materielImg"    column="materiel_img"    />
+        <result property="imgSize"    column="img_size"    />
+        <result property="remark"    column="remark"    />
+        <result property="createId"    column="create_id"    />
+        <result property="createName"    column="create_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="unit"    column="unit"    />
+    </resultMap>
+	
+	<sql id="selectMaterielVo">
+        select id, company_id, materiel_code, materiel_name, materiel_model, price, materiel_img, img_size, remark, create_id, create_name, create_time,unit from tab_materiel
+    </sql>
+	
+    <select id="selectMaterielList" parameterType="Materiel" resultMap="MaterielResult">
+        <include refid="selectMaterielVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="companyId != null "> and company_id = #{companyId}</if>
+             <if test="materielCode != null  and materielCode != '' ">
+                and materiel_code like concat ('%',#{materielCode},'%')
+             </if>
+             <if test="materielName != null  and materielName != '' "> and materiel_name = #{materielName}</if>
+             <if test="materielModel != null  and materielModel != '' ">
+                and materiel_model like concat ('%',#{materielModel},'%')
+             </if>
+             <if test="price != null "> and price = #{price}</if>
+             <if test="materielImg != null  and materielImg != '' "> and materiel_img = #{materielImg}</if>
+             <if test="imgSize != null "> and img_size = #{imgSize}</if>
+             <if test="remark != null  and remark != '' "> and remark = #{remark}</if>
+             <if test="createId != null "> and create_id = #{createId}</if>
+             <if test="createName != null  and createName != '' "> and create_name = #{createName}</if>
+             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+             </if>
+             <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+             </if>
+         </where>
+    </select>
+
+    <!--app端查询物料信息-->
+    <select id="appSelectMaterielList" parameterType="Materiel" resultMap="MaterielResult">
+        <include refid="selectMaterielVo"/>
+        <where>
+            <if test="id != null "> and id = #{id}</if>
+            <if test="companyId != null "> and company_id = #{companyId}</if>
+            <if test="materielCode != null  and materielCode != '' ">
+                and materiel_code like concat (#{materielCode},'%')
+            </if>
+            <if test="materielName != null  and materielName != '' "> and materiel_name = #{materielName}</if>
+            <if test="materielModel != null  and materielModel != '' ">
+                and materiel_model like concat (#{materielModel},'%')
+            </if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="materielImg != null  and materielImg != '' "> and materiel_img = #{materielImg}</if>
+            <if test="imgSize != null "> and img_size = #{imgSize}</if>
+            <if test="remark != null  and remark != '' "> and remark = #{remark}</if>
+            <if test="createId != null "> and create_id = #{createId}</if>
+            <if test="createName != null  and createName != '' "> and create_name = #{createName}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+    </select>
+    
+    <select id="selectMaterielById" parameterType="Integer" resultMap="MaterielResult">
+        <include refid="selectMaterielVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMateriel" parameterType="Materiel" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_materiel
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">company_id,</if>
+			<if test="materielCode != null  and materielCode != ''  ">materiel_code,</if>
+			<if test="materielName != null  and materielName != ''  ">materiel_name,</if>
+			<if test="materielModel != null  and materielModel != ''  ">materiel_model,</if>
+			<if test="price != null  ">price,</if>
+			<if test="materielImg != null  and materielImg != ''  ">materiel_img,</if>
+			<if test="imgSize != null  ">img_size,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+			<if test="createId != null  ">create_id,</if>
+			<if test="createName != null  and createName != ''  ">create_name,</if>
+			<if test="createTime != null  ">create_time,</if>
+			<if test="unit != null  ">unit,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="companyId != null  ">#{companyId},</if>
+			<if test="materielCode != null  and materielCode != ''  ">#{materielCode},</if>
+			<if test="materielName != null  and materielName != ''  ">#{materielName},</if>
+			<if test="materielModel != null  and materielModel != ''  ">#{materielModel},</if>
+			<if test="price != null  ">#{price},</if>
+			<if test="materielImg != null  and materielImg != ''  ">#{materielImg},</if>
+			<if test="imgSize != null  ">#{imgSize},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+			<if test="createId != null  ">#{createId},</if>
+			<if test="createName != null  and createName != ''  ">#{createName},</if>
+			<if test="createTime != null  ">#{createTime},</if>
+			<if test="unit != null  ">#{unit},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateMateriel" parameterType="Materiel">
+        update tab_materiel
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="materielCode != null  and materielCode != ''  ">materiel_code = #{materielCode},</if>
+            <if test="materielName != null  and materielName != ''  ">materiel_name = #{materielName},</if>
+            <if test="materielModel != null  and materielModel != ''  ">materiel_model = #{materielModel},</if>
+            <if test="price != null  ">price = #{price},</if>
+            <if test="materielImg != null  and materielImg != ''  ">materiel_img = #{materielImg},</if>
+            <if test="imgSize != null  ">img_size = #{imgSize},</if>
+            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+            <if test="createId != null  ">create_id = #{createId},</if>
+            <if test="createName != null  and createName != ''  ">create_name = #{createName},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="unit != null  ">unit = #{unit},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <!--通过物料编码更新物料信息-->
+    <update id="updateMaterielByMaterielCode" parameterType="Materiel">
+        update tab_materiel
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyId != null  ">company_id = #{companyId},</if>
+            <if test="materielName != null  and materielName != ''  ">materiel_name = #{materielName},</if>
+            <if test="materielModel != null  and materielModel != ''  ">materiel_model = #{materielModel},</if>
+            <if test="price != null  ">price = #{price},</if>
+            <if test="materielImg != null  and materielImg != ''  ">materiel_img = #{materielImg},</if>
+            <if test="imgSize != null  ">img_size = #{imgSize},</if>
+            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+            <if test="createId != null  ">create_id = #{createId},</if>
+            <if test="createName != null  and createName != ''  ">create_name = #{createName},</if>
+            <if test="createTime != null  ">create_time = #{createTime},</if>
+            <if test="unit != null  ">unit = #{unit},</if>
+        </trim>
+        where materiel_code = #{materielCode}
+    </update>
+
+	<delete id="deleteMaterielById" parameterType="Integer">
+        delete from tab_materiel where id = #{id}
+    </delete>
+	
+    <delete id="deleteMaterielByIds" parameterType="String">
+        delete from tab_materiel where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过物料编码和公司id查询物料信息-->
+    <select id="selectMaterielByMaterielCode" resultMap="MaterielResult">
+        <include refid="selectMaterielVo"/>
+        where materiel_code = #{materielCode} and company_id = #{companyId}
+    </select>
+
+    <!--根据供应商id查询对应的物料信息-->
+    <select id="selectMaterielBySupplierId" resultMap="MaterielResult">
+      SELECT b.* FROM tab_materiel_supplier as a,tab_materiel as b where a.materiel_id = b.id
+      and b.company_id = #{cid} and a.supplier_id = #{sid};
+    </select>
+
+    <!--通过公司id查询该公司物料基本信息-->
+    <select id="selectAllMatByComId" resultType="com.ruoyi.project.product.materiel.domain.Materiel">
+        select id as Id,materiel_code as materielCode,materiel_model as materielModel,materiel_name as materielName from tab_materiel
+        where company_id = #{companyId};
+    </select>
+
+    <!--查询各公司的物料名称信息-->
+    <select id="selectAllMatNameByComId" resultType="com.ruoyi.project.product.materiel.domain.Materiel">
+        select distinct materiel_name as materielName from tab_materiel where company_id = #{companyId};
+    </select>
+
+    <!--查询未配置对应规则的物料信息-->
+    <select id="selectMaterielByMesNotCof" parameterType="Integer" resultMap="MaterielResult">
+        SELECT a.* FROM tab_materiel as a left join
+        (SELECT * from tab_mes_batch_rule_detail where rule_id = #{ruleId} and d_type = 2) as b
+        on a.materiel_code = b.d_code where b.d_code is null
+    </select>
+</mapper>

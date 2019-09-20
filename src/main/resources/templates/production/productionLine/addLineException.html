@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-workExceptionList-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">异常类型：</label>
+            <div class="col-sm-8">
+                <input id="workId" name="workId" th:value="${work_id}" class="form-control" type="hidden">
+                <select id="exceType" name="exceType" class="form-control"
+                        th:with="exceTypeAll=${@exceType.findExceTypeAll(#httpServletRequest.getCookies())}">
+                    <option value="">选择异常</option>
+                    <option th:each="exceType : ${exceTypeAll}" th:text="${exceType.typeName}" th:value="${exceType.Id}">
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">备注信息：</label>
+            <div class="col-sm-8">
+                <textarea id="remark" name="remark" rows="4" class="form-control" type="text"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var prefix = ctx + "production/workExceptionList"
+    $("#form-workExceptionList-add").validate({
+        rules: {
+            xxxx: {
+                required: true,
+            },
+        }
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/add", $('#form-workExceptionList-add').serialize());
+        }
+    }
+
+</script>
+</body>
+</html>

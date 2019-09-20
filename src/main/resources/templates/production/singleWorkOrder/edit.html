@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-singleWorkOrder-edit" th:object="${singleWorkOrder}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<input id="type" name="type" th:value="${type}" type="hidden">
+			<input id="singleP" name="singleP" th:value="${singleP}" type="hidden">
+			<div class="form-group" th:if="${type == 0}">
+				<input type="hidden" name="singleId" th:value="${singleId}">
+				<label class="col-sm-3 control-label">工单编号：</label>
+				<div class="col-sm-8">
+					<select  name="workId" class="form-control">
+						<option th:utext="${singleWorkOrder.workCode}" th:value="${singleWorkOrder.workId}" th:selected="selected"></option>
+						<option th:each="item:${works}" th:text="${item.workorderNumber}" th:value="${item.id}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group" th:if="${type == 1}">
+				<label class="col-sm-3 control-label">单工位：</label>
+				<div class="col-sm-8" >
+					<input id="workId" name="workId"th:value="${orderId}" class="form-control" type="hidden">
+					<select id="singleId" class="form-control"  name="singleId" >
+						<option th:each="item : ${works}" th:selected="${singleWorkOrder.singleId == item.id}"  th:text="${item.imCode}" th:value="${item.id}"></option>
+					</select>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "production/singleWorkOrder";
+		$("#form-singleWorkOrder-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-singleWorkOrder-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

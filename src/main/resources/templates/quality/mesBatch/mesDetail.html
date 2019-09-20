@@ -1,0 +1,132 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        h3 {
+            text-align: center;
+            font-size: 16px;
+            margin: 10px;
+        }
+
+        .box {
+            text-align: center;
+        }
+
+        #barcode {
+            width: 200px;
+        }
+    </style>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title" style="text-align: center;padding: 0px;min-height: 20px">
+            <span style="font-weight: bold;color: #0a0a0a;font-size: x-large">工单号：</span>
+            <span id="workCode" style="font-weight: bold;color: #0a0a0a;font-size: x-large"
+                  th:utext="${workCode!=null?workCode:'--'}"></span>
+        </div>
+        <div>
+            <div class="panel-body">
+                <div class="panel-group">
+                    <div class="row" id="mes-body">
+                        <div class="col-sm-12">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <span style="font-weight: bold">批次追踪信息</span>
+                                </div>
+                                <div class="panel-body" style="max-height: 650px;overflow-y: scroll">
+                                    <form class="form-horizontal m" name="form-mesBatch-add">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">主码：</label>
+                                            <div class="col-sm-8">
+                                                <span class="form-control" id="mesCode"
+                                                      th:utext="${mesCode!=null?mesCode:'--'}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="ibox-content">
+                                            <table class="table table-striped table-bordered table-hover "
+                                                   name="add-mesBatchDetail">
+                                                <thead>
+                                                <tr>
+                                                    <th>关联物料/半成品</th>
+                                                    <th>批次信息</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody name="add-mesBatchDetail-body" th:if="${mesDetails != null}">
+                                                <tr th:each="item:${mesDetails}">
+                                                    <td>
+                                                        <span th:if="${item.dTag == 0}" th:utext="${item.materielCode}"></span>
+                                                        <a th:if="${item.dTag == 1}" onclick="showPartMesData(this)" href="javascript:void(0)"><span name="materielCode" style="font-weight: bold;color: red" th:utext="${item.materielCode}"></span></a>
+                                                    </td>
+                                                    <td><a style="font-weight: bold" href="javascript:void(0)"
+                                                           onclick="showMatInfoCode(this)" title="显示二维码"><span
+                                                            name="batchCode" th:utext="${item.batchCode}"></span></a>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="box" id="matInfoCode" style="display: none;">
+    <div id="container">
+        <canvas width="260" height="260"></canvas>
+    </div>
+    <img id="barcode"/>
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/js/jqueryqr.js}"></script>
+<script th:src="@{/js/qrcode.js}"></script>
+<script th:inline="javascript">
+    var prefix = ctx + "mes/mesBatchDetail";
+
+    // 关闭窗口
+    function submitHandler() {
+        $.modal.close();
+        window.parent.$.table.refresh();
+    }
+
+    /**
+     * 显示二维码
+     */
+    function showMatInfoCode(val) {
+        var code = $(val).parent("td").find("span[name='batchCode']").text();
+        var url = prefix + '/showCode?code=' + code;
+        $.modal.open("查看批次二维码", url, 460, 400);
+    }
+
+    /**
+     * 关闭
+     */
+    function submitHandler() {
+        $.modal.close();
+    }
+
+    /**
+     * 查看半成品的MES明细信息
+     */
+    function showPartMesData(val) {
+        var mesCode = $("#mesCode").text(); // 主码信息
+        var partCode = $(val).parent().find("span[name='materielCode']").text(); // 半成品编码
+        var workCode = $("#workCode").html(); // 工单号
+        var url = prefix + "/partCofMes?mesCode=" + mesCode + "&partCode=" + partCode + "&workCode=" + workCode;
+        $.modal.open(partCode + "追踪明细", url);
+    }
+</script>
+</body>
+</html>

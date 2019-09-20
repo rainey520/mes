@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+<div class="container-div">
+	<div class="row">
+		<div class="col-sm-12 search-collapse">
+			<div class="ibox float-e-margins">
+				<div class="ibox-title">
+					<h5>上传数据设置</h5>
+				</div>
+				<div class="ibox-content">
+					<div class="panel-body">
+						<div class="panel-group" id="accordion">
+							<table style="width: 80%;line-height: 45px;"  cellspacing="5">
+								<tr>
+									<td align="center">
+										<h3 th:text="${dev.deviceId}"></h3>
+									</td>
+									<td  align="center">
+										<h3 th:text="${dev.deviceName}"></h3>
+									</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td width="150"  align="center">信号接入口</td>
+									<td  align="center">数据名称</td>
+									<td  align="center">备注</td>
+								</tr>
+								<tr th:if="${not #lists.isEmpty(dev.devIos)}" data-device-io th:each="io : ${dev.devIos}">
+									<td >
+										<input th:value="${io.id}" readonly name="id" type="hidden">
+										<input type="text" th:value="${io.ioOrder}" readonly name="ioOrder" class="form-control">
+									</td>
+									<td> <input type="text" name="ioName" th:value="${io.ioName}" class="form-control" ></td>
+									<td >
+										<input type="text" name="remark" th:value="${io.remark}" class="form-control" >
+									</td>
+								</tr>
+								<tr>
+									<td colspan="3" align="center">
+										<a class="btn btn-success" onclick="save()">
+											<i class="fa fa-save"></i> 保存设置
+										</a>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div th:include="include :: footer"></div>
+<script type="text/javascript" th:inline="javascript">
+	function save() {
+		var devIo =[];
+		$("tr[data-device-io]").each(function () {
+			var data ={};
+			data.id = $(this).find("input[name='id']").val();
+			data.ioOrder = $(this).find("input[name='ioOrder']").val();
+			data.ioName = $(this).find("input[name='ioName']").val();
+			data.remark = $(this).find("input[name='remark']").val();
+			devIo.push(data);
+		})
+		$.ajax({
+			cache : true,
+			type : "POST",
+			contentType: 'application/json',
+			url : ctx + "device/devIo/edit",
+			data :JSON.stringify(devIo),
+			async : false,
+			error : function(request) {
+				$.modal.alertError("系统错误");
+			},
+			success : function(data) {
+				layer.msg("保存成功,正在刷新数据请稍后……", {
+							icon: $.modal.icon(modal_status.SUCCESS),
+							time: 500,
+							shade: [0.1, '#8F8F8F']
+						},
+						function () {});
+			}
+		});
+	}
+</script>
+</body>
+</html>
