@@ -65,6 +65,10 @@ public class AfterServiceServiceImpl implements IAfterServiceService
 	@Override
 	public List<AfterServiceItem> selectListBySearchInfo(AfterService afterService)
 	{
+		User user = JwtUtil.getUser();
+		if (user == null) {
+			return Collections.emptyList();
+		}
 		List<AfterServiceItem> serviceItemList = new ArrayList<>();
 		if (StringUtils.isNotEmpty(afterService.getSearchItems())) {
 			String[] strings = Convert.toStrArray(afterService.getSearchItems());
@@ -75,9 +79,9 @@ public class AfterServiceServiceImpl implements IAfterServiceService
 				// 搜索条件
 				serviceItem.setSearchItem(searchItem);
 				// 查询录入该条件的所有人的信息
-				serviceItem.setUserNames(afterServiceMapper.selectListBySearchInfoUserName(searchItem,afterService.getParams()));
+				serviceItem.setUserNames(afterServiceMapper.selectListBySearchInfoUserName(user.getCompanyId(),searchItem,afterService.getParams()));
 				// 查询总共的记录数
-				item = afterServiceMapper.selectListByBatchInfo(searchItem,afterService.getParams());
+				item = afterServiceMapper.selectListByBatchInfo(user.getCompanyId(),searchItem,afterService.getParams());
 				if (StringUtils.isNotNull(item)) {
 					serviceItem.setTotalNum(item.getTotalNum());
 					serviceItem.setsTime(item.getsTime());

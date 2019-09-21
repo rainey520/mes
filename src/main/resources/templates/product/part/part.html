@@ -96,11 +96,8 @@
         $("#productName").val(null).trigger("change");
     }
 
-	var editFlag = [[${@permission.hasPermi('device:devPart:edit')}]];
+	var editFlag = [[${@permission.hasPermi('device:devPart:add')}]];
 	var removeFlag = [[${@permission.hasPermi('device:devPart:remove')}]];
-    var viewFileFlag = [[${@permission.hasPermi('erp:fileSourceInfo:list')}]];
-    var ecnFlag = [[${@permission.hasPermi('production:ecnLog:list')}]];
-    var customerFlag = [[${@permission.hasPermi('erp:customer:list')}]];
 	var prefix = ctx + "product";
 
 	$(function() {
@@ -149,17 +146,6 @@
 					title : '半成品名称',
 					sortable: true
 				},
-				{
-					field : 'ecnStatus',
-					title : 'E/DCN',
-					formatter:function (value, row, index) {
-						if(value == 0){
-							return '<a class="btn btn-default btn-xs ' + ecnFlag + '" href="javascript:void(0)" onclick="ecnView(' + row.id + ','+value+')">无</a>';
-						}
-						 return '<a class="btn btn-primary btn-xs ' + ecnFlag + '" href="javascript:void(0)" onclick="ecnView(' + row.id + ','+value+')">有</a>';
-					},
-					width:50,
-				},
                 {
                     title: '操作',
                     align: 'center',
@@ -185,11 +171,6 @@
 				{
 					field : 'unit',
 					title : '单位',
-					sortable: true
-				},
-				{
-					field : 'standardHourYield',
-					title : '标准工时[UPH]',
 					sortable: true
 				},
 				{

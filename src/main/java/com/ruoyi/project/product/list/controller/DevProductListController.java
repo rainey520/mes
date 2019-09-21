@@ -345,12 +345,12 @@ public class DevProductListController extends BaseController {
     /**
      * 修改保存半成品管理
      */
-    @RequiresPermissions("device:devPart:edit")
+    @RequiresPermissions("device:devPart:add")
     @Log(title = "半成品管理", businessType = BusinessType.UPDATE)
     @PostMapping("/editPart")
     @ResponseBody
-    public AjaxResult editPartSave(DevProductList devProductList, HttpServletRequest request) {
-        devProductList.setCompanyId(JwtUtil.getTokenUser(request).getCompanyId());
+    public AjaxResult editPartSave(DevProductList devProductList) {
+        devProductList.setCompanyId(JwtUtil.getUser().getCompanyId());
         return toAjax(devProductListService.updateDevProductList(devProductList));
     }
 

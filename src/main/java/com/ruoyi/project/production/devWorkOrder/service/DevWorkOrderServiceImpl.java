@@ -329,6 +329,19 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int deleteDevWorkOrderByIds(String ids) {
+        Integer[] workIds = Convert.toIntArray(ids);
+        DevWorkOrder devWorkOrder = null;
+        List<MesBatch> mesBatchList = null;
+        for (Integer workId : workIds) {
+            devWorkOrder = devWorkOrderMapper.selectDevWorkOrderById(workId);
+            if (devWorkOrder != null) {
+                mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(devWorkOrder.getWorkorderNumber());
+                for (MesBatch mesBatch : mesBatchList) {
+                    mesBatchDetailMapper.deleteMesBatchDetailByBId(mesBatch.getId());
+                }
+                mesBatchMapper.deleteMesBatchByWorkCode(devWorkOrder.getWorkorderNumber());
+            }
+        }
         return devWorkOrderMapper.deleteDevWorkOrderByIds(Convert.toStrArray(ids));
     }
 

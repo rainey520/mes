@@ -2,7 +2,7 @@
 <configuration>
 
 	<!--<property name="log.path" value="/home/zouqiang/logs82" />-->
-	<property name="log.path" value="/root/logs/mes" />
+	<property name="log.path" value="/root/meslogs" />
 	<property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n" />
 
 	<!-- 控制台输出 -->

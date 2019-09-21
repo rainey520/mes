@@ -242,7 +242,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--通过标记查询半成品或者成品-->
     <select id="selectProAllBySign" resultType="com.ruoyi.project.product.list.domain.DevProductList">
-        SELECT id as id, product_code as productCode,rule_id as ruleId FROM dev_product_list where sign = #{sign} and def_id = 0;
+        SELECT id as id, product_code as productCode,rule_id as ruleId FROM dev_product_list where sign = #{sign} and def_id = 0 and company_id = #{companyId};
     </select>
 
     <!--查看MES规则未配置的半成品明细-->

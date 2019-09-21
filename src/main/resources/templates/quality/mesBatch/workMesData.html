@@ -65,8 +65,7 @@
                             </div>
                         </div>
                         <div th:if="${mesData != null}">
-                            <div class="col-sm-12" style="margin-top: 5px;"
-                                 th:if="${mesData.mesBatchList != null}"
+                            <div class="col-sm-12" th:if="${mesData.mesBatchList != null}"
                                  th:each="item:${mesData.mesBatchList}">
                                 <div class="panel panel-primary">
                                     <div class="panel-heading">
@@ -87,8 +86,7 @@
                                                     <tr>
                                                         <th width="3%">序号</th>
                                                         <th width="30%">物料编码</th>
-                                                        <th width="30%">配置批次</th>
-                                                        <th width="30%">生产批次</th>
+                                                        <th width="30%">批次信息</th>
                                                         <th width="7%">批次数量</th>
                                                     </tr>
                                                     </thead>
@@ -96,15 +94,13 @@
                                                            th:if="${item.mesBatchDetailList != null}"
                                                            th:each="item2:${item.mesBatchDetailList}">
                                                     <tr>
-                                                        <td><span class="form-control"
+                                                        <td><span
                                                                   th:utext="${item2.ruleOrder}"></span></td>
-                                                        <td><span class="form-control"
+                                                        <td><span
                                                                   th:utext="${item2.materielCode}"></span></td>
-                                                        <td><span class="form-control"
+                                                        <td><span
                                                                   th:utext="${item2.batchCode}"></span></td>
-                                                        <td><span class="form-control"
-                                                                  th:utext="${item2.proBatchCode}"></span></td>
-                                                        <td><span class="form-control"
+                                                        <td><span
                                                                   th:utext="${item2.mesNumber}"></span></td>
                                                     </tr>
                                                     </tbody>

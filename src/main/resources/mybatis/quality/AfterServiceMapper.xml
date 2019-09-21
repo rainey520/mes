@@ -109,19 +109,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <!--通过搜索条件查询所有的录入者姓名-->
     <select id="selectListBySearchInfoUserName" resultType="java.lang.String">
-        select GROUP_CONCAT(b.user_name) AS inputUserName from (SELECT * from tab_after_service where input_batch_info like concat ('%',#{searchItem},'%')
+        select GROUP_CONCAT(b.user_name) AS inputUserName from (SELECT input_user_id from tab_after_service where input_batch_info like concat ('%',#{searchItem},'%')
         <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
             AND date_format(input_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
         </if>
         <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
             AND date_format(input_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
         </if>
-         group by input_user_id) as a,sys_user as b where a.input_user_id = b.user_id
+         group by input_user_id) as a,sys_user as b where a.input_user_id = b.user_id and b.company_id = #{companyId}
     </select>
 
     <!--通过搜索条件查询售后服务列表-->
     <select id="selectListByBatchInfo"  resultType="com.ruoyi.project.quality.afterService.domain.AfterServiceItem">
         SELECT count(*) as totalNum, min(input_time) as sTime,max(input_time) as eTime from tab_after_service where input_batch_info like concat ('%',#{searchItem},'%')
+        and company_id = #{companyId}
         <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
             AND date_format(input_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
         </if>

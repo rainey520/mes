@@ -51,7 +51,7 @@
         $("#id").val(0).trigger("change"); // select2标签重置
     }
     var prefix = ctx + "product";
-    var removeFlag = [[${@permission.hasPermi('mes:mesBatch:remove')}]];
+    var removeFlag = [[${@permission.hasPermi('mes:mesBatchRule:remove')}]];
     $(function () {
         var options = {
             url: prefix + "/mesCfList",
@@ -83,21 +83,6 @@
                 {
                     field : 'productName',
                     title : '产品名称',
-                    sortable: true
-                },
-                {
-                    field : 'price',
-                    title : '单价',
-                    sortable: true
-                },
-                {
-                    field : 'unit',
-                    title : '单位',
-                    sortable: true
-                },
-                {
-                    field : 'standardHourYield',
-                    title : '标准工时[UPH]',
                     sortable: true
                 },
                 {

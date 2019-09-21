@@ -141,11 +141,11 @@
                     field: 'param1',
                     title: '产线',
                     formatter: function (value, row, index) {
-                        if(row.resSign == 0){
-                            return '<a class="btn btn-danger btn-xs" href="#" onclick="configWork(' + row.id + ',\''+value+'\')">' + value + '</a>';
-                        }else if(row.resSign == 1){
-                            return '<a class="btn btn-success btn-xs" href="#" onclick="configWork(' + row.id + ',\''+value+'\')">' + value + '</a>';
-                        }
+                        // if(row.resSign == 0){
+                        //     return '<a class="btn btn-danger btn-xs" href="#" onclick="configWork(' + row.id + ',\''+value+'\')">' + value + '</a>';
+                        // }else if(row.resSign == 1){
+                        //     return '<a class="btn btn-success btn-xs" href="#" onclick="configWork(' + row.id + ',\''+value+'\')">' + value + '</a>';
+                        // }
                         return value;
                     }
                 },

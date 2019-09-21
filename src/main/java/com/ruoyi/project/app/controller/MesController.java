@@ -1,9 +1,13 @@
 package com.ruoyi.project.app.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.production.devWorkOrder.service.IDevWorkOrderService;
+import com.ruoyi.project.quality.afterService.domain.AfterService;
+import com.ruoyi.project.quality.afterService.service.IAfterServiceService;
 import com.ruoyi.project.quality.mesBatch.domain.MesBatch;
 import com.ruoyi.project.quality.mesBatch.service.IMesBatchService;
 import org.slf4j.Logger;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +42,9 @@ public class MesController {
 
     @Autowired
     private IMesBatchService mesBatchService;
+
+    @Autowired
+    private IAfterServiceService afterServiceService;
 
     /**
      * 仓库配置MES数据拉取
@@ -90,4 +98,38 @@ public class MesController {
             return AjaxResult.error(e.getMessage());
         }
     }
+
+    /**
+     * 拉取售后录入的列表
+     */
+    @RequestMapping("/appAfterList")
+    public TableDataInfo appAfterList(@RequestBody AfterService afterService)
+    {
+        TableDataInfo rspData = new TableDataInfo();
+        if (afterService != null) {
+            afterService.appStartPage();
+            List<AfterService> list = afterServiceService.selectAfterServiceList(afterService);
+            rspData.setCode(0);
+            rspData.setRows(list);
+            rspData.setTotal(new PageInfo(list).getTotal());
+            return rspData;
+        } else {
+            rspData.setCode(500);
+            return rspData;
+        }
+    }
+
+
+    /**
+     * 售后录入
+     */
+    @RequestMapping("/appAfterInput")
+    public AjaxResult appAfterInput(@RequestBody AfterService afterService){
+        if (afterService != null) {
+            int i = afterServiceService.insertAfterService(afterService);
+            return i> 0 ? AjaxResult.success():AjaxResult.error();
+        }
+        return AjaxResult.error();
+    }
 }
+

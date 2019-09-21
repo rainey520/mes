@@ -93,6 +93,7 @@ public class MesBatchController extends BaseController {
         return prefix + "/add";
     }
 
+    
     /**
      * 新增保存MES批准追踪
      */
@@ -178,8 +179,6 @@ public class MesBatchController extends BaseController {
         // 反追溯
         if (mesData != null && mesData.getMesSign().equals(MesConstants.MES_SIGN_BACK)) {
             map.put("mesCode", batchCode);
-            // map.put("mesData", mesData);
-            // return prefix + "/mesData1";
             return prefix + "/mesBatch1";
             // 正向追溯
         } else {

@@ -7,8 +7,8 @@ ruoyi:
   # 版权年份
   copyrightYear: 2019
   # 文件上传路径
-  profile: D:/profile/
-#  profile: /root/mesfile/
+#  profile: D:/profile/
+  profile: /root/mesfile/
   # 获取ip地址开关
   addressEnabled: true
 
@@ -135,18 +135,18 @@ gen:
   tablePrefix: tab_
 
 page:
-#  url: http://47.106.177.50:89/t/
-  url: http://172.16.30.55:89/t/
+  url: http://47.106.177.50:89/t/
+#  url: http://172.16.30.55:89/t/
 
 img:
-#  url: http://47.106.177.50:89/profile/avatar/
-  url: http://172.16.30.55:89/profile/avatar/
+  url: http://47.106.177.50:89/profile/avatar/
+#  url: http://172.16.30.55:89/profile/avatar/
 
 file:
-#  url: http://47.106.177.50:89/profile/upload/
-#  iso: http://47.106.177.50:89/profile/
-  url: http://172.16.30.55:89/profile/upload/
-  iso: http://172.16.30.55:89/profile/
+  url: http://47.106.177.50:89/profile/upload/
+  iso: http://47.106.177.50:89/profile/
+#  url: http://172.16.30.55:89/profile/upload/
+#  iso: http://172.16.30.55:89/profile/
 
 baidu:
   appId: 16721729

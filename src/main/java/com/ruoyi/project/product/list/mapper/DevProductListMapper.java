@@ -216,7 +216,7 @@ public interface DevProductListMapper {
      * @param sign 半成品成品标记
      * @return 结果
      */
-    List<DevProductList> selectProAllBySign(Integer sign);
+    List<DevProductList> selectProAllBySign(@Param("companyId") Integer companyId, @Param("sign") Integer sign);
 
     /**
      * 查询MES配置规则未配置的半成品信息
@@ -228,6 +228,7 @@ public interface DevProductListMapper {
 
     /**
      * app检索产品信息
+     *
      * @param product 产品信息
      * @return 结果
      */

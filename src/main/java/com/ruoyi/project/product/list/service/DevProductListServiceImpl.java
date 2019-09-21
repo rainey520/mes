@@ -440,7 +440,11 @@ public class DevProductListServiceImpl implements IDevProductListService {
      */
     @Override
     public List<DevProductList> selectProAllBySign(Integer sign) {
-        return devProductListMapper.selectProAllBySign(sign);
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        return devProductListMapper.selectProAllBySign(user.getCompanyId(),sign);
     }
 
     /**

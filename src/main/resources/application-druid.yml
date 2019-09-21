@@ -8,8 +8,8 @@ spring:
             master:
                 url: jdbc:mysql://127.0.0.1:3306/mes?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
                 username: root
-                password: root
-#                password: Gte_123456
+#                password: root
+                password: Gte_123456
             # 初始连接数
             initialSize: 5
             # 最小连接池数量
