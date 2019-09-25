@@ -14,6 +14,7 @@ import com.ruoyi.project.quality.mesBatchRule.domain.MesBatchRuleDetail;
 import com.ruoyi.project.quality.mesBatchRule.mapper.MesBatchRuleDetailMapper;
 import com.ruoyi.project.quality.mesBatchRule.mapper.MesBatchRuleMapper;
 import com.ruoyi.project.system.user.domain.User;
+import org.apache.commons.lang.text.StrBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -248,4 +249,33 @@ public class MesBatchRuleServiceImpl implements IMesBatchRuleService {
         return mesBatchRuleMapper.selectAllMesRule();
     }
 
+    /**
+     * 改变规则的有效无效性
+     * @param mesBatchRule 规则信息
+     * @return 结果
+     */
+    @Override
+    public int changeStatus(MesBatchRule mesBatchRule) {
+        return mesBatchRuleMapper.updateMesBatchRule(mesBatchRule);
+    }
+
+    /**
+     * app端查询meis规则列表
+     * @param mesBatchRule mes规则
+     * @return 结果
+     */
+    @Override
+    public List<MesBatchRule> appSelectMesRuleList(MesBatchRule mesBatchRule) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        mesBatchRule.setCompanyId(user.getCompanyId());
+        List<MesBatchRule> mesBatchRules = mesBatchRuleMapper.selectMesBatchRuleList(mesBatchRule);
+        for (MesBatchRule batchRule : mesBatchRules) {
+            List<MesBatchRuleDetail> mesBatchRuleDetails = batchRuleDetailMapper.selectMesBatchRuleDetailByRuleId(batchRule.getId());
+            batchRule.setMesBatchRuleDetails(mesBatchRuleDetails);
+        }
+        return mesBatchRules;
+    }
 }

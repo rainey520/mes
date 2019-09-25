@@ -72,4 +72,17 @@ public interface IMesBatchRuleService
 	 */
 	List<MesBatchRule> selectAllMesRule();
 
+	/**
+	 * 改变规则的有效无效性
+	 * @param mesBatchRule 规则信息
+	 * @return 结果
+	 */
+	int changeStatus(MesBatchRule mesBatchRule);
+
+	/**
+	 * app 端查询mes规则列表
+	 * @param mesBatchRule mes规则
+ 	 * @return 结果
+	 */
+	List<MesBatchRule> appSelectMesRuleList(MesBatchRule mesBatchRule);
 }

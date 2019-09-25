@@ -335,7 +335,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         for (Integer workId : workIds) {
             devWorkOrder = devWorkOrderMapper.selectDevWorkOrderById(workId);
             if (devWorkOrder != null) {
-                mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(devWorkOrder.getWorkorderNumber());
+                mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(JwtUtil.getUser().getCompanyId(),devWorkOrder.getWorkorderNumber());
                 for (MesBatch mesBatch : mesBatchList) {
                     mesBatchDetailMapper.deleteMesBatchDetailByBId(mesBatch.getId());
                 }
@@ -429,43 +429,24 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             devWorkOrder.setWorkorderStatus(WorkConstants.WORK_STATUS_STARTING);  // 修改工单的状态为进行中
             devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_STARTING);   // 修改工单的操作状态为正在进行，页面显示暂停按钮
             devWorkOrder.setUpdateBy(user.getUserName());   // 工单的更新者
-            //将对应工单推送反馈状态修改为0
-            devWorkOrderMapper.updateWorkOrderResSign(devWorkOrder.getId(), 0);
-            workstationMapper.updateAllResSignByCompanyIdAndLineId(devWorkOrder.getCompanyId(), devWorkOrder.getLineId(), 0);
-            //流水线消息推送
-            JPushMsg(1, devWorkOrder);
-            // 通过产线id获取各个工位信息
-            List<Workstation> workstationList = workstationMapper.selectWorkstationListByLineId(user.getCompanyId(), devWorkOrder.getLineId());
-            WorkData workData = null;
-            WorkDayHour workDayHour = null;
-            if (StringUtils.isNotEmpty(workstationList)) {
-                for (Workstation workstation : workstationList) {
-                    // 初始化工单数据
-                    workData = new WorkData();
-                    workData.setWorkId(devWorkOrder.getId());
-                    workData.setCompanyId(devWorkOrder.getCompanyId());
-                    workData.setLineId(devWorkOrder.getLineId());
-                    workData.setScType(WorkConstants.SING_LINE);
-                    // 设置计数器硬件
-                    workData.setDevId(workstation.getDevId());
-                    workData.setDevName(workstation.getDevName());
-                    // 设置工位
-                    workData.setIoId(workstation.getId());
-                    workData.setCreateTime(new Date());
-                    workDataMapper.insertWorkData(workData);
 
-                    // 初始化工单各个IO口每小时数据
-                    workDayHour = new WorkDayHour();
-                    workDayHour.setWorkId(devWorkOrder.getId());
-                    workDayHour.setCompanyId(devWorkOrder.getCompanyId());
-                    workDayHour.setLineId(devWorkOrder.getLineId());
-                    // 初始化硬件名称以及工位信息
-                    workDayHour.setDevId(workstation.getDevId());
-                    workDayHour.setDevName(workstation.getDevName());
-                    workDayHour.setIoId(workstation.getId());
-                    workDayHour.setDataTime(new Date()); // 创建时间年月日
-                    workDayHour.setCreateTime(new Date()); // 创建时间年月日时分秒
-                    workDayHourMapper.insertWorkDayHour(workDayHour); // 保存工单各个IO口每小时数据
+            // 工单MES逻辑判断
+            DevProductList product = productListMapper.selectDevProductByCode(user.getCompanyId(), devWorkOrder.getProductCode());
+            if (product != null && product.getRuleId() != null) {
+                MesBatchRule mesBatchRule = mesBatchRuleMapper.selectMesBatchRuleById(product.getRuleId());
+                if (mesBatchRule != null) {
+                    List<MesBatch> mesBatches = mesBatchMapper.selectMesBatchListByWorkCode(user.getCompanyId(), devWorkOrder.getWorkorderNumber());
+                    if (StringUtils.isEmpty(mesBatches)) {
+                        throw new BusinessException("配料批次未完整录入");
+                    }
+                    for (MesBatch mesBatch : mesBatches) {
+                        List<MesBatchDetail> mesBatchDetails = mesBatchDetailMapper.selectMesBatchDetailByBId(mesBatch.getId());
+                        for (MesBatchDetail mesBatchDetail : mesBatchDetails) {
+                            if (mesBatchDetail != null && StringUtils.isEmpty(mesBatchDetail.getBatchCode())) {
+                                throw new BusinessException("配料批次未完整录入");
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -483,49 +464,6 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         return devWorkOrderMapper.checkWorkLineUnique(lineId, WorkConstants.SING_LINE);
     }
 
-    /***************************消息推送开始**********************************/
-
-    @Value("${jpush.mastersecret}")
-    private String MASTER_SECRET;
-
-    @Value("${jpush.appkey}")
-    private String APP_KEY;
-
-    private void JPushMsg(int type, DevWorkOrder order) {
-        if (order == null)
-            return;
-        List<String> alias = null;
-        if (type == 1) {
-            //流水线信息推送
-            //1、查询对应产线
-            ProductionLine line = productionLineMapper.selectProductionLineById(order.getLineId());
-            //2、查询对应产线所有配置SOP看板硬件的硬件编码
-            if (line != null) {
-                alias = workstationMapper.countLineKBCode(line.getCompanyId(), line.getId());
-            }
-        }
-        if (alias == null || alias.size() <= 0) {
-            return;
-        }
-        JSONObject data = new JSONObject();
-        data.put("msg", "1");
-        //进行消息推送
-        JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY, null, ClientConfig.getInstance());
-        PushPayload payload = PushPayload.newBuilder()
-                .setPlatform(Platform.all())
-                .setAudience(Audience.alias(alias))
-                .setNotification(Notification.alert(data.toString()))
-                .build();
-        try {
-            PushResult result = jpushClient.sendPush(payload);
-        } catch (APIConnectionException e) {
-            e.printStackTrace();
-        } catch (APIRequestException e) {
-            e.printStackTrace();
-        }
-
-    }
-    /********************************消息推送结束*******************************/
     /**
      * 结束工单
      *
@@ -547,13 +485,17 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                 !user.getLoginName().equals("admin")) {
             throw new BusinessException("不是工单负责人");
         }
-        updateWork(user, devWorkOrder);
-        if (devWorkOrder.getSignTime() != null) {
-            devWorkOrder.setSignHuor(devWorkOrder.getSignHuor() + TimeUtil.getDateDel(devWorkOrder.getSignTime(), new Date()));
+        // 判断是否已经全部录入完成
+        List<MesBatch> mesBatches = mesBatchMapper.selectMesBatchListByWorkCode(user.getCompanyId(),devWorkOrder.getWorkorderNumber());
+        for (MesBatch mesBatch : mesBatches) {
+            List<MesBatchDetail> mesBatchDetails = mesBatchDetailMapper.selectMesBatchDetailByBId(mesBatch.getId());
+            for (MesBatchDetail mesBatchDetail : mesBatchDetails) {
+                if (mesBatchDetail != null && StringUtils.isEmpty(mesBatchDetail.getProBatchCode())) {
+                    throw new BusinessException("还有未录入的生产批次，不能结束工单");
+                }
+            }
         }
-        devWorkOrderMapper.updateWorkOrderResSign(devWorkOrder.getId(), -1);
-        workstationMapper.updateAllResSignByCompanyIdAndLineId(devWorkOrder.getCompanyId(), devWorkOrder.getLineId(), -1);
-        JPushMsg(1, devWorkOrder);
+        updateWork(user, devWorkOrder);
         return devWorkOrderMapper.updateDevWorkOrder(devWorkOrder);
     }
 
@@ -1408,9 +1350,14 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         if (StringUtils.isNotNull(workOrder)) {
             // 查询工单产品信息
             DevProductList product = productListMapper.selectProductByCode(workOrder.getProductCode());
+            // 查询规则是否有效
+            MesBatchRule mesRule = mesBatchRuleMapper.selectMesBatchRuleById(product.getRuleId());
+            if (StringUtils.isNotNull(mesRule) && mesRule.getStatus() != null) {
+                workOrder.setRuleStatus(mesRule.getStatus());
+            }
             workOrder.setRuleId(product.getRuleId());
             // 查询已经配置的工单批次追踪信息
-            List<MesBatch> mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(workOrder.getWorkorderNumber());
+            List<MesBatch> mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(JwtUtil.getUser().getCompanyId(),workOrder.getWorkorderNumber());
             if (StringUtils.isNotEmpty(mesBatchList)) {
                 List<MesBatchDetail> mesBatchDetailList = null;
                 for (MesBatch mesBatch : mesBatchList) {
@@ -1420,7 +1367,6 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                 workOrder.setMesBatchList(mesBatchList);
             } else {
                 // 查询生产产品的MES规则
-                MesBatchRule mesRule = mesBatchRuleMapper.selectMesBatchRuleById(product.getRuleId());
                 if (StringUtils.isNotNull(mesRule)) {
                     List<MesBatchRuleDetail> ruleDetailList = mesBatchRuleDetailMapper.selectMesBatchRuleDetailByRuleId(mesRule.getId());
                     workOrder.setMesRuleDetailList(ruleDetailList);
@@ -1441,8 +1387,17 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     public DevWorkOrder selectWorkMesOrderByWorkId(int id) {
         DevWorkOrder workOrder = devWorkOrderMapper.selectDevWorkOrderById(id);
         if (StringUtils.isNotNull(workOrder)) {
+            // 查询工单产品信息
+            DevProductList product = productListMapper.selectProductByCode(workOrder.getProductCode());
+            if (product != null) {
+                // 查询规则是否有效
+                MesBatchRule mesRule = mesBatchRuleMapper.selectMesBatchRuleById(product.getRuleId());
+                if (StringUtils.isNotNull(mesRule) && mesRule.getStatus() != null) {
+                    workOrder.setRuleStatus(mesRule.getStatus());
+                }
+            }
             // 查询MES数据
-            List<MesBatch> mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(workOrder.getWorkorderNumber());
+            List<MesBatch> mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(JwtUtil.getUser().getCompanyId(),workOrder.getWorkorderNumber());
             if (StringUtils.isNotEmpty(mesBatchList)) {
                 List<MesBatchDetail> mesBatchDetailList = null;
                 for (MesBatch mesBatch : mesBatchList) {

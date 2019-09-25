@@ -82,4 +82,11 @@ public interface IMesBatchService
 	 * @return 结果
 	 */
 	MesData selectMesDataByWorkCode(String workCode);
+
+	/**
+	 * app 端查看mes数据
+	 * @param mesBatch mes数据
+	 * @return 结果
+	 */
+    List<MesBatch> appSelectMesBatchList(MesBatch mesBatch);
 }

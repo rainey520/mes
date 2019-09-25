@@ -140,5 +140,5 @@ public interface IMenuService
      */
     List<MenuApi> selectMenuListByParentId(Integer uid, Integer parentId);
 
-    List<Menu>  selectMenuListByParentIdAndUserId(Integer  uid, Integer parentId) throws Exception;
+    List<Menu>  selectMenuListByParentIdAndUserId(Integer  uid, Integer parentId);
 }

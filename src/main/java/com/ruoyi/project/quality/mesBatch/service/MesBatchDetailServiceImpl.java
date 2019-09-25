@@ -99,4 +99,14 @@ public class MesBatchDetailServiceImpl implements IMesBatchDetailService
 	public int selectMesBatchTotal(String batchCode) {
 		return mesBatchDetailMapper.selectMesBatchTotal(batchCode);
 	}
+
+	/**
+	 * 清空指定mes的数据
+	 * @param id 明细id
+	 * @return 结果
+	 */
+	@Override
+	public int removeDetailById(Integer id) {
+		return mesBatchDetailMapper.removeDetailById(id);
+	}
 }

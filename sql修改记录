@@ -1,0 +1,3 @@
+# 添加规则排序是否有效字段
+ALTER TABLE `mes`.`tab_mes_batch_rule`
+ADD COLUMN `status` INT NULL DEFAULT 0 COMMENT '规格排序是否有效(0、默认值无效，1、有效)' AFTER `u_time`;

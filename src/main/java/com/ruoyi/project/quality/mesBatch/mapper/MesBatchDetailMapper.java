@@ -102,4 +102,11 @@ public interface MesBatchDetailMapper
 	 * @return
 	 */
     List<MesBatchDetail> selectMesBatchTotalByWorkCode(@Param("workCode") String workCode);
+
+	/**
+	 * 清空指定mes明细的数据
+	 * @param id 明细id
+	 * @return 结果
+	 */
+	int removeDetailById(@Param("id") Integer id);
 }

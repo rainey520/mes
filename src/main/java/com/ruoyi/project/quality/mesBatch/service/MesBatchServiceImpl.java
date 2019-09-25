@@ -369,7 +369,7 @@ public class MesBatchServiceImpl implements IMesBatchService {
      */
     @Override
     public MesData selectMesDataByWorkCode(String workCode) {
-        List<MesBatch> mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(workCode);
+        List<MesBatch> mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(JwtUtil.getUser().getCompanyId(),workCode);
         if (StringUtils.isEmpty(mesBatchList)) {
             return null;
         }
@@ -399,5 +399,39 @@ public class MesBatchServiceImpl implements IMesBatchService {
         }
         mesWork.setMesBatchList(mesBatchList);
         return mesWork;
+    }
+
+    /**
+     * app端查看mes数据
+     * @param mesBatch mes数据
+     * @return 结果
+     */
+    @Override
+    public List<MesBatch> appSelectMesBatchList(MesBatch mesBatch) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
+        }
+        mesBatch.setCompanyId(user.getCompanyId());
+        List<MesBatch> mesBatches = mesBatchMapper.selectMesBatchList(mesBatch);
+        if (StringUtils.isNotEmpty(mesBatches)) {
+            for (MesBatch batch : mesBatches) {
+                List<MesBatchDetail> mesBatchDetails = mesBatchDetailMapper.selectMesBatchDetailByBId(batch.getId());
+                batch.setMesBatchDetailList(mesBatchDetails);
+            }
+            return mesBatches;
+        } else {
+            mesBatches = mesBatchMapper.appSelectMesBatchList(mesBatch);
+            List<MesBatch> mesBatchList = new ArrayList<>();
+            for (MesBatch batch : mesBatches) {
+                batch = mesBatchMapper.selectMesBatchById(batch.getId());
+                if (StringUtils.isNotNull(batch)) {
+                    List<MesBatchDetail> mesBatchDetails = mesBatchDetailMapper.selectMesBatchDetailByBId(batch.getId());
+                    batch.setMesBatchDetailList(mesBatchDetails);
+                    mesBatchList.add(batch);
+                }
+            }
+            return mesBatchList;
+        }
     }
 }

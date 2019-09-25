@@ -12,10 +12,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="materiels"    column="materiels"    />
         <result property="cTime"    column="c_time"    />
         <result property="uTime"    column="u_time"    />
+        <result property="status"    column="status"    />
     </resultMap>
 	
 	<sql id="selectMesBatchRuleVo">
-        select id, company_id, rule_name, p_type, materiels, c_time, u_time from tab_mes_batch_rule
+        select id, company_id, rule_name, p_type, materiels, c_time, u_time,status from tab_mes_batch_rule
     </sql>
 	
     <select id="selectMesBatchRuleList" parameterType="MesBatchRule" resultMap="MesBatchRuleResult">
@@ -25,7 +26,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              <if test="companyId != null "> and company_id = #{companyId}</if>
              <if test="ruleName != null  and ruleName != '' "> and rule_name like concat('%',#{ruleName},'%') </if>
              <if test="pType != null and pType != -1 "> and p_type = #{pType}</if>
-             <if test="materiels != null  and materiels != '-1' "> and materiels like concat('%',#{materiels},'%')</if>
+             <if test="materiels != null  and materiels != '' "> and materiels like concat('%',#{materiels},'%')</if>
              <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
                 AND date_format(c_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
              </if>
@@ -49,6 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="materiels != null  and materiels != ''  ">materiels,</if>
 			<if test="cTime != null  ">c_time,</if>
 			<if test="uTime != null  ">u_time,</if>
+            <if test="status != null  ">status,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="companyId != null  ">#{companyId},</if>
@@ -57,6 +59,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="materiels != null  and materiels != ''  ">#{materiels},</if>
 			<if test="cTime != null  ">#{cTime},</if>
 			<if test="uTime != null  ">#{uTime},</if>
+            <if test="status != null  ">#{status},</if>
          </trim>
     </insert>
 	 
@@ -69,6 +72,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="materiels != null  and materiels != ''  ">materiels = #{materiels},</if>
             <if test="cTime != null  ">c_time = #{cTime},</if>
             <if test="uTime != null  ">u_time = #{uTime},</if>
+            <if test="status != null  ">status = #{status},</if>
         </trim>
         where id = #{id}
     </update>

@@ -65,4 +65,11 @@ public interface IMesBatchDetailService
 	 * @param batchCode 批次号
 	 */
     int selectMesBatchTotal(String batchCode);
+
+	/**
+	 * 清空指定mes明细的数据
+	 * @param id 明细id
+	 * @return 结果
+	 */
+	int removeDetailById(Integer id);
 }

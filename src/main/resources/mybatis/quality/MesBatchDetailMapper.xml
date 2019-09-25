@@ -120,5 +120,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select a.materiel_code as materielCode,COALESCE(SUM(mes_number),0) as totalNum from tab_mes_batch_detail as a, tab_mes_batch as b where a.b_id = b.id
         and b.work_code = #{workCode} and a.mes_number >0 group by a.materiel_code;
     </select>
+
+    <!--清空指定mes明细的数据-->
+    <update id="removeDetailById">
+        update tab_mes_batch_detail set batch_code = null,pro_batch_code = null,mes_number = null where id = #{id}
+    </update>
     
 </mapper>

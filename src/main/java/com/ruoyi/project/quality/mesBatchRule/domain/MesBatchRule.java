@@ -44,6 +44,18 @@ public class MesBatchRule extends BaseEntity
 	private List<MesBatchRuleDetail> mesBatchRuleDetails;
 	/** 已配置的总数 */
 	private Integer totalNum;
+	/**
+	 * 顺序是否有效性 0、默认值无效，1、有效
+	 */
+	private Integer status;
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 
 	public Integer getTotalNum() {
 		return totalNum;
@@ -141,19 +153,22 @@ public class MesBatchRule extends BaseEntity
 		this.uTime = uTime;
 	}
 
-    @Override
-    public String toString() {
-        return "MesBatchRule{" +
-                "id=" + id +
-                ", companyId=" + companyId +
-                ", ruleName='" + ruleName + '\'' +
-                ", pType=" + pType +
-                ", materiels='" + materiels + '\'' +
-                ", materielList=" + Arrays.toString(materielList) +
-                ", notMaterielList=" + notMaterielList +
-                ", cTime=" + cTime +
-                ", uTime=" + uTime +
-                ", mesBatchRuleDetails=" + mesBatchRuleDetails +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "MesBatchRule{" +
+				"id=" + id +
+				", companyId=" + companyId +
+				", ruleName='" + ruleName + '\'' +
+				", pType=" + pType +
+				", materiels='" + materiels + '\'' +
+				", materielList=" + Arrays.toString(materielList) +
+				", notMaterielList=" + notMaterielList +
+				", notPartlList=" + notPartlList +
+				", cTime=" + cTime +
+				", uTime=" + uTime +
+				", mesBatchRuleDetails=" + mesBatchRuleDetails +
+				", totalNum=" + totalNum +
+				", status=" + status +
+				'}';
+	}
 }

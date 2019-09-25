@@ -125,17 +125,12 @@
 					title : '主码信息',
 					sortable: true,
 					formatter:function (value, row, index) {
-						return '<a class="btn btn-primary btn-sm" href="javascript:void(0)" onclick="showMesData(\''+ row.mesCode +'\')"><i></i>'+ value +'</a>';
+						return '<a href="javascript:void(0)" onclick="showMesData(\''+ row.mesCode +'\')"><span style="font-weight: bold;color: blue">'+ value +'</span></a>';
 					}
 				},
 				{
 					field : 'workCode', 
 					title : '工单号',
-					sortable: true
-				},
-				{
-					field : 'orderCode', 
-					title : '订单号',
 					sortable: true
 				},
 				{

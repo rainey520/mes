@@ -4,6 +4,7 @@ import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.web.domain.BaseEntity;
 
 import java.util.Date;
+import java.util.StringJoiner;
 
 /**
  * 售后服务表 tab_after_service
@@ -34,6 +35,19 @@ public class AfterService extends BaseEntity
 	private String batchCode;
 	/** 所属公司ID */
 	private Integer companyId;
+
+	/**
+	 * 权限拉取
+	 */
+	private Integer menuId;
+
+	public Integer getMenuId() {
+		return menuId;
+	}
+
+	public void setMenuId(Integer menuId) {
+		this.menuId = menuId;
+	}
 
 	public Integer getCompanyId() {
 		return companyId;

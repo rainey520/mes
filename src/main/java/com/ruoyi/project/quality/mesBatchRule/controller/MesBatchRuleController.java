@@ -15,12 +15,14 @@ import com.ruoyi.project.product.materiel.service.IMaterielService;
 import com.ruoyi.project.quality.mesBatchRule.domain.MesBatchRule;
 import com.ruoyi.project.quality.mesBatchRule.service.IMesBatchRuleDetailService;
 import com.ruoyi.project.quality.mesBatchRule.service.IMesBatchRuleService;
+import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -211,6 +213,20 @@ public class MesBatchRuleController extends BaseController
 			map.put("matList",materielService.selectAllMatByComId());
 		}
 		return AjaxResult.success(map);
+	}
+
+	/**
+	 * mes规则有效性修改
+	 */
+	@RequiresPermissions("mes:mesBatchRule:add")
+	@PostMapping("/changeStatus")
+	@ResponseBody
+	public AjaxResult changeStatus(MesBatchRule mesBatchRule) {
+		try {
+			return toAjax(mesBatchRuleService.changeStatus(mesBatchRule));
+		} catch (BusinessException e) {
+			return error(e.getMessage());
+		}
 	}
 
 

@@ -292,7 +292,7 @@ public class MenuServiceImpl implements IMenuService {
     }
 
     @Override
-    public List<Menu> selectMenuListByParentIdAndUserId(Integer uid, Integer parentId) throws Exception{
+    public List<Menu> selectMenuListByParentIdAndUserId(Integer uid, Integer parentId){
         return menuMapper.selectMenuListByParentIdAndUserId(uid,parentId);
     }
 }

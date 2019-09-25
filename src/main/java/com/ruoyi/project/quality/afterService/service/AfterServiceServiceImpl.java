@@ -7,6 +7,7 @@ import com.ruoyi.project.quality.afterService.domain.AfterService;
 import com.ruoyi.project.quality.afterService.domain.AfterServiceItem;
 import com.ruoyi.project.quality.afterService.mapper.AfterServiceMapper;
 import com.ruoyi.project.system.user.domain.User;
+import org.apache.commons.lang.text.StrBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -106,6 +107,7 @@ public class AfterServiceServiceImpl implements IAfterServiceService
 		if (user == null) {
 		    return 0;
 		}
+		String inputBatchInfo = afterService.getInputBatchInfo();
 		afterService.setCompanyId(user.getCompanyId());
 		afterService.setInputUserId(user.getUserId().intValue());
 		afterService.setInputTime(new Date());
@@ -134,5 +136,15 @@ public class AfterServiceServiceImpl implements IAfterServiceService
 	public int deleteAfterServiceByIds(String ids)
 	{
 		return afterServiceMapper.deleteAfterServiceByIds(Convert.toStrArray(ids));
+	}
+
+	/**
+	 * 删除录入信息
+	 * @param id 录入id
+	 * @return 结果
+	 */
+	@Override
+	public int deleteAfterServiceById(Integer id) {
+		return afterServiceMapper.deleteAfterServiceById(id);
 	}
 }

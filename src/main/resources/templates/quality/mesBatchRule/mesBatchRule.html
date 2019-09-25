@@ -27,7 +27,7 @@
 							<li>
 								物料编码：
 								<select id="materiels" name="materiels" class="form-control" th:with="allMat=${@materiel.selectAllMatByComId()}">
-									<option value="-1">请选择</option>
+									<option value="">请选择</option>
 									<option th:each="item : ${allMat}"  th:text="${item.materielCode}" th:value="${item.materielCode}"></option>
 								</select>
 							</li>
@@ -128,6 +128,14 @@
 					}
 				},
 				{
+					visible: editFlag == 'hidden' ? false : true,
+					title: '顺序有效性',
+					align: 'center',
+					formatter: function (value, row, index) {
+						return statusTools(row);
+					}
+				},
+				{
 					field : 'materiels',
 					title : '关联编码',
 					width:300,
@@ -195,6 +203,29 @@
 		function showCfDetail(id,pType,value) {
 			var url = prefix + "/showCfDetail?id="+ id +"&pType=" + pType;
 			$.modal.open("查看" + value + "的追踪规则配置明细", url,'800','680');
+		}
+
+		/* 顺序是否有效显示 */
+		function statusTools(row) {
+			if (row.status == 1) {
+				return '<i class=\"fa fa-toggle-on text-info fa-2x\" onclick="disable(\'' + row.id + '\')"></i> ';
+			} else {
+				return '<i class=\"fa fa-toggle-off text-info fa-2x\" onclick="enable(\'' + row.id + '\')"></i> ';
+			}
+		}
+
+		/* 用户管理-停用 */
+		function disable(id) {
+			$.modal.confirm("确认取消顺序有效性吗？", function () {
+				$.operate.post(prefix + "/changeStatus", {"id": id, "status": 0});
+			})
+		}
+
+		/* 用户管理启用 */
+		function enable(id) {
+			$.modal.confirm("确认激活顺序有效性吗？", function () {
+				$.operate.post(prefix + "/changeStatus", {"id": id, "status": 1});
+			})
 		}
 	</script>
 </body>

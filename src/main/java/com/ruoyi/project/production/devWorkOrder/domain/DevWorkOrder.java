@@ -209,6 +209,8 @@ public class DevWorkOrder extends BaseEntity {
     private String[] mesMatList;
     /** 配置规则id */
     private Integer ruleId;
+    /** 配置排序是否有效性，无效0, 有效1 */
+    private Integer ruleStatus;
     /**
      * 对应产品追踪MES规则明细列表
      */
@@ -223,6 +225,13 @@ public class DevWorkOrder extends BaseEntity {
     private String devType; //设备类型
 
 
+    public Integer getRuleStatus() {
+        return ruleStatus;
+    }
+
+    public void setRuleStatus(Integer ruleStatus) {
+        this.ruleStatus = ruleStatus;
+    }
 
     public String getLineName() {
         return lineName;

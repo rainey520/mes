@@ -9,6 +9,7 @@
         <input type="hidden" name="orderCode" id="orderCode" th:value="${workOrder.orderCode}">
         <input type="hidden" name="pbCode" id="pbCode" th:value="${workOrder.productCode}">
         <input type="hidden" name="ruleId" id="ruleId" th:value="${workOrder.ruleId}">
+        <input type="hidden" id="ruleStatus" th:if="${workOrder.ruleStatus != null}" th:value="${workOrder.ruleStatus}">
         <div class="ibox-title" style="padding: 0px;min-height: 20px;margin-left: 20px">
             <span style="font-weight: bold;color: #0a0a0a;font-size: x-large">工单号：</span>
             <span id="workCode" style="font-weight: bold;color: #0a0a0a;font-size: x-large"
@@ -190,10 +191,11 @@
         // 批次排序
         var ruleOrder = $(val).parent().parent().find("input[name='ruleOrder']").val();
         var mesSign = $(val).parent().parent().parent().parent().parent().parent().find("input[name='mesSign']").val();
+        var ruleStatus = $("#ruleStatus").val();
         var failNum = 0;
         for (var i = 1; i < ruleOrder; i++) {
             var mesTag = mesSign.substring(i - 1, i);
-            if (mesTag != 1 && mesTag != 2) {
+            if (mesTag != 1 && mesTag != 2 && ruleStatus == 1) {
                 failNum++;
             }
         }

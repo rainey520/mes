@@ -59,4 +59,11 @@ public interface IAfterServiceService
 	 * @return 结果
 	 */
 	List<AfterServiceItem> selectListBySearchInfo(AfterService afterService);
+
+	/**
+	 * 删除售后录入
+	 * @param id 录入id
+	 * @return 结果
+	 */
+	int deleteAfterServiceById(Integer id);
 }

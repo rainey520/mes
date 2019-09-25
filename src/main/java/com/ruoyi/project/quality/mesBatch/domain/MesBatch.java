@@ -176,6 +176,7 @@ public class MesBatch extends BaseEntity
     public String toString() {
         return "MesBatch{" +
                 "id=" + id +
+                ", workId=" + workId +
                 ", companyId=" + companyId +
                 ", mesCode='" + mesCode + '\'' +
                 ", workCode='" + workCode + '\'' +

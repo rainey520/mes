@@ -41,7 +41,11 @@
     $('#inputBatchInfo').keyup(function (e) {
         if (e.keyCode == 13) {
             if ($.validate.form()) {
-                addSave(prefix + "/add", $('#form-afterService-add').serialize());
+                var inputBatchInfo = $.common.trim($("#inputBatchInfo").val());
+                var data = {
+                    inputBatchInfo:inputBatchInfo,
+                }
+                addSave(prefix + "/add", data);
             }
         }
     });
