@@ -4,8 +4,11 @@ import com.ruoyi.common.constant.MesConstants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.support.Convert;
+import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
+import com.ruoyi.project.device.devCompany.domain.DevCompany;
+import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
 import com.ruoyi.project.quality.mesBatch.domain.MesBatch;
@@ -20,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.CollationElementIterator;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -46,6 +49,9 @@ public class MesBatchServiceImpl implements IMesBatchService {
     @Autowired
     private DevWorkOrderMapper workOrderMapper;
 
+    @Autowired
+    private DevCompanyMapper companyMapper;
+
     /**
      * 查询MES批准追踪信息
      *
@@ -69,11 +75,54 @@ public class MesBatchServiceImpl implements IMesBatchService {
         if (user == null) {
             return Collections.emptyList();
         }
+        setTimeValid(mesBatch);
         mesBatch.setCompanyId(user.getCompanyId());
         if (StringUtils.isNotEmpty(mesBatch.getBatchCode())) {
             return mesBatchMapper.selectMesBatchList2(mesBatch);
         }
         return mesBatchMapper.selectMesBatchList(mesBatch);
+    }
+
+
+    /**
+     * 设置检索有效期
+     * @param mesBatch
+     */
+    private void setTimeValid(MesBatch mesBatch) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        // 检索开始时间
+        String searchBeginTime = (String) mesBatch.getParams().get("beginTime");
+        Date bTime = DateUtils.parseDate(searchBeginTime);
+
+        // 检索结束时间
+        String searchEndTime = (String) mesBatch.getParams().get("endTime");
+        Date eTime = DateUtils.parseDate(searchEndTime);
+
+        // 查询公司是否为会员
+        DevCompany devCompany = companyMapper.selectDevCompanyById(JwtUtil.getUser().getCompanyId());
+        if (devCompany != null && devCompany.getSign() != 1) {
+            // 有效时间，非会员检索时间为13个月，会员为永久
+            Date validDate = DateUtils.stepMonth(new Date(),-13);
+            String validDateStr = format.format(validDate);
+            if (bTime == null) {
+                searchBeginTime = validDateStr;
+            }
+            if (bTime != null) {
+                int i = bTime.compareTo(validDate);
+                if (i == -1) {
+                    searchBeginTime = validDateStr;
+                }
+            }
+
+            if (eTime != null) {
+                int i = eTime.compareTo(validDate);
+                if (i == -1) {
+                    searchEndTime = validDateStr;
+                }
+            }
+        }
+        mesBatch.setSearchBeginTime(searchBeginTime);
+        mesBatch.setSearchEndTime(searchEndTime);
     }
 
     /**
@@ -181,7 +230,13 @@ public class MesBatchServiceImpl implements IMesBatchService {
             return null;
         }
         MesData mesData = new MesData();
-        MesBatch mesPro = mesBatchMapper.selectMesBatchByMesCode(user.getCompanyId(), batchCode);
+        MesBatch mesBatch = new MesBatch();
+        mesBatch.setCompanyId(user.getCompanyId());
+        mesBatch.setMesCode(batchCode);
+
+        setTimeValid(mesBatch);
+
+        MesBatch mesPro = mesBatchMapper.selectMesBatch(mesBatch);
         /**
          * mes主表不为空时，正向追溯
          */
@@ -235,11 +290,12 @@ public class MesBatchServiceImpl implements IMesBatchService {
              * 存在对应批次明细记录，反向追溯
              */
             DevWorkOrder workBackOrder = null;
+            MesBatch mesBack = null;
             List<MesData> mesDataList = new ArrayList<>();
             for (MesBatchDetail mesBatchDetail : mesBatchDetailList) {
                 mesData = new MesData();
                 // 查询用到该批次的工单信息
-                MesBatch mesBack = mesBatchMapper.selectMesBatchById(mesBatchDetail.getbId());
+                mesBack = mesBatchMapper.selectMesBatchById(mesBatchDetail.getbId());
                 workBackOrder = workOrderMapper.selectWorkOrderByCode(mesBack.getWorkCode());
                 if (workBackOrder != null) {
                     mesData.setProMesCode(mesBack.getMesCode());
@@ -413,6 +469,7 @@ public class MesBatchServiceImpl implements IMesBatchService {
             return Collections.emptyList();
         }
         mesBatch.setCompanyId(user.getCompanyId());
+        setTimeValid(mesBatch);
         List<MesBatch> mesBatches = mesBatchMapper.selectMesBatchList(mesBatch);
         if (StringUtils.isNotEmpty(mesBatches)) {
             for (MesBatch batch : mesBatches) {

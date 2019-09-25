@@ -5,6 +5,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import java.lang.management.ManagementFactory;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -159,5 +160,20 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         // 计算差多少秒//输出结果
         // long sec = diff % nd % nh % nm / ns;
         return day + "天" + hour + "小时" + min + "分钟";
+    }
+
+    /**
+     * 在给定的日期加上或减去指定月份后的日期
+     *
+     * @param sourceDate 原始时间
+     * @param month      要调整的月份，向前为负数，向后为正数
+     * @return
+     */
+    public static Date stepMonth(Date sourceDate, int month) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(sourceDate);
+        c.add(Calendar.MONTH, month);
+
+        return c.getTime();
     }
 }

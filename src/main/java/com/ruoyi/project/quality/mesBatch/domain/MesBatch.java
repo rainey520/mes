@@ -52,6 +52,25 @@ public class MesBatch extends BaseEntity
 	/** 物料批次追踪条件 */
     private String batchCode;
 
+    private String searchBeginTime;
+    private String searchEndTime;
+
+    public String getSearchBeginTime() {
+        return searchBeginTime;
+    }
+
+    public void setSearchBeginTime(String searchBeginTime) {
+        this.searchBeginTime = searchBeginTime;
+    }
+
+    public String getSearchEndTime() {
+        return searchEndTime;
+    }
+
+    public void setSearchEndTime(String searchEndTime) {
+        this.searchEndTime = searchEndTime;
+    }
+
     public Integer getWorkId() {
         return workId;
     }

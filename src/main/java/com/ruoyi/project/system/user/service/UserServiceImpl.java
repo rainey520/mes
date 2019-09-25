@@ -581,25 +581,11 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public List<UserApp> appSelectUserList(UserApp userApp) {
-        Integer userId = userApp.getUid();
-        if (userId != null) {
-            User user = userMapper.selectUserInfoById(userId);
-            if (StringUtils.isNotNull(user)) {
-                return userMapper.appSelectUserList(user.getCompanyId());
-            }
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
-    }
-
-    @Override
-    public List<UserApp> appSelectUserInfoList(Integer uid) {
-        if (uid != null) {
-            User user = userMapper.selectUserInfoById(uid);
-            if (user != null) {
-                return userMapper.appSelectUserList(user.getCompanyId());
-            }
-        }
-        return Collections.emptyList();
+        return userMapper.appSelectUserList(user.getCompanyId());
     }
 
     /**

@@ -1,18 +1,7 @@
 package com.ruoyi.project.production.devWorkOrder.service;
 
-import cn.jiguang.common.ClientConfig;
-import cn.jiguang.common.resp.APIConnectionException;
-import cn.jiguang.common.resp.APIRequestException;
-import cn.jpush.api.JPushClient;
-import cn.jpush.api.push.PushResult;
-import cn.jpush.api.push.model.Platform;
-import cn.jpush.api.push.model.PushPayload;
-import cn.jpush.api.push.model.audience.Audience;
-import cn.jpush.api.push.model.notification.Notification;
 import com.alibaba.fastjson.JSON;
 import com.baidu.aip.ocr.AipOcr;
-import com.ruoyi.common.constant.EcnConstants;
-import com.ruoyi.common.constant.ProductConstants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
@@ -44,9 +33,7 @@ import com.ruoyi.project.production.singleWork.domain.SingleWork;
 import com.ruoyi.project.production.singleWork.domain.SingleWorkOrder;
 import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
 import com.ruoyi.project.production.singleWork.mapper.SingleWorkOrderMapper;
-import com.ruoyi.project.production.workData.domain.WorkData;
 import com.ruoyi.project.production.workData.mapper.WorkDataMapper;
-import com.ruoyi.project.production.workDayHour.domain.WorkDayHour;
 import com.ruoyi.project.production.workDayHour.mapper.WorkDayHourMapper;
 import com.ruoyi.project.production.workOrderChange.domain.WorkOrderChange;
 import com.ruoyi.project.production.workOrderChange.mapper.WorkOrderChangeMapper;
@@ -251,7 +238,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      * @return 结果
      */
     @Override
-    public int appSaveWorkOrder(DevWorkOrder workOrder) throws Exception{
+    public int appSaveWorkOrder(DevWorkOrder workOrder) throws Exception {
         User user = JwtUtil.getUser();
         if (user == null) {
             return 0;
@@ -335,7 +322,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         for (Integer workId : workIds) {
             devWorkOrder = devWorkOrderMapper.selectDevWorkOrderById(workId);
             if (devWorkOrder != null) {
-                mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(JwtUtil.getUser().getCompanyId(),devWorkOrder.getWorkorderNumber());
+                mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(JwtUtil.getUser().getCompanyId(), devWorkOrder.getWorkorderNumber());
                 for (MesBatch mesBatch : mesBatchList) {
                     mesBatchDetailMapper.deleteMesBatchDetailByBId(mesBatch.getId());
                 }
@@ -486,7 +473,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             throw new BusinessException("不是工单负责人");
         }
         // 判断是否已经全部录入完成
-        List<MesBatch> mesBatches = mesBatchMapper.selectMesBatchListByWorkCode(user.getCompanyId(),devWorkOrder.getWorkorderNumber());
+        List<MesBatch> mesBatches = mesBatchMapper.selectMesBatchListByWorkCode(user.getCompanyId(), devWorkOrder.getWorkorderNumber());
         for (MesBatch mesBatch : mesBatches) {
             List<MesBatchDetail> mesBatchDetails = mesBatchDetailMapper.selectMesBatchDetailByBId(mesBatch.getId());
             for (MesBatchDetail mesBatchDetail : mesBatchDetails) {
@@ -590,6 +577,79 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      */
     private void getLineOrHouseName(List<DevWorkOrder> workOrders) {
         for (DevWorkOrder workOrder : workOrders) {
+            if (workOrder.getWlSign() == 0) {
+                ProductionLine productionLine = productionLineMapper.selectProductionLineById(workOrder.getLineId());
+                if (null != productionLine) {
+                    workOrder.setParam1(productionLine.getLineName());
+                }
+            } else if (workOrder.getWlSign() == 1) {
+                SingleWork work = singleWorkMapper.selectSingleWorkById(workOrder.getLineId());
+                if (work != null) {
+                    workOrder.setParam1(work.getWorkshopName());
+                }
+            }
+        }
+    }
+
+    /**
+     * app查工单信息
+     */
+    private void getLineOrHouseName1(List<DevWorkOrder> workOrders) {
+        for (DevWorkOrder workOrder : workOrders) {
+            DevProductList product = productListMapper.selectDevProductByCode(workOrder.getCompanyId(), workOrder.getProductCode());
+            int configInputNum = 0;
+            int produceInputNum = 0;
+            int totalInputNum = 0;
+            if (product != null) {
+                if (product.getRuleId() == 0) {
+                    workOrder.setTotalInputNum(totalInputNum);
+                    workOrder.setConfigInputNum(configInputNum);
+                    workOrder.setProduceInputNum(produceInputNum);
+                    workOrder.setMesInputStatus(0);
+                } else {
+                    List<MesBatch> mesBatches = mesBatchMapper.selectMesBatchListByWorkCode(workOrder.getCompanyId(), workOrder.getWorkorderNumber());
+                    if (StringUtils.isEmpty(mesBatches)) {
+                        List<MesBatchRuleDetail> mesBatchRuleDetails = mesBatchRuleDetailMapper.selectMesBatchRuleDetailByRuleId(product.getRuleId());
+                        if (StringUtils.isNotEmpty(mesBatchRuleDetails)) {
+                            workOrder.setTotalInputNum(mesBatchRuleDetails.size());
+                            workOrder.setConfigInputNum(configInputNum);
+                            workOrder.setProduceInputNum(produceInputNum);
+                        }
+                        workOrder.setMesInputStatus(1);
+                    } else {
+                        MesBatch mesBatch = mesBatches.get(0);
+                        int configNum = 0;
+                        int produceNum = 0;
+                        List<MesBatchDetail> mesBatchDetails = mesBatchDetailMapper.selectMesBatchDetailByBId(mesBatch.getId());
+                        if (StringUtils.isNotEmpty(mesBatchDetails)) {
+                            totalInputNum = mesBatchDetails.size();
+                            for (MesBatchDetail mesBatchDetail : mesBatchDetails) {
+                                if (mesBatchDetail != null && StringUtils.isEmpty(mesBatchDetail.getBatchCode())) {
+                                    configNum++;
+                                    configInputNum++;
+                                }
+                                if (mesBatchDetail != null && StringUtils.isEmpty(mesBatchDetail.getProBatchCode())) {
+                                    produceNum++;
+                                    produceInputNum++;
+                                }
+                            }
+                            workOrder.setTotalInputNum(totalInputNum);
+                        }
+                        workOrder.setConfigInputNum(totalInputNum - configInputNum <= 0 ? 0 : totalInputNum - configInputNum);
+                        workOrder.setProduceInputNum(totalInputNum - produceInputNum <= 0 ? 0 : totalInputNum - produceInputNum);
+                        if (configNum > 0) {
+                            workOrder.setMesInputStatus(1);
+                        } else {
+                            if (produceNum > 0) {
+                                workOrder.setMesInputStatus(2);
+                            } else {
+                                workOrder.setMesInputStatus(3);
+                            }
+                        }
+                    }
+                }
+            }
+
             if (workOrder.getWlSign() == 0) {
                 ProductionLine productionLine = productionLineMapper.selectProductionLineById(workOrder.getLineId());
                 if (null != productionLine) {
@@ -1144,7 +1204,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
         DevCompany company = companyMapper.selectDevCompanyById(user.getCompanyId());
         if (company == null) throw new Exception("系统异常");
-        ImportConfig config = configMapper.selectImportConfigByType(user.getCompanyId(),3);
+        ImportConfig config = configMapper.selectImportConfigByType(user.getCompanyId(), 3);
         if (config == null || StringUtils.isEmpty(config.getSecretKey()) ||
                 StringUtils.isEmpty(config.getAppId()) || StringUtils.isEmpty(config.getApiKey())) {
             throw new Exception("无APPKEY配置，请先初始化APPKEY配置");
@@ -1237,9 +1297,9 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Transactional
     public int initOcrConfig() {
         User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
-        ImportConfig config = configMapper.selectImportConfigByType(user.getCompanyId(),3);
+        ImportConfig config = configMapper.selectImportConfigByType(user.getCompanyId(), 3);
         if (config != null) {
-            configMapper.deleteImportConfigByType(user.getCompanyId(),3);
+            configMapper.deleteImportConfigByType(user.getCompanyId(), 3);
         }
         config = new ImportConfig();
         config.setcSign(0);
@@ -1261,7 +1321,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Override
     public int saveInitOcrConfig(ImportConfig config) {
         User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
-        ImportConfig config1 = configMapper.selectImportConfigByType(user.getCompanyId(),3);
+        ImportConfig config1 = configMapper.selectImportConfigByType(user.getCompanyId(), 3);
         config.setAppId(appId);
         config.setApiKey(appKey);
         config.setSecretKey(secretKey);
@@ -1269,7 +1329,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             config.setAppId(config1.getAppId());
             config.setApiKey(config1.getApiKey());
             config.setSecretKey(config1.getSecretKey());
-            configMapper.deleteImportConfigByType(user.getCompanyId(),3);
+            configMapper.deleteImportConfigByType(user.getCompanyId(), 3);
         }
         config.setcSign(1);
         config.setcType(3);
@@ -1357,7 +1417,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             }
             workOrder.setRuleId(product.getRuleId());
             // 查询已经配置的工单批次追踪信息
-            List<MesBatch> mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(JwtUtil.getUser().getCompanyId(),workOrder.getWorkorderNumber());
+            List<MesBatch> mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(JwtUtil.getUser().getCompanyId(), workOrder.getWorkorderNumber());
             if (StringUtils.isNotEmpty(mesBatchList)) {
                 List<MesBatchDetail> mesBatchDetailList = null;
                 for (MesBatch mesBatch : mesBatchList) {
@@ -1397,7 +1457,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                 }
             }
             // 查询MES数据
-            List<MesBatch> mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(JwtUtil.getUser().getCompanyId(),workOrder.getWorkorderNumber());
+            List<MesBatch> mesBatchList = mesBatchMapper.selectMesBatchListByWorkCode(JwtUtil.getUser().getCompanyId(), workOrder.getWorkorderNumber());
             if (StringUtils.isNotEmpty(mesBatchList)) {
                 List<MesBatchDetail> mesBatchDetailList = null;
                 for (MesBatch mesBatch : mesBatchList) {
@@ -1430,7 +1490,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         }
         workOrder.setCompanyId(user.getCompanyId());
         List<DevWorkOrder> workOrders = devWorkOrderMapper.selectDevWorkOrderList(workOrder);
-        getLineOrHouseName(workOrders);
+        getLineOrHouseName1(workOrders);
         return workOrders;
     }
 

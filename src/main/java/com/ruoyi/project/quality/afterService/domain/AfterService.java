@@ -4,7 +4,6 @@ import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.ruoyi.framework.web.domain.BaseEntity;
 
 import java.util.Date;
-import java.util.StringJoiner;
 
 /**
  * 售后服务表 tab_after_service
@@ -40,6 +39,28 @@ public class AfterService extends BaseEntity
 	 * 权限拉取
 	 */
 	private Integer menuId;
+
+	/**
+	 * 检索有效期，开始结束时间
+	 */
+	private String searchBeginTime;
+	private String searchEndTime;
+
+	public String getSearchBeginTime() {
+		return searchBeginTime;
+	}
+
+	public void setSearchBeginTime(String searchBeginTime) {
+		this.searchBeginTime = searchBeginTime;
+	}
+
+	public String getSearchEndTime() {
+		return searchEndTime;
+	}
+
+	public void setSearchEndTime(String searchEndTime) {
+		this.searchEndTime = searchEndTime;
+	}
 
 	public Integer getMenuId() {
 		return menuId;

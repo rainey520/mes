@@ -84,9 +84,8 @@ public interface AfterServiceMapper {
     /**
      * 通过搜索条件的查询列表
      *
-     * @param companyId  公司id
-     * @param searchItem 搜索条件
+     * @param afterService  售后检索
      * @return 结果
      */
-    AfterServiceItem selectListByBatchInfo(@Param("companyId") Integer companyId,@Param("searchItem") String searchItem, @Param("params") Map<String, Object> params);
+    AfterServiceItem selectListByBatchInfo(AfterService afterService);
 }

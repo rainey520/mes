@@ -24,14 +24,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectAfterServiceVo"/>
         <where>
             <if test="companyId != null and companyId >0 "> and company_id = #{companyId}</if>
+            <if test="inputUserId != null and inputUserId >0 "> and input_user_id = #{inputUserId}</if>
              <if test="inputBatchInfo != null  and inputBatchInfo != '' ">
               and input_batch_info like concat ('%',#{inputBatchInfo},'%')
               </if>
-             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(input_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+             <if test="searchBeginTime != null and searchBeginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(input_time,'%y%m%d') &gt;= date_format(#{searchBeginTime},'%y%m%d')
              </if>
-             <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(input_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+             <if test="searchEndTime != null and searchEndTime != ''"><!-- 结束时间检索 -->
+                AND date_format(input_time,'%y%m%d') &lt;= date_format(#{searchEndTime},'%y%m%d')
              </if>
          </where>
          order by input_time desc
@@ -47,6 +48,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                     input_batch_info LIKE CONCAT(CONCAT('%', #{searchItems}), '%')
                 </foreach>
             </if>
+            <if test="inputUserId != null and inputUserId >0 "> and input_user_id = #{inputUserId}</if>
             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
                 AND date_format(input_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
             </if>
@@ -120,15 +122,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <!--通过搜索条件查询售后服务列表-->
-    <select id="selectListByBatchInfo"  resultType="com.ruoyi.project.quality.afterService.domain.AfterServiceItem">
-        SELECT count(*) as totalNum, min(input_time) as sTime,max(input_time) as eTime from tab_after_service where input_batch_info like concat ('%',#{searchItem},'%')
+    <select id="selectListByBatchInfo" parameterType="AfterService"  resultType="com.ruoyi.project.quality.afterService.domain.AfterServiceItem">
+        SELECT count(*) as totalNum, min(input_time) as sTime,max(input_time) as eTime from tab_after_service where input_batch_info like concat ('%',#{inputBatchInfo},'%')
         and company_id = #{companyId}
-        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
-            AND date_format(input_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+        <if test="searchBeginTime != null and searchBeginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(input_time,'%y%m%d') &gt;= date_format(#{searchBeginTime},'%y%m%d')
         </if>
-        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
-            AND date_format(input_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
-        </if>;
+        <if test="searchEndTime != null and searchEndTime != ''"><!-- 结束时间检索 -->
+            AND date_format(input_time,'%y%m%d') &lt;= date_format(#{searchEndTime},'%y%m%d')
+        </if>
     </select>
 
 </mapper>

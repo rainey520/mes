@@ -25,6 +25,7 @@ public class AfterServiceItem extends BaseEntity {
     /** 所有录入者姓名 */
     private String userNames;
 
+
     public String getSearchItem() {
         return searchItem;
     }

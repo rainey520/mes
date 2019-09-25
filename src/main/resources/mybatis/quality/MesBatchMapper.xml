@@ -34,11 +34,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              <if test="ruleId != null "> and rule_id = #{ruleId}</if>
              <if test="ruleName != null  and ruleName != '' "> and rule_name = #{ruleName}</if>
              <if test="ruleMateriel != null  and ruleMateriel != '' "> and rule_materiel like concat(#{ruleMateriel},'%')</if>
-             <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
-                AND date_format(c_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+             <if test="searchBeginTime != null and searchBeginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(c_time,'%y%m%d') &gt;= date_format(#{searchBeginTime},'%y%m%d')
              </if>
-             <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
-                AND date_format(c_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+             <if test="searchEndTime != null and searchEndTime != ''"><!-- 结束时间检索 -->
+                AND date_format(c_time,'%y%m%d') &lt;= date_format(#{searchEndTime},'%y%m%d')
              </if>
          </where>
     </select>
@@ -66,11 +66,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             and a.company_id = #{companyId}
         </if>
         <if test="pbCode != null  and pbCode != '' "> and a.pb_code like concat(#{pbCode},'%')</if>
-        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
-            AND date_format(a.c_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+        <if test="searchBeginTime != null and searchBeginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(a.c_time,'%y%m%d') &gt;= date_format(#{searchBeginTime},'%y%m%d')
         </if>
-        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
-            AND date_format(a.c_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+        <if test="searchEndTime != null and searchEndTime != ''"><!-- 结束时间检索 -->
+            AND date_format(a.c_time,'%y%m%d') &lt;= date_format(#{searchEndTime},'%y%m%d')
         </if>
         group by a.id
     </select>
@@ -145,8 +145,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <!--通过mes编码查询mes批次追踪信息-->
-    <select id="selectMesBatchByMesCode" resultMap="MesBatchResult">
-        SELECT * FROM tab_mes_batch where mes_code = #{mesCode} and company_id = #{companyId} limit 1
+    <select id="selectMesBatchByMesCode" parameterType="MesBatch" resultMap="MesBatchResult">
+        SELECT * FROM tab_mes_batch where mes_code = #{mesCode} and company_id = #{companyId} limit 1;
+    </select>
+
+    <!--通过mes编码查询mes批次追踪信息-->
+    <select id="selectMesBatch" parameterType="MesBatch" resultMap="MesBatchResult">
+        SELECT * FROM tab_mes_batch where mes_code = #{mesCode} and company_id = #{companyId}
+        <if test="searchBeginTime != null and searchBeginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(c_time,'%y%m%d') &gt;= date_format(#{searchBeginTime},'%y%m%d')
+        </if>
+        <if test="searchEndTime != null and searchEndTime != ''"><!-- 结束时间检索 -->
+            AND date_format(c_time,'%y%m%d') &lt;= date_format(#{searchEndTime},'%y%m%d')
+        </if>
+        limit 1;
     </select>
 
     <!--通过工单编号删除MES批次追踪信息-->

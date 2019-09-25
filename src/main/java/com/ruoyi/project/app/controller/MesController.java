@@ -15,6 +15,8 @@ import com.ruoyi.project.quality.mesBatch.service.IMesBatchDetailService;
 import com.ruoyi.project.quality.mesBatch.service.IMesBatchService;
 import com.ruoyi.project.system.menu.service.IMenuService;
 import com.ruoyi.project.system.user.domain.User;
+import com.ruoyi.project.system.user.domain.UserApp;
+import com.ruoyi.project.system.user.service.IUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +58,9 @@ public class MesController {
 
     @Autowired
     private IMenuService menuService;
+
+    @Autowired
+    private IUserService userService;
 
     /**
      * 仓库配置MES数据拉取
@@ -161,7 +166,18 @@ public class MesController {
         return map;
     }
 
-
+    /**
+     * 拉取用户信息
+     */
+    @RequestMapping("/userList")
+    public AjaxResult appSelectUserList(@RequestBody UserApp userApp){
+        try {
+            return AjaxResult.success(userService.appSelectUserList(userApp));
+        } catch (Exception e) {
+            LOGGER.error("app拉取用户接口出现异常:" + e.getMessage());
+            return AjaxResult.error();
+        }
+    }
     /**
      * 售后录入
      */

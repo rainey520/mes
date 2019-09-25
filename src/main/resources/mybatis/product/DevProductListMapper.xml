@@ -128,7 +128,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--通过公司id查询该公司所有的产品信息-->
     <select id="selectProductAllByCompanyId" resultType="com.ruoyi.project.product.list.domain.DevProductList">
         select id as Id,product_code as productCode,product_model as productModel,product_name as productName,ecnstatus as ecnStatus, sign as  sign from dev_product_list
-         where company_id = #{companyId} and def_id = 0
+         where company_id = #{companyId} and def_id = 0 and rule_id > 0
           <if test="sign > -1">
               and sign=#{sign}
           </if>
@@ -262,7 +262,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--app端检索产品信息-->
     <select id="appSearchProList" parameterType="com.ruoyi.project.app.domain.Product" resultType="com.ruoyi.project.app.domain.Product">
         SELECT id as proId,product_code as productCode FROM dev_product_list
-        where def_id = 0
+        where def_id = 0 and rule_id > 0
         <if test="companyId != null and  companyId > 0"> and company_id = #{companyId}</if>
         <if test="productCode != null  and productCode != '' "> and product_code  like concat(#{productCode}, '%') </if>
         limit 0,5;

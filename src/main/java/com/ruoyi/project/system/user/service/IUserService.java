@@ -200,8 +200,6 @@ public interface IUserService
      */
     List<UserApp> appSelectUserList(UserApp userApp);
 
-    List<UserApp> appSelectUserInfoList(Integer uid);
-
     /**
      * 查询用户头像
      * @param uid

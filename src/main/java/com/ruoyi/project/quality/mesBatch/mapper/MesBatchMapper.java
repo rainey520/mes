@@ -99,4 +99,11 @@ public interface MesBatchMapper {
      * @return 结果
      */
     List<MesBatch> appSelectMesBatchList(MesBatch mesBatch);
+
+    /**
+     * 查看mes数据主表
+     * @param mesBatch mes数据
+     * @return 结果
+     */
+    MesBatch selectMesBatch(MesBatch mesBatch);
 }

@@ -211,6 +211,14 @@ public class DevWorkOrder extends BaseEntity {
     private Integer ruleId;
     /** 配置排序是否有效性，无效0, 有效1 */
     private Integer ruleStatus;
+    /** mes录入状态，0、生产的产品没有配置规则，1、仓库录入，2、生产录入，3、生产录入完 */
+    private Integer mesInputStatus;
+    /** 仓库录入数 */
+    private Integer configInputNum;
+    /** 生产录入数 */
+    private Integer produceInputNum;
+    /** 总录入数 */
+    private Integer totalInputNum;
     /**
      * 对应产品追踪MES规则明细列表
      */
@@ -224,6 +232,37 @@ public class DevWorkOrder extends BaseEntity {
     private String devCode; //设备编号
     private String devType; //设备类型
 
+    public Integer getConfigInputNum() {
+        return configInputNum;
+    }
+
+    public void setConfigInputNum(Integer configInputNum) {
+        this.configInputNum = configInputNum;
+    }
+
+    public Integer getProduceInputNum() {
+        return produceInputNum;
+    }
+
+    public void setProduceInputNum(Integer produceInputNum) {
+        this.produceInputNum = produceInputNum;
+    }
+
+    public Integer getTotalInputNum() {
+        return totalInputNum;
+    }
+
+    public void setTotalInputNum(Integer totalInputNum) {
+        this.totalInputNum = totalInputNum;
+    }
+
+    public Integer getMesInputStatus() {
+        return mesInputStatus;
+    }
+
+    public void setMesInputStatus(Integer mesInputStatus) {
+        this.mesInputStatus = mesInputStatus;
+    }
 
     public Integer getRuleStatus() {
         return ruleStatus;
