@@ -216,14 +216,19 @@ public class DevProductListServiceImpl implements IDevProductListService {
             product.setProductModel(pModel);
             //获取产品标准工时
             try {
-                Integer hours = Integer.parseInt(ExcelUtil.getCellValue1(row,config.getCon4()-1).toString());
-                if(hours == null || hours <=0){
-                    failNum++;
-                    failMsg.append("<br/>第"+(i+1)+"行，标准工时必须大于0");
-                    continue;
+                String hoursStr = ExcelUtil.getCellValue1(row, config.getCon4() - 1).toString();
+                if (StringUtils.isNotEmpty(hoursStr)) {
+                    Integer hours = Integer.parseInt(hoursStr);
+                    product.setStandardHourYield(hours);
                 }
-                product.setStandardHourYield(hours);
+
+                // if(hours == null || hours <=0){
+                //     failNum++;
+                //     failMsg.append("<br/>第"+(i+1)+"行，标准工时必须大于0");
+                //     continue;
+                // }
             }catch (Exception e){
+                e.printStackTrace();
                 failNum++;
                 failMsg.append("<br/>第"+(i+1)+"行,标准工时解析失败");
                 continue;
