@@ -1,11 +1,7 @@
 package com.ruoyi.project.device.devCompany.domain;
 
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
-import io.swagger.models.auth.In;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.framework.web.domain.BaseEntity;
-import java.util.Date;
 
 /**
  * 公司表 dev_company
@@ -44,6 +40,26 @@ public class DevCompany extends BaseEntity
 	private int sign;//公司等级 0、普通用户  1 VIP 用户
 
 	private long fileSize;//文件大小 b 为单位
+
+	/** 看板登录账号密码 */
+	private String loginNumber;
+	private Integer loginPassword;
+
+	public String getLoginNumber() {
+		return loginNumber;
+	}
+
+	public void setLoginNumber(String loginNumber) {
+		this.loginNumber = loginNumber;
+	}
+
+	public Integer getLoginPassword() {
+		return loginPassword;
+	}
+
+	public void setLoginPassword(Integer loginPassword) {
+		this.loginPassword = loginPassword;
+	}
 
 	public Integer getIndustry() {
 		return industry;

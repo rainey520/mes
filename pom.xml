@@ -320,6 +320,13 @@
             <artifactId>java-sdk</artifactId>
             <version>4.10.0</version>
         </dependency>
+
+        <!--获取首字母工具-->
+        <dependency>
+            <groupId>com.belerweb</groupId>
+            <artifactId>pinyin4j</artifactId>
+            <version>2.5.0</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -69,10 +69,10 @@ public interface IDevCompanyService
 
 	/**
 	 * 校验公司名称是否唯一
-	 * @param comName 公司信息
+	 * @param company 公司信息
 	 * @return 结果
 	 */
-	String checkComNameUnique(String comName);
+	String checkComNameUnique(DevCompany company);
 
 	/**
 	 * 查询公司轮播图片

@@ -16,11 +16,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="totalIso"    column="total_iso"    />
         <result property="sign"    column="sign"    />
         <result property="fileSize"    column="file_size"    />
+        <result property="loginNumber"    column="login_number"    />
+        <result property="loginPassword"    column="login_password"    />
     </resultMap>
 
     <sql id="selectDevCompanyVo">
         select company_id, com_name, create_time, com_address, com_type, com_logo, com_picture,
-        industry,total_iso,sign,file_size from dev_company
+        industry,total_iso,sign,file_size,login_number,login_password from dev_company
     </sql>
 
     <select id="selectDevCompanyList" parameterType="DevCompany" resultMap="DevCompanyResult">
@@ -54,6 +56,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="comPicture != null  and comPicture != ''  ">com_picture,</if>
             <if test="industry != null  and industry != ''  ">industry,</if>
             <if test="totalIso != null  and totalIso != ''  ">total_iso,</if>
+            <if test="loginNumber != null  and loginNumber != ''  ">login_number,</if>
+            <if test="loginPassword != null  and loginPassword != ''  ">login_password,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             #{companyId},
@@ -65,6 +69,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="comPicture != null  and comPicture != ''  ">#{comPicture},</if>
             <if test="industry != null  and industry != ''  ">#{industry},</if>
             <if test="totalIso != null  and totalIso != ''  ">#{totalIso},</if>
+            <if test="loginNumber != null  and loginNumber != ''  ">#{loginNumber},</if>
+            <if test="loginPassword != null  and loginPassword != ''  ">#{loginPassword},</if>
         </trim>
     </insert>
 
@@ -78,6 +84,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="comPicture != null  and comPicture != ''  ">com_picture = #{comPicture},</if>
             <if test="sign >= 0  ">sign = #{sign},</if>
             <if test="fileSize  >= 0  ">file_size = #{fileSize},</if>
+            <if test="loginNumber != null  and loginNumber != ''  ">login_number = #{loginNumber},</if>
+            <if test="loginPassword != null  and loginPassword != ''  ">login_password = #{loginPassword},</if>
         </trim>
         where company_id = #{companyId}
     </update>

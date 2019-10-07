@@ -17,6 +17,16 @@ public class TableDataInfo implements Serializable
     private List<?> rows;
     /** 消息状态码 */
     private int code;
+    /** 集合长度 */
+    private Integer size;
+
+    public Integer getSize() {
+        return size;
+    }
+
+    public void setSize(Integer size) {
+        this.size = size;
+    }
 
     /**
      * 表格数据对象

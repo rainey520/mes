@@ -203,13 +203,13 @@ public class DevCompanyController extends BaseController {
     /**
      * 校验公司名称是否唯一
      *
-     * @param comName
+     * @param company
      * @return
      */
     @PostMapping("/checkComNameUnique")
     @ResponseBody
-    public String checkComNameUnique(String comName) {
-        return devCompanyService.checkComNameUnique(comName);
+    public String checkComNameUnique(DevCompany company) {
+        return devCompanyService.checkComNameUnique(company);
     }
 
     /**

@@ -74,12 +74,10 @@ public interface AfterServiceMapper {
     /**
      * 通过搜索条件查询所有的录入者
      *
-     * @param companyId  公司id
-     * @param searchItem 搜索条件
-     * @param params     搜索参数
+     * @param afterService  售后检索
      * @return 结果
      */
-    String selectListBySearchInfoUserName(@Param("companyId") Integer companyId, @Param("searchItem") String searchItem, @Param("params") Map<String, Object> params);
+    String selectListBySearchInfoUserName(AfterService afterService);
 
     /**
      * 通过搜索条件的查询列表

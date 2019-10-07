@@ -110,8 +110,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <!--通过搜索条件查询所有的录入者姓名-->
-    <select id="selectListBySearchInfoUserName" resultType="java.lang.String">
-        select GROUP_CONCAT(b.user_name) AS inputUserName from (SELECT input_user_id from tab_after_service where input_batch_info like concat ('%',#{searchItem},'%')
+    <select id="selectListBySearchInfoUserName" parameterType="AfterService" resultType="java.lang.String">
+        select GROUP_CONCAT(b.user_name) AS inputUserName from (SELECT input_user_id from tab_after_service where input_batch_info like concat ('%',#{inputBatchInfo},'%')
         <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
             AND date_format(input_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
         </if>

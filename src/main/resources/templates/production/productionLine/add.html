@@ -29,42 +29,6 @@
 					</select>
 				</div>
 			</div>
-			<!--<div class="form-group">-->
-				<!--<label class="col-sm-3 control-label">PE：</label>-->
-				<!--<div class="col-sm-8">-->
-					<!--<select id="edUser" name="edUser" class="form-control m-b" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">-->
-						<!--<option value="">请选择</option>-->
-						<!--<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>-->
-					<!--</select>-->
-				<!--</div>-->
-			<!--</div>-->
-			<!--<div class="form-group">-->
-				<!--<label class="col-sm-3 control-label">IPQC：</label>-->
-				<!--<div class="col-sm-8">-->
-					<!--<select id="ipqcUser" name="ipqcUser" class="form-control m-b" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">-->
-						<!--<option value="">请选择</option>-->
-						<!--<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>-->
-					<!--</select>-->
-				<!--</div>-->
-			<!--</div>-->
-			<!--<div class="form-group">-->
-				<!--<label class="col-sm-3 control-label">ME：</label>-->
-				<!--<div class="col-sm-8">-->
-					<!--<select id="meUser" name="meUser" class="form-control m-b" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">-->
-						<!--<option value="">请选择</option>-->
-						<!--<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>-->
-					<!--</select>-->
-				<!--</div>-->
-			<!--</div>-->
-			<!--<div class="form-group">-->
-				<!--<label class="col-sm-3 control-label">TE：</label>-->
-				<!--<div class="col-sm-8">-->
-					<!--<select id="teUser" name="teUser" class="form-control m-b" th:with="user=${@user.selectComAllUser(#httpServletRequest.getCookies())}">-->
-						<!--<option value="">请选择</option>-->
-						<!--<option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>-->
-					<!--</select>-->
-				<!--</div>-->
-			<!--</div>-->
 			<div class="form-group">	
 				<label class="col-sm-3 control-label">备注信息：</label>
 				<div class="col-sm-8">
@@ -94,9 +58,6 @@
 						}
 					}
 				},
-                deviceLiable:{
-                    required:true,
-                },
 
 			},
             messages:{
@@ -104,14 +65,17 @@
                     required:"产线名称必填",
 					remote:"产线名称已存在",
                 },
-                deviceLiable:{
-                    required:"责任人1必填",
-                },
             }
 		});
 		
 		function submitHandler() {
 	        if ($.validate.form()) {
+				var deviceLiable = $("#deviceLiable").val();
+				var deviceLiableTow = $("#deviceLiableTow").val();
+				if ($.common.isEmpty(deviceLiable) || $.common.isEmpty(deviceLiableTow)) {
+					$.modal.alertWarning("责任人必填");
+					return;
+				}
 	            $.operate.save(prefix + "/add", $('#form-productionLine-add').serialize());
 	        }
 	    }

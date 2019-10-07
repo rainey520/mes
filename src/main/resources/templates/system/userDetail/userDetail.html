@@ -229,7 +229,7 @@
     });
 
     function submitUserInfo() {
-        if ($.validate.form()) {
+        if ($.validate.form("form-user-edit")) {
             var data={
                 userId:$("#userId").val(),
                 userName:$("#userName").val(),
@@ -273,7 +273,7 @@
     })
 
     function editCompany(){
-        if ($.validate.form()) {
+        if ($.validate.form("form-company-edit")) {
             var data ={
                 companyId:$("#companyId").val(),
                 comName:$("#comName").val(),
@@ -329,7 +329,7 @@
     });
 
     function submitChangPassword() {
-        if ($.validate.form()) {
+        if ($.validate.form("form-user-resetPwd")) {
             var data ={
                 userId:$("#userId").val(),
                 newPassword:$("#newPassword").val(),

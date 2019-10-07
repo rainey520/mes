@@ -3,11 +3,13 @@ package com.ruoyi.project.app.controller;
 import com.github.pagehelper.PageInfo;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.production.devWorkOrder.service.IDevWorkOrderService;
 import com.ruoyi.project.quality.afterService.domain.AfterService;
+import com.ruoyi.project.quality.afterService.domain.AfterServiceItem;
 import com.ruoyi.project.quality.afterService.service.IAfterServiceService;
 import com.ruoyi.project.quality.mesBatch.domain.MesBatch;
 import com.ruoyi.project.quality.mesBatch.domain.MesBatchDetail;
@@ -153,11 +155,16 @@ public class MesController {
             List<AfterService> list = afterServiceService.selectAfterServiceList(afterService);
             rspData.setCode(0);
             rspData.setRows(list);
+            rspData.setSize(list.size());
             rspData.setTotal(new PageInfo(list).getTotal());
             map.put("data",rspData);
             map.put("code",0);
             if (afterService.getMenuId() != null) {
                 map.put("menuList",menuService.selectMenuListByParentIdAndUserId(user.getUserId().intValue(), afterService.getMenuId()));
+            }
+            if (StringUtils.isNotEmpty(afterService.getSearchItems())) {
+                List<AfterServiceItem> serviceItemList = afterServiceService.selectListBySearchInfo(afterService);
+                map.put("searchList",serviceItemList);
             }
             return map;
         }

@@ -101,13 +101,16 @@ public class DevCompanyServiceImpl implements IDevCompanyService {
     /**
      * 校验公司名称是否存在
      *
-     * @param comName 公司信息
+     * @param company 公司信息
      * @return 结果
      */
     @Override
-    public String checkComNameUnique(String comName) {
-        DevCompany companyInfo = devCompanyMapper.selectDevCompanyByComName(comName);
-        if (!StringUtils.isNull(companyInfo) ) { // 数据库存在记录
+    public String checkComNameUnique(DevCompany company) {
+        if (StringUtils.isEmpty(company.getComName())) {
+            return CompanyConstants.COM_NAME_NOT_UNIQUE;
+        }
+        DevCompany companyInfo = devCompanyMapper.selectDevCompanyByComName(company.getComName());
+        if (!StringUtils.isNull(companyInfo) && !companyInfo.getCompanyId().equals(company.getCompanyId()) ) {
             return CompanyConstants.COM_NAME_NOT_UNIQUE;
         }
         return CompanyConstants.COM_NAME_UNIQUE;

@@ -4,6 +4,7 @@ package com.ruoyi.project.system.user.service;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.support.Convert;
+import com.ruoyi.common.utils.ChineseCharacterUtil;
 import com.ruoyi.common.utils.PasswordUtil;
 import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -493,6 +494,10 @@ public class UserServiceImpl implements IUserService {
         company.setComName(user.getComName());
         company.setComType(0);
         company.setCreateTime(new Date());
+        if (StringUtils.isEmpty(user.getComName())) {
+            throw new BusinessException("请输入公司名称");
+        }
+        company.setLoginNumber(ChineseCharacterUtil.convertHanzi2Pinyin(user.getComName(),false).toUpperCase());
         companyMapper.insertDevCompany(company);
         //新增用户信息
         user.randomSalt();

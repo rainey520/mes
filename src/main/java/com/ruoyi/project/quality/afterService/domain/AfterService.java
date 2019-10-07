@@ -20,7 +20,7 @@ public class AfterService extends BaseEntity
 	/** 录入批次信息 */
 	@Excel(name = "批次信息", type = Excel.Type.EXPORT)
 	private String inputBatchInfo;
-	/** 搜索条件，多个分号隔开 */
+	/** 搜索条件，多个逗号隔开 */
 	private String searchItems;
 	/** 录入时间 */
 	@Excel(name = "录入时间", type = Excel.Type.EXPORT, dateFormat = "yyyy-MM-dd HH:ss")
