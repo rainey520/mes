@@ -61,6 +61,7 @@
                     <th>总数</th>
                     <th>时间</th>
                     <th>录入者</th>
+                    <th>批次追溯</th>
                 </tr>
                 </thead>
                 <tbody id="search-info-data">
@@ -265,6 +266,7 @@
                     '<td><span style="font-weight: bold;color: red">'+ totalNum + '</span></td>' +
                     '<td><span>'+ sTime +'</span><span>至</span><span>'+ eTime +'</span></td>' +
                     '<td><span>' + userNames+ '</span></td>' +
+                    '<td><a class="btn btn-primary btn-xs" href="javascript:void(0)" onclick="watchWorkInfo(\''+ data[i].searchItem +'\')"><i class="fa fa-eye"></i>查看</a></td>' +
                     '</tr>')
             }
             $("#search-info-data").append(item);
@@ -371,6 +373,23 @@
                 iframeWin.contentWindow.submitHandler();
             }
         });
+    }
+
+    /**
+     * 查看工单信息
+     * @param value
+     */
+    function watchWorkInfo(value) {
+        // 检验主码信息是否补全
+        $.post(ctx + "mes/mesBatch/checkMesCodeComplete?mesCode=" + value,function (res) {
+            if (res.code == web_status.SUCCESS) {
+                var url = ctx + "mes/mesBatch/selectMesData?batchCode=" + value;
+                createMenuItem(url,"查看" + value + "批次相关信息");
+            } else {
+                $.modal.alertWarning("该搜索条件未找到记录或非完整的主码批次信息");
+            }
+        })
+
     }
 </script>
 </body>

@@ -5,22 +5,23 @@
 <body class="white-bg">
 <div class="wrapper wrapper-content animated fadeInRight ibox-content">
     <form class="form-horizontal m" id="form-mesBatchRule-add">
+        <input type="hidden" name="pType" id="pType" value="0">
         <div class="form-group col-sm-6" >
             <label class="col-sm-4 control-label">规则名称：</label>
             <div class="col-sm-8">
                 <input id="ruleName" name="ruleName" class="form-control" type="text">
             </div>
         </div>
-        <div class="form-group col-sm-6">
-            <label class="col-sm-4 control-label">配置类型：</label>
-            <div class="col-sm-8">
-                <select id="pType" name="pType" class="form-control" onchange="changeCofType(this)">
-                    <option value="-1">请选择</option>
-                    <option value="0">成品</option>
-                    <option value="1">半成品</option>
-                </select>
-            </div>
-        </div>
+        <!--<div class="form-group col-sm-6">-->
+            <!--<label class="col-sm-4 control-label">配置类型：</label>-->
+            <!--<div class="col-sm-8">-->
+                <!--<select id="pType" name="pType" class="form-control" onchange="changeCofType(this)">-->
+                    <!--<option value="-1">请选择</option>-->
+                    <!--<option value="0">成品</option>-->
+                    <!--<option value="1">半成品</option>-->
+                <!--</select>-->
+            <!--</div>-->
+        <!--</div>-->
         <div class="form-group col-sm-12">
             <label class="col-sm-2 control-label">关联编码：</label>
             <div class="col-sm-10">
@@ -91,11 +92,12 @@
      * 添加MES物料明细
      */
     function addMatCode() {
-        var pType = $("#pType").find("option:selected").val();
-        if (pType <= -1) {
-            $.modal.alertWarning("请选择配置类型");
-            return;
-        }
+        var pType = $("#pType").val();
+        // var pType = $("#pType").find("option:selected").val();
+        // if (pType <= -1) {
+        //     $.modal.alertWarning("请选择配置类型");
+        //     return;
+        // }
         if (pType > -1){
             orderNum ++;
             $.post(prefix + "/selectPType",{"pType":pType},function (res) {
@@ -106,10 +108,10 @@
                     for (var i = 0; i < mat.length; i++) {
                         item.push("<option value='" + mat[i].materielCode + "' data-dtype='2'>" + mat[i].materielCode + "</option>")
                     }
-                    var parts = res.data.parList;
-                    for (var j = 0; j < parts.length; j++) {
-                        item.push("<option value='" + parts[j].productCode + "' data-dtype='1'>" + parts[j].productCode + "</option>")
-                    }
+                    // var parts = res.data.parList;
+                    // for (var j = 0; j < parts.length; j++) {
+                    //     item.push("<option value='" + parts[j].productCode + "' data-dtype='1'>" + parts[j].productCode + "</option>")
+                    // }
                     var mesDetailText = '<tr name="tr-mes-detail">' +
                         '                                <td>' +
                         '                                    <select name="dCode" class="form-control">'+ item +
@@ -149,11 +151,11 @@
 
     function submitHandler() {
         if ($.validate.form()) {
-            var pType = $("#pType").find("option:selected").val();
-            if (pType <= -1) {
-                $.modal.alertWarning("请选择配置类型");
-                return;
-            }
+            // var pType = $("#pType").find("option:selected").val();
+            // if (pType <= -1) {
+            //     $.modal.alertWarning("请选择配置类型");
+            //     return;
+            // }
             //封装MES规则明细
             var tagNum = 0;
             var mesRuleDetail = [];
@@ -189,7 +191,7 @@
             })
             var mesRule = {
                 ruleName:$("#ruleName").val(),
-                pType:pType
+                pType:$("#pType").val()
             }
             if (mesRuleDetail.length <= 0) {
                 $.modal.alertWarning("请添加MES规则明细");

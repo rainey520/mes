@@ -595,8 +595,11 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      * app查工单信息
      */
     private void getLineOrHouseName1(List<DevWorkOrder> workOrders) {
+        DevProductList product = null;
+        List<MesBatch> mesBatches = null;
+        List<MesBatchDetail> mesBatchDetails = null;
         for (DevWorkOrder workOrder : workOrders) {
-            DevProductList product = productListMapper.selectDevProductByCode(workOrder.getCompanyId(), workOrder.getProductCode());
+            product = productListMapper.selectDevProductByCode(workOrder.getCompanyId(), workOrder.getProductCode());
             int configInputNum = 0;
             int produceInputNum = 0;
             int totalInputNum = 0;
@@ -607,11 +610,15 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                     workOrder.setProduceInputNum(produceInputNum);
                     workOrder.setMesInputStatus(0);
                 } else {
-                    List<MesBatch> mesBatches = mesBatchMapper.selectMesBatchListByWorkCode(workOrder.getCompanyId(), workOrder.getWorkorderNumber());
+                    mesBatches = mesBatchMapper.selectMesBatchListByWorkCode(workOrder.getCompanyId(), workOrder.getWorkorderNumber());
                     if (StringUtils.isEmpty(mesBatches)) {
                         List<MesBatchRuleDetail> mesBatchRuleDetails = mesBatchRuleDetailMapper.selectMesBatchRuleDetailByRuleId(product.getRuleId());
                         if (StringUtils.isNotEmpty(mesBatchRuleDetails)) {
                             workOrder.setTotalInputNum(mesBatchRuleDetails.size());
+                            workOrder.setConfigInputNum(configInputNum);
+                            workOrder.setProduceInputNum(produceInputNum);
+                        } else {
+                            workOrder.setTotalInputNum(totalInputNum);
                             workOrder.setConfigInputNum(configInputNum);
                             workOrder.setProduceInputNum(produceInputNum);
                         }
@@ -620,7 +627,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                         MesBatch mesBatch = mesBatches.get(0);
                         int configNum = 0;
                         int produceNum = 0;
-                        List<MesBatchDetail> mesBatchDetails = mesBatchDetailMapper.selectMesBatchDetailByBId(mesBatch.getId());
+                        mesBatchDetails = mesBatchDetailMapper.selectMesBatchDetailByBId(mesBatch.getId());
                         if (StringUtils.isNotEmpty(mesBatchDetails)) {
                             totalInputNum = mesBatchDetails.size();
                             for (MesBatchDetail mesBatchDetail : mesBatchDetails) {
@@ -648,6 +655,11 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                         }
                     }
                 }
+            } else {
+                workOrder.setTotalInputNum(totalInputNum);
+                workOrder.setConfigInputNum(configInputNum);
+                workOrder.setProduceInputNum(produceInputNum);
+                workOrder.setMesInputStatus(0);
             }
 
             if (workOrder.getWlSign() == 0) {
@@ -1410,6 +1422,9 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         if (StringUtils.isNotNull(workOrder)) {
             // 查询工单产品信息
             DevProductList product = productListMapper.selectProductByCode(workOrder.getProductCode());
+            if (product == null) {
+                return null;
+            }
             // 查询规则是否有效
             MesBatchRule mesRule = mesBatchRuleMapper.selectMesBatchRuleById(product.getRuleId());
             if (StringUtils.isNotNull(mesRule) && mesRule.getStatus() != null) {

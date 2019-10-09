@@ -69,7 +69,8 @@
                                         <tr>
                                             <th width="35%">关联编码</th>
                                             <th width="35%">批次信息</th>
-                                            <th width="20%">批次二维码</th>
+                                            <th width="35%">批次数量</th>
+                                            <!--<th width="20%">批次二维码</th>-->
                                         </tr>
                                         </thead>
                                         <tbody id="add-mesBatchDetail-body" th:if="${not #lists.isEmpty(mesData.mesProList) && (mesData.mesProList).size() > 0}">
@@ -80,14 +81,17 @@
                                             <td>
                                                 <span name="batchCode" th:utext="${item.batchCode}"></span>
                                             </td>
-                                            <td name="erweima">
-                                                <div name="qr-code-div" style="display: none">
-
-                                                </div>
-                                                <div name="qr-code-img">
-
-                                                </div>
+                                            <td>
+                                                <span  th:utext="${item.mesNumber}"></span>
                                             </td>
+                                            <!--<td name="erweima">-->
+                                                <!--<div name="qr-code-div" style="display: none">-->
+
+                                                <!--</div>-->
+                                                <!--<div name="qr-code-img">-->
+
+                                                <!--</div>-->
+                                            <!--</td>-->
                                         </tr>
                                         </tbody>
                                     </table>
@@ -116,30 +120,30 @@
 <script th:src="@{/js/jqueryqr.js}"></script>
 <script th:src="@{/js/qrcode.js}"></script>
 <script th:inline="javascript">
-    $(function () {
-        initMesCode();
-    })
-    var i = 1;
-    function initMesCode() {
-        $("#add-mesBatchDetail-body").find("tr").each(function () {
-            var code = '<div id="container'+i+'">' +
-                '        <canvas  width="110" height="110"></canvas>' +
-                '    </div>'
-
-            $(this).find("div[name='qr-code-div']").append(code);
-             var code = $(this).find("span[name='batchCode']").text();
-            $('#container'+i).erweima({
-                fill:"#000",
-                size:110,
-                text:code,
-                label:'请扫码'
-            });
-            i++;
-            $(this).find("td[name='erweima']").find("div[name='qr-code-img']").children().remove();
-            var item = '<img src="'+ $(this).find("canvas")[0].toDataURL() +'" />';
-            $(this).find("td[name='erweima']").find("div[name='qr-code-img']").append(item);
-        })
-    }
+    // $(function () {
+    //     initMesCode();
+    // })
+    // var i = 1;
+    // function initMesCode() {
+    //     $("#add-mesBatchDetail-body").find("tr").each(function () {
+    //         var code = '<div id="container'+i+'">' +
+    //             '        <canvas  width="110" height="110"></canvas>' +
+    //             '    </div>'
+    //
+    //         $(this).find("div[name='qr-code-div']").append(code);
+    //          var code = $(this).find("span[name='batchCode']").text();
+    //         $('#container'+i).erweima({
+    //             fill:"#000",
+    //             size:110,
+    //             text:code,
+    //             label:'请扫码'
+    //         });
+    //         i++;
+    //         $(this).find("td[name='erweima']").find("div[name='qr-code-img']").children().remove();
+    //         var item = '<img src="'+ $(this).find("canvas")[0].toDataURL() +'" />';
+    //         $(this).find("td[name='erweima']").find("div[name='qr-code-img']").append(item);
+    //     })
+    // }
     // 打印
     function dayin() {
         var userAgent = navigator.userAgent.toLowerCase(); //取得浏览器的userAgent字符串

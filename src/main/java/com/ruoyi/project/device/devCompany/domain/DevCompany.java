@@ -43,7 +43,7 @@ public class DevCompany extends BaseEntity
 
 	/** 看板登录账号密码 */
 	private String loginNumber;
-	private Integer loginPassword;
+	private String loginPassword;
 
 	public String getLoginNumber() {
 		return loginNumber;
@@ -53,11 +53,11 @@ public class DevCompany extends BaseEntity
 		this.loginNumber = loginNumber;
 	}
 
-	public Integer getLoginPassword() {
+	public String getLoginPassword() {
 		return loginPassword;
 	}
 
-	public void setLoginPassword(Integer loginPassword) {
+	public void setLoginPassword(String loginPassword) {
 		this.loginPassword = loginPassword;
 	}
 

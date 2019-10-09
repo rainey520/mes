@@ -11,6 +11,7 @@ import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
 import com.ruoyi.project.production.devWorkOrder.domain.DevWorkOrder;
 import com.ruoyi.project.production.devWorkOrder.mapper.DevWorkOrderMapper;
+import com.ruoyi.project.production.productionLine.mapper.ProductionLineMapper;
 import com.ruoyi.project.quality.mesBatch.domain.MesBatch;
 import com.ruoyi.project.quality.mesBatch.domain.MesBatchDetail;
 import com.ruoyi.project.quality.mesBatch.domain.MesData;
@@ -24,10 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * MES批准追踪 服务层实现
@@ -51,6 +49,9 @@ public class MesBatchServiceImpl implements IMesBatchService {
 
     @Autowired
     private DevCompanyMapper companyMapper;
+
+    @Autowired
+    private ProductionLineMapper lineMapper;
 
     /**
      * 查询MES批准追踪信息
@@ -490,5 +491,80 @@ public class MesBatchServiceImpl implements IMesBatchService {
             }
             return mesBatchList;
         }
+    }
+
+    /**
+     * 校验编码信息是否完整
+     * @param mesCode 编码信息
+     * @return 结果
+     */
+    @Override
+    public int checkMesCodeComplete(String mesCode) {
+        User user = JwtUtil.getUser();
+        if (user == null) {
+            return 0;
+        }
+        MesBatch mesBatch = mesBatchMapper.selectMesBatchByMesCode(user.getCompanyId(), mesCode);
+        if (mesBatch != null) {
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
+     * app端追溯mes信息
+     * @param mesBatch mes信息
+     * @return 结果
+     */
+    @Override
+    public Map<String, Object> appSelectMesData(MesBatch mesBatch) {
+        Map<String,Object> map = new HashMap<>(16);
+        try {
+            User user = JwtUtil.getUser();
+            if (user == null) {
+                map.put("code",0);
+                map.put("msg","用户未登录或登录超时");
+                return map;
+            }
+            if (mesBatch == null || StringUtils.isEmpty(mesBatch.getMesCode())) {
+                map.put("code",0);
+                map.put("msg","主码信息不能为空");
+                return map;
+            }
+            MesBatch mes= mesBatchMapper.selectMesBatchByMesCode(user.getCompanyId(), mesBatch.getMesCode());
+            if (mes == null) {
+                map.put("code",0);
+                map.put("msg","未找到MES追溯信息");
+                return map;
+            }
+            MesData mesData = new MesData();
+            // 查询工单信息
+            DevWorkOrder workOrder = workOrderMapper.selectWorkOrderByCode(mes.getWorkCode());
+            if (workOrder == null) {
+                map.put("code",0);
+                map.put("msg","工单不存在或被删除");
+                return map;
+            }
+            // 工单相关信息
+            mesData.setBatchCode(mesBatch.getMesCode());
+            mesData.setWorkCodePro(workOrder.getWorkorderNumber());
+            mesData.setLineNamePro(workOrder.getLineName());
+            mesData.setProductCodePro(workOrder.getProductCode());
+            mesData.setProductNamePro(workOrder.getProductName());
+            mesData.setWorkNumber(workOrder.getProductNumber());
+            mesData.setStartTimePro(workOrder.getStartTime());
+            mesData.setEndTimePro(workOrder.getEndTime());
+            // 关联物料明细
+            mesData.setMesProList(mesBatchDetailMapper.selectMesBatchDetailByBId(mes.getId()));
+            map.put("code",1);
+            map.put("msg","请求成功");
+            map.put("data",mesData);
+            return map;
+        } catch (Exception e) {
+            // e.printStackTrace();
+        }
+        map.put("code",0);
+        map.put("msg","请求失败");
+        return map;
     }
 }

@@ -6,6 +6,7 @@ import com.ruoyi.project.quality.mesBatch.domain.MesBatchDetail;
 import com.ruoyi.project.quality.mesBatch.domain.MesData;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * MES批准追踪 服务层
@@ -89,4 +90,18 @@ public interface IMesBatchService
 	 * @return 结果
 	 */
     List<MesBatch> appSelectMesBatchList(MesBatch mesBatch);
+
+	/**
+	 * 校验编码信息是否完整
+	 * @param mesCode 编码信息
+	 * @return 结果
+	 */
+	int checkMesCodeComplete(String mesCode);
+
+	/**
+	 * app查询mes数据
+	 * @param mesBatch mes信息
+	 * @return 结果
+	 */
+	Map<String, Object> appSelectMesData(MesBatch mesBatch);
 }

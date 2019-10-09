@@ -224,4 +224,13 @@ public class MesBatchController extends BaseController {
         return prefix + "/workMesData";
     }
 
+    /**
+     * 校验主码信息是否完成
+     */
+    @RequestMapping("/checkMesCodeComplete")
+    @ResponseBody
+    public AjaxResult checkMesCodeComplete(String mesCode){
+        return toAjax(mesBatchService.checkMesCodeComplete(mesCode));
+    }
+
 }
