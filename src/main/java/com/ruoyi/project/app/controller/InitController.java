@@ -66,4 +66,12 @@ public class InitController extends BaseController {
             return error(e.getMessage());
         }
     }
+
+    /**
+     * 获取工单号的接口
+     */
+    @RequestMapping("/getWorkCode")
+    public AjaxResult getWorkCode(){
+        return AjaxResult.success(iInitService.getWorkCode());
+    }
 }

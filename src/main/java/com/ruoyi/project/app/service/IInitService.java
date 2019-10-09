@@ -19,4 +19,10 @@ public interface IInitService {
      * @return
      */
     List<Menu> initMenu(Index index);
+
+    /**
+     * 获取工单号
+     * @return 工单号
+     */
+    String getWorkCode();
 }
