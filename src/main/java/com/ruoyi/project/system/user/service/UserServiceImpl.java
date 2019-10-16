@@ -607,4 +607,14 @@ public class UserServiceImpl implements IUserService {
         }
         return null;
     }
+
+    /**
+     * 更新用户语言版本
+     * @param user 用户信息
+     * @return 结果
+     */
+    @Override
+    public int updateUserLangVersion(User user) {
+        return userMapper.updateUserLangVersion(user);
+    }
 }

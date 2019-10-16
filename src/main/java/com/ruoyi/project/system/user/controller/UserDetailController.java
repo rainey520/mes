@@ -1,13 +1,11 @@
 package com.ruoyi.project.system.user.controller;
 
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.service.IDevCompanyService;
-import com.ruoyi.project.device.devUser.service.IDevUserService;
-import com.ruoyi.project.system.menu.domain.Menu;
-import com.ruoyi.project.system.menu.service.IMenuService;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 /**
  * 用户个人设置控制层
@@ -48,6 +45,9 @@ public class UserDetailController extends BaseController {
         mmap.put("user", userService.selectUserById(user.getUserId()));
         mmap.put("company", devCompany);
         mmap.put("copyrightYear", ruoYiConfig.getCopyrightYear());
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix +"/userDetailEn";
+        }
         return prefix +"/userDetail";
     }
 

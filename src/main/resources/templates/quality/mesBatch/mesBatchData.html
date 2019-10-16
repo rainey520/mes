@@ -46,9 +46,9 @@
                                     <div class="col-sm-3">
                                         <span>产线：</span><span th:utext="${mesData.lineNamePro != null ? mesData.lineNamePro:'--'}"></span>
                                     </div>
-                                    <!--<div class="col-sm-3">-->
-                                        <!--<span>生产数量：</span><span th:utext="${mesData.workNumber != null ? mesData.workNumber:'&#45;&#45;'}"></span>-->
-                                    <!--</div>-->
+                                    <div class="col-sm-3">
+                                        <span>生产数量：</span><span th:utext="${mesData.workNumber != null ? mesData.workNumber:'--'}"></span>
+                                    </div>
                                     <div class="col-sm-3">
                                         <span>开始时间：</span><span>[[${#dates.format(mesData.startTimePro, 'yyyy-MM-dd HH:mm')}]]</span>
                                     </div>

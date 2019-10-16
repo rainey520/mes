@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        h3 {
+            text-align: center;
+            font-size: 16px;
+            margin: 10px;
+        }
+
+    </style>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <div class="ibox float-e-margins">
+        <div>
+            <div class="panel-body">
+                <div class="panel-group" th:if="${mesData != null && mesData.mesSign == 0}">
+                    <!--正向追溯开始-->
+                    <div class="row" id="initData">
+                        <div class="col-sm-12">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading" style="text-align: center;padding: 0px;min-height: 20px">
+                                    <span style="font-weight: bold;font-size: large">MES Main code information</span>
+                                </div>
+                                <div class="panel-body" style="max-height: 650px;overflow-y: scroll;font-size: 16px;margin-top: 1px">
+                                    <div class="col-sm-3">
+                                        <span>Master code：</span><span th:style="${mesData.proMesCode == mesCode?'color:red':''}" th:utext="${mesData.proMesCode != null?mesData.proMesCode:'--'}"></span>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <span>Product Code：</span><span th:utext="${mesData.productCodePro != null ? mesData.productCodePro:'--'}"></span>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <span>Product Name：</span><span th:utext="${mesData.productNamePro != null ? mesData.productNamePro:'--'}"></span>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <span>Work order number：</span><span th:utext="${mesData.workCodePro != null ? mesData.workCodePro:'--'}"></span>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <span>line：</span><span th:utext="${mesData.lineNamePro != null ? mesData.lineNamePro:'--'}"></span>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <span>Quantity of production：</span><span th:utext="${mesData.workNumber != null ? mesData.workNumber:'--'}"></span>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <span>startTime：</span><span>[[${#dates.format(mesData.startTimePro, 'yyyy-MM-dd HH:mm')}]]</span>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <span>startTime：</span><span>[[${#dates.format(mesData.endTimePro, 'yyyy-MM-dd HH:mm')}]]</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" style="margin-top: 5px;">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading" style="text-align: center;padding: 0px;min-height: 20px">
+                                    <span style="font-weight: bold;">Trace details</span>
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th width="35%">Material code</th>
+                                            <th width="35%">Batch Information</th>
+                                            <th width="35%">batch quantity</th>
+                                            <!--<th width="20%">批次二维码</th>-->
+                                        </tr>
+                                        </thead>
+                                        <tbody id="add-mesBatchDetail-body" th:if="${not #lists.isEmpty(mesData.mesProList) && (mesData.mesProList).size() > 0}">
+                                        <tr th:each="item:${mesData.mesProList}" th:if="${item.batchCode != null}">
+                                            <td>
+                                                <span th:utext="${item.materielCode}"></span>
+                                            </td>
+                                            <td>
+                                                <span name="batchCode" th:utext="${item.batchCode}"></span>
+                                            </td>
+                                            <td>
+                                                <span  th:utext="${item.mesNumber}"></span>
+                                            </td>
+                                            <!--<td name="erweima">-->
+                                                <!--<div name="qr-code-div" style="display: none">-->
+
+                                                <!--</div>-->
+                                                <!--<div name="qr-code-img">-->
+
+                                                <!--</div>-->
+                                            <!--</td>-->
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12" th:if="${mesData != null}">
+                        <div class="form-group">
+                            <div style="margin-top: 20px;text-align: center">&nbsp;&nbsp;
+                                <a class="btn btn-primary btn-rounded" href="javascript:void(0)" onclick="dayin()"><i class="fa fa-eye"></i>preview MES</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!--正向追溯结束-->
+                </div>
+                <div class="panel panel-primary" style="text-align: center" th:if="${mesData == null}">
+                    <h1 style="color: red">The batch number you entered does not have relevant MES traceability information</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/js/jqueryqr.js}"></script>
+<script th:src="@{/js/qrcode.js}"></script>
+<script th:inline="javascript">
+    // $(function () {
+    //     initMesCode();
+    // })
+    // var i = 1;
+    // function initMesCode() {
+    //     $("#add-mesBatchDetail-body").find("tr").each(function () {
+    //         var code = '<div id="container'+i+'">' +
+    //             '        <canvas  width="110" height="110"></canvas>' +
+    //             '    </div>'
+    //
+    //         $(this).find("div[name='qr-code-div']").append(code);
+    //          var code = $(this).find("span[name='batchCode']").text();
+    //         $('#container'+i).erweima({
+    //             fill:"#000",
+    //             size:110,
+    //             text:code,
+    //             label:'请扫码'
+    //         });
+    //         i++;
+    //         $(this).find("td[name='erweima']").find("div[name='qr-code-img']").children().remove();
+    //         var item = '<img src="'+ $(this).find("canvas")[0].toDataURL() +'" />';
+    //         $(this).find("td[name='erweima']").find("div[name='qr-code-img']").append(item);
+    //     })
+    // }
+    // 打印
+    function dayin() {
+        var userAgent = navigator.userAgent.toLowerCase(); //取得浏览器的userAgent字符串
+        if (userAgent.indexOf("trident") > -1) {
+            alert("请使用google或者360浏览器打印");
+            return false;
+        } else if (userAgent.indexOf('msie') > -1) {
+            var onlyChoseAlert = simpleAlert({
+                "content": "请使用Google或者360浏览器打印",
+                "buttons": {
+                    "确定": function () {
+                        onlyChoseAlert.close();
+                    }
+                }
+            })
+            alert("请使用google或者360浏览器打印");
+            return false;
+        } else {//其它浏览器使用lodop
+            var oldstr = document.body.innerHTML;
+            var headstr = "<html><head><title></title></head><body>";
+            var footstr = "</body>";
+            //此处id换为你自己的id
+            var printData = document.getElementById("initData").innerHTML; //获得 div 里的所有 html 数据
+            document.body.innerHTML = headstr + printData + footstr;
+            window.print();
+            document.body.innerHTML = oldstr;
+        }
+    }
+</script>
+</body>
+</html>

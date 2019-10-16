@@ -206,4 +206,11 @@ public interface IUserService
      * @return
      */
     String selectUserInfo(Integer uid);
+
+    /**
+     * 更新用户语言版本
+     * @param user 用户信息
+     * @return 结果
+     */
+    int updateUserLangVersion(User user);
 }

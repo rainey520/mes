@@ -1,0 +1,117 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-devProductList-edit" th:object="${product}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">productCode：</label>
+				<div class="col-sm-8">
+					<input id="productCode" th:field="*{productCode}"  name="productCode" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">productModel：</label>
+				<div class="col-sm-8">
+					<input id="productModel" th:field="*{productModel}"  name="productModel" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">productName：</label>
+				<div class="col-sm-8">
+					<input id="productName" th:field="*{productName}" name="productName" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">standardHourYield[UPH]：</label>
+				<div class="col-sm-8">
+					<input id="standardHourYield" th:field="*{standardHourYield}" name="standardHourYield" class="form-control" type="number">
+				</div>
+			</div>
+			<!--<div class="form-group">-->
+				<!--<label class="col-sm-3 control-label">产品单价：</label>-->
+				<!--<div class="col-sm-8">-->
+					<!--<input id="price" th:field="*{price}" name="price" class="form-control" type="text">-->
+				<!--</div>-->
+			<!--</div>-->
+			<!--<div class="form-group">-->
+				<!--<label class="col-sm-3 control-label">产品单位：</label>-->
+				<!--<div class="col-sm-8">-->
+					<!--<input id="unit" th:field="*{unit}" name="unit" class="form-control" type="text">-->
+				<!--</div>-->
+			<!--</div>-->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">remark：</label>
+				<div class="col-sm-8">
+					<textarea id="remark" name="remark" th:field="*{remark}" rows="4" class="form-control" type="text"></textarea>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "product";
+		$("#form-devProductList-edit").validate({
+			rules:{
+                productCode:{
+                    required:true,
+                    remote: {
+                        url: prefix + "/checkProductCodeUnique",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            name: function () {
+                                return $.common.trim($("#productCode").val());
+                            },
+							id: function () {
+                                return $.common.trim($("#id").val());
+                            }
+                        },
+                        dataFilter: function (data, type) {
+                            return $.validate.unique(data);
+                        }
+                    }
+                },
+				productName:{
+					required:true,
+				},
+				productModel:{
+					required:true,
+				},
+				standardHourYield:{
+					required:true,
+				},
+				// price:{
+				// 	required:true,
+				// }
+			},
+            messages: {
+				"productCode": {
+					required:"Please enter the product code",
+					remote: "Product code already exists"
+				},
+				productName:{
+					required:"Please enter the product name.",
+				},
+				productModel:{
+					required:"Please enter product model",
+				},
+				standardHourYield:{
+					required:"Please enter standard working hours",
+				},
+				// price:{
+				// 	required:"请输入产品单价",
+				// }
+            }
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-devProductList-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

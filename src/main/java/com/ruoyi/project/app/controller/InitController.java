@@ -28,7 +28,7 @@ public class InitController extends BaseController {
     public AjaxResult ajaxLogin(@RequestBody User user) {
         try {
             System.out.println(user);
-            return loginService.login(user.getLoginName(),user.getPassword());
+            return loginService.login(user.getLoginName(), user.getPassword(), user.getLangVersion());
         } catch (AuthenticationException e) {
             String msg = "用户或密码错误";
             if (StringUtils.isNotEmpty(e.getMessage())) {
@@ -42,27 +42,29 @@ public class InitController extends BaseController {
 
     /**
      * 获取当天工单、菜单权限、公司信息
+     *
      * @return
      */
     @PostMapping("/index")
-    public AjaxResult initIndex(@RequestBody Index index){
+    public AjaxResult initIndex(@RequestBody Index index) {
         try {
             return AjaxResult.success(iInitService.initIndex(index));
-        }catch (Exception e){
+        } catch (Exception e) {
             return error(e.getMessage());
         }
     }
 
     /**
      * 获取菜单
+     *
      * @param index
      * @return
      */
     @PostMapping("/menu")
-    public AjaxResult initMenu(@RequestBody Index index){
+    public AjaxResult initMenu(@RequestBody Index index) {
         try {
             return AjaxResult.success(iInitService.initMenu(index));
-        }catch (Exception e){
+        } catch (Exception e) {
             return error(e.getMessage());
         }
     }
@@ -71,7 +73,7 @@ public class InitController extends BaseController {
      * 获取工单号的接口
      */
     @RequestMapping("/getWorkCode")
-    public AjaxResult getWorkCode(){
+    public AjaxResult getWorkCode() {
         return AjaxResult.success(iInitService.getWorkCode());
     }
 }

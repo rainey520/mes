@@ -87,6 +87,14 @@ public interface DevProductListMapper {
     List<DevProductList> selectProductAllByCompanyId(@Param("companyId") Integer companyId, @Param("sign") int sign);
 
     /**
+     * 查询公司配置过规则的所有产品信息
+     * @param companyId 公司id
+     * @param sign 标记
+     * @return 结果
+     */
+    List<DevProductList> selectAllProductByRuleId(@Param("companyId") Integer companyId, @Param("sign") int sign);
+
+    /**
      * 通过产品id查询产品信息
      *
      * @param productId 产品id

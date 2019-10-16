@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/footable/footable.core.css}" rel="stylesheet"/>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="col-sm-5">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title" style="background-color: #00a65a">
+                <h5 style="color: #0a0a0a">Picture carousel setting</h5>
+            </div>
+            <div>
+                <div class="ibox-content" th:if="${picList != null}">
+                    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" data-interval="10000">
+                        <ol class="carousel-indicators">
+                            <li th:each="item,start:${picList}" data-target="#carousel-example-generic"
+                                th:data-slide-to="${start.index}" th:class="${start.index ==0?'active':''}"></li>
+                        </ol>
+                        <div class="carousel-inner" role="listbox">
+                            <div th:class="${start.index ==0?'item active':'item'}" th:each="item,start:${picList}">
+                                <img alt="image" class="img-responsive" style="width:100%;height: 350px;"
+                                     th:src="${item.filePath}">
+                            </div>
+                        </div>
+                        <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+                            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+                            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content profile-content" th:if="${picList == null}">
+                    <div class="user-button">
+                        <div class="row" style="text-align: center">
+                            <h3>Unuploaded Rotary Pictures</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="ibox-content profile-content">
+                    <div class="user-button">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <button onclick="comPicture()" type="button" class="btn btn-w-m btn-primary btn-block">
+                                    Manage Rotary Pictures
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:src="@{/ajax/libs/select/select2.js}"></script>
+<script th:src="@{/ajax/libs/cropbox/cropbox.js}"></script>
+<script th:src="@{/ajax/libs/footable/footable.all.min.js}"></script>
+<script th:inline="javascript">
+    var prefix = ctx + "device/devCompany";
+
+    /**
+     * 公司LOGO修改
+     */
+    function comLogo() {
+        var url = prefix + '/comLogo';
+        $.modal.open("Modify company LOGO", url);
+    }
+
+    /**
+     * 公司轮播图修改
+     */
+    function comPicture() {
+        var url = prefix + '/comPicture';
+        $.modal.open("Modify the company's rotation plan", url);
+    }
+
+
+</script>
+</body>
+</html>

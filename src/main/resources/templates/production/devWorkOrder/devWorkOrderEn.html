@@ -1,0 +1,487 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+
+                        <li>
+                            line：
+                            <select name="lineId" id="lineId" class="kuan"
+                                    th:with="productionLine=${@productionLine.selectAllProductionLineByCompanyId()}">
+                                <option value="">All</option>
+                                <option th:each="line : ${productionLine}" th:text="${line.lineName}"
+                                        th:value="${line.Id}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            product：
+                            <select id="productName" name="productName"
+                                    th:with="productList=${@product.selectProductAllByCompanyId(-1)}">
+                                <option value="">All</option>
+                                <option th:each="pro : ${productList}" th:text="${pro.productName +'-'+pro.productCode}"
+                                        th:value="${pro.productName}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            Person liable：
+                            <select style="width: 200px" id="deviceLiable" name="deviceLiable" class="kuan"
+                                    th:with="user=${@user.selectComAllUser()}">
+                                <option value="">All</option>
+                                <option th:each="u : ${user}" th:text="${u.userName}" th:value="${u.userId}"></option>
+                            </select>
+                        </li>
+
+                        <li>
+                            Production state：
+                            <select style="width: 200px" name="workorderStatus">
+                                <option value="">all</option>
+                                <option value="0">Not begin</option>
+                                <option value="1">beginning</option>
+                                <option value="2">Completed</option>
+                            </select>
+                        </li>
+
+                        <li>
+                            Work order number：<input type="text" style="max-width: 200px" name="workorderNumber"/>
+                        </li>
+                        <li class="select-time">
+                            <label>Planning start time： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="startTime"
+                                   name="params[beginTime]"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="endTime"
+                                   name="params[endTime]"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;search</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="formReset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;reset</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="addWork()" shiro:hasPermission="device:devWorkOrder:add">
+                <i class="fa fa-plus"></i> add
+            </a>
+            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="device:devWorkOrder:export">
+                <i class="fa fa-download"></i> export
+            </a>
+            <a class="btn btn-primary" onclick="showLine()" shiro:hasPermission="production:productionLine:list">
+                <i class="fa fa-bars"></i> lineList
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script th:inline="javascript">
+    $("select").select2({
+        width: 100
+    })
+    $(".kuan").select2({
+        width: 160
+    })
+    $("select[name='productName']").select2({
+        width: 200
+    })
+
+    // 重置搜索表单信息
+    function formReset() {
+        $('#formId')[0].reset();//input标签重置
+        $("select").val(null).trigger("change"); // select2标签重置
+    }
+
+    var editFlag = [[${@permission.hasPermi('device:devWorkOrder:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('device:devWorkOrder:remove')}]];
+    var configMes = [[${@permission.hasPermi('device:devWorkOrder:configMes')}]];
+    var produceMes = [[${@permission.hasPermi('device:devWorkOrder:produceMes')}]];
+    var prefix = ctx + "device/devWorkOrder";
+
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "workOrder",
+            search: false,
+            showExport: false,
+            showSearch: true,
+            showRefresh: true,
+            showColumns: false,
+            showToggle: true,
+            sortName:'createTime',
+            sortOrder:'desc',
+            columns: [
+                {
+                    field: 'id',
+                    title: '',
+                    visible: false
+                },
+                {
+                    field: 'workSign',
+                    title: '',
+                    visible: false
+                },
+                {
+                    field: 'param1',
+                    title: 'line',
+                    formatter: function (value, row, index) {
+                        // if(row.resSign == 0){
+                        //     return '<a class="btn btn-danger btn-xs" href="#" onclick="configWork(' + row.id + ',\''+value+'\')">' + value + '</a>';
+                        // }else if(row.resSign == 1){
+                        //     return '<a class="btn btn-success btn-xs" href="#" onclick="configWork(' + row.id + ',\''+value+'\')">' + value + '</a>';
+                        // }
+                        return value;
+                    }
+                },
+                {
+                    field: 'workorderNumber',
+                    title: 'workorderNumber',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        if (row.abolish == 1) {
+                            return '<span style="color: red;font-weight: bold">' + value + '</span>'
+                        }
+                        return '<span style="font-weight: bold;color:#1E0FBE">' + value + '</span>';
+                    }
+                },
+                {
+                    title: 'MES Operation',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.abolish == 0) {
+                            actions.push('<a class="btn btn-primary btn-xs ' + configMes + '" href="javascript:void(0)" onclick="woConfigMes(\'' + row.id + '\',\'' + row.workorderNumber + '\')"><i></i>Warehouse</a> ');
+                            actions.push('<a class="btn btn-success btn-xs ' + produceMes + '" href="javascript:void(0)" onclick="mesProduce(\'' + row.id + '\',\'' + row.workorderNumber + '\')"><i></i>production</a> ');
+                        }
+                        return actions.join('');
+                    }
+                },
+                {
+                    field: 'workorderStatus',
+                    title: 'status',
+                    formatter: function (value, row, index) {
+                        if (row.abolish == 1) {
+                            return '<span style="font-weight: bold;color: red">Invalid</span>'
+                        }
+                        if (row.workorderStatus == 0) {
+                            return '<span style="font-weight: bold;color: blue">Not begin</span>';
+                        } else if (row.workorderStatus == 1) {
+                            return '<span style="font-weight: bold;color: green">beginning</span>';
+                        } else if (row.workorderStatus == 2) {
+                            return '<span style="font-weight: bold;color: orangered">Completed</span>';
+                        }
+                    }
+                },
+                {
+                    field: 'productCode',
+                    title: 'productCode',
+                    sortable: true
+                },
+                {
+                    field: 'productionStart',
+                    title: 'Planning start time',
+                    sortable: true
+                },
+                {
+                    field: 'createTime',
+                    title: 'createTime',
+                    sortable: true
+                },
+                {
+                    // field: 'operationStatus',
+                    title: 'State management',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.abolish == 0) {
+
+                            // 工单操作状态判断
+                            if (row.operationStatus == 0 || row.operationStatus == 2) {
+                                actions.push('<a class="btn btn-warning btn-xs ' + editFlag + '" id="editStatus' + row.id + '" href="javascript:void(0)" onclick="editStatus(\'' + row.id + '\')"><i></i>start</a> ');
+                            } else if (row.operationStatus == 1) {
+                                actions.push('<a class="btn btn-primary btn-xs ' + editFlag + '" id="editStatus' + row.id + '" href="javascript:void(0)" onclick="editStatus(\'' + row.id + '\')"><i></i>stop</a> ');
+                            } else if (row.operationStatus == 3) { // 工单结束，按钮不可点击
+                                actions.push('<a class="btn btn-danger btn-xs ' + editFlag + '" href="javascript:void(0)" disabled="true"><i></i>finish</a> ');
+                            }
+                            // 工单结束状态
+                            if (row.workorderStatus == 2 || row.workorderStatus == 0) { // 未开始和已经完成的工单完成不可点击
+                                actions.push('<a class="btn btn-danger btn-xs ' + editFlag + '" href="javascript:void(0)" disabled="true"><i></i>complete</a> ');
+                            } else {
+                                actions.push('<a class="btn btn-primary btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="finishWorkerOrder(\'' + row.id + '\')"><i></i>finish</a> ');
+                            }
+                        }
+                        return actions.join('');
+                    }
+                },
+                {
+                    title: 'Work management',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        // 只有生产状态处于未生产的工单才允许删除
+                        if (row.workorderStatus == 0) {
+                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i></i>remove</a> ');
+                        } else {
+                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" disabled="true"><i></i>remove</a> ');
+                        }
+                        return actions.join('');
+                    }
+                }
+            ]
+        };
+        $.table.init(options);
+    });
+
+    /**
+     * 跳转到添加页面
+     */
+    function addWork() {
+        var url = prefix + "/add";
+        // createMenuItem(url, "新建工单");
+        $.modal.open("add work", url,800,500);
+    }
+
+    /**
+     * 跳转到产线页面
+     */
+    function showLine() {
+        var url = ctx + "production/productionLine/showLine";
+        $.modal.open("查看产线", url);
+    }
+
+    // 修改开始暂停状态
+    function editStatus(id) {
+        var x = document.getElementById("editStatus" + id);
+        // 通过.innerText获取不同的当前状态类型
+        if (x.innerText == "start") {
+            $.modal.confirm("Do you confirm the beginning?", function () {
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    dataType: 'json',
+                    url: prefix + "/editWorkerOrderById", // 一点击开始，工单数据进行初始化
+                    data: {
+                        "id": id,
+                    },
+                    async: false,
+                    error: function (request) {
+                        $.modal.alertError("系统错误");
+                    },
+                    success: function (data) {
+                        if (data.code == 0) {
+                            $.modal.alertWarning("Work orders have begun....");
+                            $.table.refresh(); // 重新刷新
+                        } else {
+                            $.modal.alertError(data.msg);
+                        }
+                    }
+                });
+            });
+        } else if (x.innerText == "stop") {
+            $.modal.confirm("Confirm the suspension", function () {
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    dataType: 'json',
+                    url: prefix + "/editWorkerOrderById",
+                    data: {
+                        "id": id,
+                    },
+                    async: false,
+                    error: function (request) {
+                        $.modal.alertError("系统错误");
+                    },
+                    success: function (data) {
+                        if (data.code == 0) {
+                            $.modal.alertWarning("Work orders have been suspended...");
+                            $.table.refresh();
+                        } else {
+                            $.modal.alertError(data.msg);
+                        }
+                    }
+                });
+            });
+        }
+    }
+    function configWork(id,name) {
+        createMenuItem("/production/workstation/work/"+id,name+"--ASOP更新状态");
+    }
+    /**
+     * 提交工单确认工单
+     * @param id
+     */
+    function submitWorkOrder(id) {
+        $.modal.confirm("提交工单不可进行修改删除，确认执行该操作吗？", function () {
+            $.ajax({
+                type: 'POST',
+                url: prefix + '/submitWorkOrder',
+                dataType: 'json',
+                data: {
+                    id: id
+                },
+                async: false,  //同步请求，
+                success: function (result) {
+                    if (result.code == 0) {
+                        $.modal.alertWarning("工单已经提交了");
+                        $.table.refresh();
+                    } else {
+                        $.modal.alertError(result.msg);
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * 结束工单
+     * @param id
+     */
+    function finishWorkerOrder(id) {
+        $.modal.confirm("Do you confirm the closure of the order?", function () {
+
+            $.ajax({
+                type: 'POST',
+                url: prefix + '/finishWorkerOrder',
+                dataType: 'json',
+                data: {
+                    id: id
+                },
+                async: false,  //同步请求，
+                success: function (result) {
+                    if (result.code == 0) {
+                        $.modal.alertWarning("The work order is over.");
+                        $.table.refresh();
+                    } else {
+                        $.modal.alertError(result.msg);
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * 工单变更
+     * @param id
+     */
+    function toChange(id, code) {
+        createMenuItem("/production/workOrderChange?order_id=" + id, "工单 " + code + " 变更")
+    }
+
+    /**
+     * 查询工单ecn
+     * @param id
+     */
+    function ecnView(id) {
+        $.modal.open("ECN详情", prefix + "/workecn?workId=" + id, 800, 400)
+    }
+
+    /**
+     * 工单合并
+     */
+    function merge() {
+        var rows = $.table.selectColumns("id");
+        $.modal.confirm("确定合并选中的工单吗", function (e) {
+            if (e) {
+                var config = {
+                    url: prefix + '/merge/verif',
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        workids: rows,
+                        type: 0,
+                    },
+                    beforeSend: function () {
+                        $.modal.loading("正在处理中，请稍后...");
+                        $.modal.disable();
+                    },
+                    success: function (result) {
+                        if (result.code == web_status.SUCCESS) {
+                            $.modal.open("工单合并", prefix + "/merge/page?workids=" + JSON.stringify(rows).replace("[", "").replace("]", ""));
+                        } else {
+                            $.modal.alertError(result.msg);
+                        }
+                        $.modal.closeLoading();
+                        $.modal.enable();
+                    }
+                };
+                $.ajax(config)
+            }
+        })
+    }
+
+    /**
+     * 拆单
+     */
+    function dismantle() {
+        var rows = $.table.selectColumns("id");
+        $.modal.confirm("确定将该工单拆除吗", function (e) {
+            if (e) {
+                var config = {
+                    url: prefix + '/merge/verif',
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        workids: rows,
+                        type: 1,
+                    },
+                    beforeSend: function () {
+                        $.modal.loading("正在处理中，请稍后...");
+                        $.modal.disable();
+                    },
+                    success: function (result) {
+                        if (result.code == web_status.SUCCESS) {
+                            createMenuItem(prefix + "/dismantle?id=" + rows[0], "拆除工单")
+                        } else {
+                            $.modal.alertError(result.msg);
+                        }
+                        $.modal.closeLoading();
+                        $.modal.enable();
+                    }
+                };
+                $.ajax(config)
+            }
+        })
+    }
+
+    function edit(id, sign) {
+        $.modal.open("修改工单", prefix + "/edit/" + id, 800, sign == 0 ? 800 : 600)
+    }
+
+
+
+
+    /**
+     * 工单MES配料
+     */
+    function woConfigMes(id, code) {
+        var url = prefix + "/woConfigMes?id=" + id;
+        createMenuItem(url, code + "--MES Hair feed");
+    }
+
+    /**
+     * 工单MES生产
+     */
+    function mesProduce(id,code) {
+        var url = prefix + "/mesProduce?id=" + id;
+        createMenuItem(url, code + "--MES production");
+    }
+
+</script>
+</body>
+</html>

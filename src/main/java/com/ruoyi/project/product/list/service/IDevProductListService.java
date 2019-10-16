@@ -71,6 +71,13 @@ public interface IDevProductListService
 	public List<DevProductList> selectProductAllByCompanyId(int sign);
 
 	/**
+	 * 查询公司配置过mes规则的产品列表
+	 * @param sign 标记
+	 * @return 结果
+	 */
+	public List<DevProductList> selectAllProductByRuleId(int sign);
+
+	/**
 	 * 通过产品id查询产品信息
 	 * @param productId
 	 * @return

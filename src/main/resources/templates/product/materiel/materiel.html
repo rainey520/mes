@@ -133,11 +133,11 @@
 					formatter: function(value, row, index) {
 						var actions = [];
 						actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.id + '\')"><i></i>编辑</a> ');
-						if (row.fileFlag == 1 ) { // 已经上传过文件
-                            actions.push('<a class="btn btn-warning btn-xs ' + viewFileFlag + '" href="#" onclick="viewFile(\'' + row.id + '\')"><i class="fa fa-eye"></i>文件管理</a> ');
-						} else { // 未上传文件
-                            actions.push('<a class="btn btn-default btn-xs ' + viewFileFlag + '" href="#" onclick="viewFile(\'' + row.id + '\')"><i class="fa fa-eye"></i>文件管理</a> ');
-						}
+						// if (row.fileFlag == 1 ) { // 已经上传过文件
+                        //     actions.push('<a class="btn btn-warning btn-xs ' + viewFileFlag + '" href="#" onclick="viewFile(\'' + row.id + '\')"><i class="fa fa-eye"></i>文件管理</a> ');
+						// } else { // 未上传文件
+                        //     actions.push('<a class="btn btn-default btn-xs ' + viewFileFlag + '" href="#" onclick="viewFile(\'' + row.id + '\')"><i class="fa fa-eye"></i>文件管理</a> ');
+						// }
 						actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i></i>删除</a>');
 						return actions.join('');
 					}

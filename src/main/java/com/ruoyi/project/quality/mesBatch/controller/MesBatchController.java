@@ -1,6 +1,7 @@
 package com.ruoyi.project.quality.mesBatch.controller;
 
 import com.ruoyi.common.constant.MesConstants;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
@@ -18,6 +19,7 @@ import com.ruoyi.project.quality.mesBatch.domain.MesData;
 import com.ruoyi.project.quality.mesBatch.service.IMesBatchDetailService;
 import com.ruoyi.project.quality.mesBatch.service.IMesBatchService;
 import com.ruoyi.project.quality.mesBatchRule.service.IMesBatchRuleService;
+import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +59,10 @@ public class MesBatchController extends BaseController {
     @RequiresPermissions("mes:mesBatch:view")
     @GetMapping()
     public String mesBatch() {
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/mesBatchEn";
+        }
         return prefix + "/mesBatch";
     }
 
@@ -173,11 +179,15 @@ public class MesBatchController extends BaseController {
      */
     @GetMapping("/selectMesData")
     public String selectMesData(String batchCode, ModelMap map) {
+        User user = JwtUtil.getUser();
         // 查询mes追溯主表
         MesData mesData = mesBatchService.selectMesDataByBatchCode(batchCode);
         // 反追溯
         if (mesData != null && mesData.getMesSign().equals(MesConstants.MES_SIGN_BACK)) {
             map.put("mesCode", batchCode);
+            if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+                return prefix + "/mesBatch1En";
+            }
             return prefix + "/mesBatch1";
             // 正向追溯
         } else {
@@ -185,6 +195,9 @@ public class MesBatchController extends BaseController {
             map.put("mesData", mesData);
             // 无二维码页面
             // return prefix + "/mesData";
+            if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+                return prefix + "/mesBatchDataEn";
+            }
             // 有二维码页面
             return prefix + "/mesBatchData";
         }

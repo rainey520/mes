@@ -126,6 +126,18 @@ public class User extends BaseEntity
     private Integer grade;
 
     private int sign;//标记注册者
+    /**
+     * 语言版本
+     */
+    private Integer langVersion;
+
+    public Integer getLangVersion() {
+        return langVersion;
+    }
+
+    public void setLangVersion(Integer langVersion) {
+        this.langVersion = langVersion;
+    }
 
     public String getLoginTag() {
         return loginTag;

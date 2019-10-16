@@ -1,5 +1,6 @@
 package com.ruoyi.project.product.list.controller;
 
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
@@ -48,6 +49,10 @@ public class DevProductListController extends BaseController {
     @RequiresPermissions("device:devProductList:view")
     @GetMapping()
     public String devProductList() {
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/devProductListEn";
+        }
         return prefix + "/devProductList";
     }
 
@@ -86,6 +91,10 @@ public class DevProductListController extends BaseController {
      */
     @GetMapping("/add")
     public String add() {
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/addEn";
+        }
         return prefix + "/add";
     }
 
@@ -107,6 +116,10 @@ public class DevProductListController extends BaseController {
     public String edit(@PathVariable("id") Integer id, ModelMap mmap) {
         DevProductList devProductList = devProductListService.selectDevProductListById(id);
         mmap.put("product", devProductList);
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/editEn";
+        }
         return prefix + "/edit";
     }
 
@@ -244,6 +257,10 @@ public class DevProductListController extends BaseController {
     @RequiresPermissions("device:devProductList:importConfig")
     public String importProductConfig(int type, ModelMap mmap) {
         mmap.put("config", configService.selectImportConfigByType(type));
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/pconfigEn";
+        }
         return prefix + "/pconfig";
     }
 
@@ -446,6 +463,10 @@ public class DevProductListController extends BaseController {
     public String mesConfig(int id, ModelMap modelMap) {
         modelMap.put("id", id);
         modelMap.put("rule", devProductListService.selectMesBatchRuleByPbId(id));
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/mesConfigEn";
+        }
         return prefix + "/mesConfig";
     }
 

@@ -1,11 +1,13 @@
 package com.ruoyi.project.quality.mesBatchRule.controller;
 
 import com.ruoyi.common.constant.MesConstants;
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
@@ -22,7 +24,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +57,11 @@ public class MesBatchRuleController extends BaseController
 	@GetMapping()
 	public String mesBatchRule()
 	{
-	    return prefix + "/mesBatchRule";
+		User user = JwtUtil.getUser();
+		if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+			return prefix + "/mesBatchRuleEn";
+		}
+		return prefix + "/mesBatchRule";
 	}
 	
 	/**
@@ -92,7 +97,11 @@ public class MesBatchRuleController extends BaseController
 	@GetMapping("/add")
 	public String add()
 	{
-	    return prefix + "/add1";
+		User user = JwtUtil.getUser();
+		if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+			return prefix + "/add1En";
+		}
+		return prefix + "/add1";
 	}
 	
 	/**
@@ -119,7 +128,11 @@ public class MesBatchRuleController extends BaseController
 	{
 		MesBatchRule mesBatchRule = mesBatchRuleService.selectMesBatchRuleById(id);
 		mmap.put("mesBatchRule", mesBatchRule);
-	    return prefix + "/edit1";
+		User user = JwtUtil.getUser();
+		if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+			return prefix + "/edit1En";
+		}
+		return prefix + "/edit1";
 	}
 
 	/**
@@ -130,6 +143,10 @@ public class MesBatchRuleController extends BaseController
 	{
 		MesBatchRule mesBatchRule = mesBatchRuleService.selectMesBatchRuleById(id);
 		mmap.put("mesBatchRule", mesBatchRule);
+		User user = JwtUtil.getUser();
+		if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+			return prefix + "/ruleDetailEn";
+		}
 		return prefix + "/ruleDetail";
 	}
 	
@@ -182,6 +199,10 @@ public class MesBatchRuleController extends BaseController
 		map.put("ruleId",id);
 		map.put("pType",pType);
 		map.put("proList",productListService.selectProductAllByCompanyId(pType));
+		User user = JwtUtil.getUser();
+		if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+			return prefix + "/cfDetailEn";
+		}
 		return prefix + "/cfDetail";
 	}
 

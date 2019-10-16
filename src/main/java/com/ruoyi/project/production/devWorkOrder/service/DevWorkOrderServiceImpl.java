@@ -495,6 +495,8 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     private void updateWork(User user, DevWorkOrder devWorkOrder) {
         // 设置工单的生产状态为已经完成
         devWorkOrder.setWorkorderStatus(WorkConstants.WORK_STATUS_END);
+        // 确认数据
+        devWorkOrder.setWorkSign(WorkConstants.WORK_SIGN_YES);
         // 设置工单的操作状态为结束
         devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_FINISH);
         // 设置结束时间

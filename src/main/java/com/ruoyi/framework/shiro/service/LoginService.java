@@ -47,7 +47,7 @@ public class LoginService
     /**
      * 登录
      */
-    public AjaxResult login(String username, String password)
+    public AjaxResult login(String username, String password,Integer languageVersion)
     {
         // 验证码校验
         if (!StringUtils.isEmpty(ServletUtils.getRequest().getAttribute(ShiroConstants.CURRENT_CAPTCHA)))
@@ -108,6 +108,11 @@ public class LoginService
         // 用户名或者密码错误
         if (!PasswordUtil.matches(user,password)) {
             throw new UserPasswordNotMatchException();
+        }
+        // 更新用户的语言版本
+        if (languageVersion != null) {
+            user.setLangVersion(languageVersion);
+            userService.updateUserLangVersion(user);
         }
         AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);

@@ -128,11 +128,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <!--通过公司id查询该公司所有的产品信息-->
     <select id="selectProductAllByCompanyId" resultType="com.ruoyi.project.product.list.domain.DevProductList">
         select id as Id,product_code as productCode,product_model as productModel,product_name as productName,ecnstatus as ecnStatus, sign as  sign from dev_product_list
-         where company_id = #{companyId} and def_id = 0 and rule_id > 0
+         where company_id = #{companyId} and def_id = 0
           <if test="sign > -1">
               and sign=#{sign}
           </if>
+    </select>
 
+    <!--查询公司配置过规则的所有产品信息-->
+    <select id="selectAllProductByRuleId" resultType="com.ruoyi.project.product.list.domain.DevProductList">
+        select id as Id,product_code as productCode,product_model as productModel,product_name as productName,ecnstatus as ecnStatus, sign as  sign from dev_product_list
+        where company_id = #{companyId} and def_id = 0 and rule_id > 0
+        <if test="sign > -1">
+            and sign=#{sign}
+        </if>
     </select>
 
     <!--通过产品id查询产品编码和标准小时产量-->

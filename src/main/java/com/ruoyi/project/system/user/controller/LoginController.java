@@ -8,7 +8,6 @@ import com.ruoyi.framework.shiro.service.LoginService;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,9 +39,9 @@ public class LoginController extends BaseController {
 
     @PostMapping("/login")
     @ResponseBody
-    public AjaxResult ajaxLogin(String username, String password, Boolean rememberMe) {
+    public AjaxResult ajaxLogin(String username, String password,Integer languageVersion, Boolean rememberMe) {
         try {
-            return loginService.login(username,password);
+            return loginService.login(username,password,languageVersion);
         } catch (AuthenticationException e) {
             String msg = "用户或密码错误";
             if (StringUtils.isNotEmpty(e.getMessage())) {

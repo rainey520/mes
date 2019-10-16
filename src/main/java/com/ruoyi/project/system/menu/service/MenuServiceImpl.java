@@ -47,7 +47,11 @@ public class MenuServiceImpl implements IMenuService {
         if (User.isAdmin(user)) {
             menus = menuMapper.selectMenuNormalAll();
         } else {
-            menus = menuMapper.selectMenusByUserId(user.getUserId());
+            if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+                menus = menuMapper.selectMenusByUserIdEn(user.getUserId());
+            } else {
+                menus = menuMapper.selectMenusByUserId(user.getUserId());
+            }
         }
         return TreeUtils.getChildPerms(menus, 0);
     }
@@ -110,10 +114,14 @@ public class MenuServiceImpl implements IMenuService {
         List<Map<String, Object>> trees = new ArrayList<Map<String, Object>>();
         List<Menu> menuList = new ArrayList<Menu>();
         User u = JwtUtil.getTokenUser(request);
-        if (User.isAdmin(u)) { // 是系统用户查询所有菜单
+        if (User.isAdmin(u)) {
            menuList = menuMapper.selectMenuAll();
         } else{
-            menuList = menuMapper.selectMenuAllByUserId(u.getUserId()); // 不是系统用户查询该角色所拥有的菜单
+            if (UserConstants.LANGUAGE_EN.equals(u.getLangVersion())) {
+                menuList = menuMapper.selectMenuAllByUserIdEn(u.getUserId());
+            } else {
+                menuList = menuMapper.selectMenuAllByUserId(u.getUserId());
+            }
         }
         if (StringUtils.isNotNull(roleId)) {
             List<String> roleMenuList = menuMapper.selectMenuTree(roleId);

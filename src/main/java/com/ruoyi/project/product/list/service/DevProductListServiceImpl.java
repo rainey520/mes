@@ -315,6 +315,18 @@ public class DevProductListServiceImpl implements IDevProductListService {
     }
 
     /**
+     * 查询公司配置过mes规则的产品列表
+     *
+     * @return
+     */
+    @Override
+    public List<DevProductList> selectAllProductByRuleId(int sign) {
+        User user = JwtUtil.getTokenUser(ServletUtils.getRequest());
+        if (user == null) return Collections.emptyList();
+        return devProductListMapper.selectAllProductByRuleId(user.getCompanyId(),sign);
+    }
+
+    /**
      * 通过产品id查询产品信息
      *
      * @param productId

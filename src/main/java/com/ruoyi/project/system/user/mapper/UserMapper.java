@@ -153,4 +153,11 @@ public interface UserMapper
      * @return 结果
      */
     List<UserApp> appSelectUserList(@Param("companyId") Integer companyId);
+
+    /**
+     * 更新用户语言版本
+     * @param user 用户
+     * @return 结果
+     */
+    int updateUserLangVersion(User user);
 }

@@ -1,5 +1,6 @@
 package com.ruoyi.project.production.productionLine.service;
 
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.StringUtils;
@@ -98,10 +99,22 @@ public class ProductionLineServiceImpl implements IProductionLineService {
     @Override
     public int insertProductionLine(ProductionLine productionLine, HttpServletRequest request) {
         User user = JwtUtil.getTokenUser(request);
-        if (user != null) {
-            productionLine.setCompanyId(user.getCompanyId());
-            productionLine.setCreate_by(user.getUserId().intValue());
+        if (user == null) {
+            throw new BusinessException(UserConstants.NOT_LOGIN);
         }
+        // 查看用户公司等级
+        DevCompany company = devCompanyMapper.selectDevCompanyById(JwtUtil.getUser().getCompanyId());
+        if (company == null) {
+            throw new BusinessException("用户所在的公司不存在或者被删除");
+        }
+        if (company.getSign() == 0) {
+            List<ProductionLine> productionLines = productionLineMapper.selectAllDef0(user.getCompanyId());
+            if (StringUtils.isNotEmpty(productionLines) && productionLines.size() >= 3) {
+                throw new BusinessException("非VIP用户最多只能新增三条产线");
+            }
+        }
+        productionLine.setCompanyId(user.getCompanyId());
+        productionLine.setCreate_by(user.getUserId().intValue());
         productionLine.setCreateTime(new Date());
         return productionLineMapper.insertProductionLine(productionLine);
     }

@@ -1,5 +1,6 @@
 package com.ruoyi.project.production.devWorkOrder.controller;
 
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.constant.WorkConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.CodeUtils;
@@ -61,6 +62,10 @@ public class DevWorkOrderController extends BaseController {
     @RequiresPermissions("device:devWorkOrder:view")
     @GetMapping("/lineWorkOrder")
     public String devWorkOrder() {
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/devWorkOrderEn";
+        }
         return prefix + "/devWorkOrder";
     }
 
@@ -114,6 +119,10 @@ public class DevWorkOrderController extends BaseController {
     @GetMapping("/add")
     public String add(ModelMap mmap) {
         mmap.put("workorderNumber", CodeUtils.getWorkOrderCode());
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/add1En";
+        }
         return prefix + "/add1";
     }
 
@@ -510,6 +519,10 @@ public class DevWorkOrderController extends BaseController {
     public String woConfigMes(int id, ModelMap map) {
         map.put("mesCode", CodeUtils.getMesCode());
         map.put("workOrder", devWorkOrderService.selectWorkOrderMesByWId(id));
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/mesConfigEn";
+        }
         return prefix + "/mesConfig";
     }
 
@@ -519,6 +532,10 @@ public class DevWorkOrderController extends BaseController {
     @GetMapping("/mesProduce")
     public String mesProduce(int id, ModelMap map) {
         map.put("workOrder", devWorkOrderService.selectWorkMesOrderByWorkId(id));
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/mesProduceEn";
+        }
         return prefix + "/mesProduce";
     }
 

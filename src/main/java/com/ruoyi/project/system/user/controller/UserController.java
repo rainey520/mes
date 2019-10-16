@@ -1,8 +1,8 @@
 package com.ruoyi.project.system.user.controller;
 
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.ServletUtils;
-import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
@@ -12,7 +12,6 @@ import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.system.post.service.IPostService;
 import com.ruoyi.project.system.role.service.IRoleService;
-import com.ruoyi.project.system.ser.domain.Ser;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.domain.UserApp;
 import com.ruoyi.project.system.user.domain.UserQrCode;
@@ -50,6 +49,10 @@ public class UserController extends BaseController {
     @RequiresPermissions("system:user:view")
     @GetMapping()
     public String user() {
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/userEn";
+        }
         return prefix + "/user";
     }
 
@@ -99,6 +102,9 @@ public class UserController extends BaseController {
         } else {
             mmap.put("roles",roleService.selectRolesByUserId(sysUser.getUserId()));
         }
+        if (UserConstants.LANGUAGE_EN.equals(sysUser.getLangVersion())) {
+            return prefix + "/addEn";
+        }
         return prefix + "/add";
     }
 
@@ -121,6 +127,10 @@ public class UserController extends BaseController {
     public String edit(@PathVariable("userId") Long userId, ModelMap mmap) {
         mmap.put("user", userService.selectUserById(userId));
         mmap.put("roles", roleService.selectRolesByUserId(userId));
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/editEn";
+        }
         return prefix + "/edit";
     }
 

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+<section class="section-content">
+    <div class="ibox-content">
+        <div class="row animated fadeInRight">
+            <div class="col-sm-3 pr5">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title ibox-title-gray dashboard-header gray-bg">
+                        <h5>Personal information</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="text-center">
+                            <p><img id="c_img" width="120" height="120" alt="image" class="img-circle"
+                                    th:src="${user.avatar == ''?'/img/profile.jpg':user.avatar}">
+                            </p>
+                            <p><a href="javascript:avatar()">Modifying head</a></p>
+                        </div>
+                        <ul class="list-group list-group-striped">
+                            <li class="list-group-item"><i class="fa fa-phone"></i>
+                                <b class="font-noraml">Login number：</b>
+                                <p class="pull-right">[[${user.loginName}]]</p>
+                            </li>
+                            <li class="list-group-item"><i class="fa fa-user"></i>
+                                <b class="font-noraml">User name：</b>
+                                <p class="pull-right">[[${user.userName}]]</p>
+                            </li>
+                            <li class="list-group-item"><i class="fa fa-envelope-o"></i>
+                                <b class="font-noraml">email：</b>
+                                <p class="pull-right">[[${user.email}]]</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-9" style="padding-left: 0px">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title ibox-title-gray dashboard-header gray-bg">
+                        <h5>Essential information</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="nav-tabs-custom">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#user_info" data-toggle="tab" aria-expanded="true">Modify personal information</a></li>
+                                <li><a href="#modify_password" data-toggle="tab" aria-expanded="false">Change Password</a></li>
+                                <li th:if="${user.sign == 1}">
+                                    <a href="#modify_company" data-toggle="tab" aria-expanded="false">Modify company information</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <!--用户信息-->
+                                <div class="tab-pane active" id="user_info">
+                                    <form class="form-horizontal" id="form-user-edit">
+                                        <!--隐藏用户ID-->
+                                        <input name="userId" id="userId" type="hidden" th:value="${user.userId}"/>
+                                        <br>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Login mobile number：</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" autocomplete="off" class="form-control"
+                                                       readonly="true" name="loginName" id="loginName"
+                                                       th:value="${user.loginName}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">User name：</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" autocomplete="off" class="form-control"
+                                                       name="userName" placeholder="Please enter a user name" id="userName"
+                                                       th:value="${user.userName}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">email：</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" autocomplete="off" class="form-control" name="email"
+                                                       id="email"
+                                                       th:value="${user.email}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Gender：</label>
+                                            <div class="col-sm-10" id="user-sex">
+                                                <div class="radio-box">
+                                                    <input type="radio" id="radio1" th:checked="${user.sex=='0'}"
+                                                           name="sex" value="0">
+                                                    <label for="radio1">male</label>
+                                                </div>
+                                                <div class="radio-box">
+                                                    <input type="radio" id="radio2" th:checked="${user.sex=='1'}"
+                                                           name="sex" value="1">
+                                                    <label for="radio2">female</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-2 col-sm-10">
+                                                <button type="button" class="btn btn-sm btn-primary"
+                                                        onclick="submitUserInfo()"><i class="fa fa-check"></i>save
+                                                </button>&nbsp;
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!--修改公司信息-->
+                                <div class="tab-pane" id="modify_company">
+                                    <form class="form-horizontal" id="form-company-edit">
+                                        <input type="hidden" id="companyId" name="companyId"
+                                               th:value="${company.companyId}">
+                                        <br>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">company name：</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" autocomplete="off" class="form-control"
+                                                       name="comName" id="comName"
+                                                       th:value="${company.comName}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">company address：</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" autocomplete="off" class="form-control"
+                                                       name="comAddress" id="comAddress"
+                                                       th:value="${company.comAddress}">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-2 col-sm-10">
+                                                <button type="button" class="btn btn-sm btn-primary"
+                                                        onclick="editCompany()"><i class="fa fa-check"></i>save
+                                                </button>&nbsp;
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!--修改密码-->
+                                <div class="tab-pane" id="modify_password">
+                                    <form class="form-horizontal" id="form-user-resetPwd">
+                                        <br>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">old password：</label>
+                                            <div class="col-sm-10">
+                                                <input type="password" class="form-control" id="oldPassword"
+                                                       name="oldPassword" placeholder="Please enter the old password">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">new password：</label>
+                                            <div class="col-sm-10">
+                                                <input type="password" class="form-control" name="newPassword"
+                                                       id="newPassword" placeholder="Please enter a new password">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">confirm password：</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="password" name="confirm"
+                                                       id="confirm"
+                                                       placeholder="Please confirm your password.">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-2 col-sm-10">
+                                                <button type="button" class="btn btn-sm btn-primary"
+                                                        onclick="submitChangPassword()"><i class="fa fa-check"></i>Change password
+                                                </button>&nbsp;
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div th:include="include::footer"></div>
+<script th:src="@{/ajax/libs/select/select2.js}"></script>
+<script th:src="@{/ajax/libs/cropbox/cropbox.js}"></script>
+<script th:inline="javascript">
+
+    /**
+     * 用户头像修改
+     */
+    function avatar() {
+        var url = ctx + 'system/user/profile/avatar';
+        $.modal.open("修改头像", url);
+    }
+
+    /**
+     * 用户信息修改
+     */
+    $("#form-user-edit").validate({
+        rules: {
+            userName: {
+                required: true,
+            },
+            email: {
+                email: true,
+                remote: {
+                    url: ctx + "system/user/checkEmailUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        "userId": function () {
+                            return $("#userId").val();
+                        },
+                        "email": function () {
+                            return $.common.trim($("#email").val());
+                        }
+                    },
+                    dataFilter: function (data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            },
+        },
+        messages: {
+            "email": {
+                remote: "Email already exists"
+            },
+        }
+    });
+
+    function submitUserInfo() {
+        if ($.validate.form("form-user-edit")) {
+            var data={
+                userId:$("#userId").val(),
+                userName:$("#userName").val(),
+                email:$("#email").val(),
+                sex:$("#user-sex input[name='sex']:checked").val()
+            }
+            toPost(data,ctx + "system/user/profile/update")
+        }
+    }
+
+    /**
+     * 公司信息修改
+     */
+    $("#form-company-edit").validate({
+        rules: {
+            comName: {
+                required: true,
+                remote: {
+                    url: ctx + "device/devCompany/checkComNameUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        "companyId": function () {
+                            return $.common.trim($("#companyId").val());
+                        },
+                        "comName": function () {
+                            return $.common.trim($("#comName").val());
+                        }
+                    },
+                    dataFilter: function (data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            },
+        },
+        messages: {
+            "comName": {
+                remote: "Company name already exists"
+            }
+        }
+    })
+
+    function editCompany(){
+        if ($.validate.form("form-company-edit")) {
+            var data ={
+                companyId:$("#companyId").val(),
+                comName:$("#comName").val(),
+                comAddress:$("#comAddress").val()
+            }
+            toPost(data,ctx + "device/devCompany/edit")
+        }
+    }
+
+    /**
+     * 用户密码修改
+     */
+    $("#form-user-resetPwd").validate({
+        rules: {
+            oldPassword: {
+                required: true,
+                remote: {
+                    url: ctx + "system/user/profile/checkPassword",
+                    type: "get",
+                    dataType: "json",
+                    data: {
+                        password: function () {
+                            return $("input[name='oldPassword']").val();
+                        }
+                    }
+                }
+            },
+            newPassword: {
+                required: true,
+                minlength: 5,
+                maxlength: 20
+            },
+            confirm: {
+                required: true,
+                equalTo: "#newPassword"
+            }
+        },
+        messages: {
+            oldPassword: {
+                required: "Please enter the original password.",
+                remote: "Error in original password"
+            },
+            newPassword: {
+                required: "Please enter a new password",
+                minlength: "Password must not be less than 6 characters",
+                maxlength: "Password cannot be greater than 20 characters"
+            },
+            confirm: {
+                required: "Please enter the new password again.",
+                equalTo: "Two inconsistent password input"
+            }
+        }
+    });
+
+    function submitChangPassword() {
+        if ($.validate.form("form-user-resetPwd")) {
+            var data ={
+                userId:$("#userId").val(),
+                newPassword:$("#newPassword").val(),
+                oldPassword:$("#oldPassword").val()
+            }
+            toPost(data,ctx + "system/user/profile/resetPwd");
+        }
+    }
+
+    function toPost(data,url) {
+        var config = {
+            url: url,
+            type: "post",
+            dataType: "json",
+            data: data,
+            beforeSend: function () {
+                $.modal.loading("In process, please wait a moment....");
+                $.modal.disable();
+            },
+            success: function (result) {
+                if (result.code == web_status.SUCCESS) {
+                    $.modal.msgSuccess("Save successfully, please wait a moment……");
+                } else {
+                    $.modal.alertError(result.msg);
+                }
+                $.modal.closeLoading();
+                $.modal.enable();
+            }
+        };
+        $.ajax(config)
+    }
+
+</script>
+</body>
+</html>

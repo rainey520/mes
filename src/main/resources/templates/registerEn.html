@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <head th:include="include :: header"></head>
+    <title>MES</title>
+    <meta name="keywords" content="MES">
+    <meta name="description" content="MES">
+    <link href="../static/css/bootstrap.min.css" th:href="@{css/bootstrap.min.css}" rel="stylesheet"/>
+    <link href="../static/css/font-awesome.min.css" th:href="@{css/font-awesome.min.css}" rel="stylesheet"/>
+    <link href="../static/css/style.css" th:href="@{css/style.css}" rel="stylesheet"/>
+    <link href="../static/css/login.min.css" th:href="@{css/login.min.css}" rel="stylesheet"/>
+    <link href="../static/ruoyi/css/ry-ui.css" th:href="@{/ruoyi/css/ry-ui.css?v=3.2.0}" rel="stylesheet"/>
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html"/>
+    <![endif]-->
+    <link rel="shortcut icon" href="../static/favicon.ico" th:href="@{favicon.ico}"/>
+    <style type="text/css">
+        label.error {
+            position: inherit;
+        }
+        .layui-layer-content{
+            color: #3c8dbc;
+            font-size: medium;
+        }
+        body.signin{
+            background: none;
+            background-color: #76b8b9;
+        }
+    </style>
+    <script>
+        if (window.top !== window.self) {
+            window.top.location = window.location
+        }
+        ;
+    </script>
+</head>
+
+<body class="signin">
+
+<div class="signinpanel">
+    <div class="row">
+        <div class="col-sm-12" style="text-align: center">
+            <div class="signin-info">
+                <div class="logopanel m-b">
+
+                </div>
+                <div class="m-b"></div>
+                <h1>Welcome to register <strong>MES</strong></h1>
+
+            </div>
+        </div>
+        <div class="col-sm-3"></div>
+        <div class="col-sm-6">
+            <form id="form-register">
+                <h4 class="no-margins">register：</h4>
+                    <div class="form-group">
+                        <input type="text" name="comName" id="comName" class="form-control uname"
+                               placeholder="company name"/>
+                    </div>
+                <div class="form-group">
+                    <input type="text" name="loginName" id="loginName" class="form-control uname"
+                           placeholder="phone"/>
+                </div>
+                <div class="form-group">
+                    <input name="password" id="password" type="password" class="form-control pword" placeholder="password"/>
+                </div>
+                <input name="confirm" id="confirm" type="password" class="form-control pword" placeholder="confirm password"/>
+                <button class="btn btn-success btn-block" id="btnSubmit" data-loading="Registering, please wait..."
+                >Register
+                </button>
+                <p class="text-muted text-center">
+                    <a href="javascript:void(0)" onclick="login()">You already have an account. Log in.</a>
+                </p>
+
+            </form>
+
+        </div>
+    </div>
+    <div class="signup-footer">
+        <div class="col-sm-12" style="text-align: center">
+            &copy; 2019 All Rights Reserved. MES <br>
+            <a href="#" target="_blank" rel="nofollow"></a><br>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:src="@{/ajax/libs/select/select2.js}"></script>
+<script th:inline="javascript">
+    $(function () {
+        // 表单校验
+        $("#form-register").validate({
+            rules: {
+                comName:{
+                    required: true,
+                    remote: {
+                        url: ctx + "device/devCompany/checkComNameUnique",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            name: function () {
+                                return $.common.trim($("#comName").val());
+                            }
+                        },
+                        dataFilter: function (data, type) {
+                            return $.validate.unique(data);
+                        }
+                    }
+                },
+                loginName: {
+                    required: true,
+                    isPhone: true,
+                    remote: {
+                        url: ctx + "system/user/checkLoginNameUnique",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            name: function () {
+                                return $.common.trim($("#loginName").val());
+                            }
+                        },
+                        dataFilter: function (data, type) {
+                            return $.validate.unique(data);
+                        }
+                    }
+                },
+                password: {
+                    required: true,
+                    minlength: 5,
+                    maxlength: 20
+                },
+                confirm: {
+                    required: true,
+                    equalTo: "#password"
+                }
+            },
+            messages: {
+                comName:{
+                    required:'Please enter company name',
+                    remote:'Company already exists'
+                },
+                password: {
+                    required: "Please input a password",
+                    minlength: "Password cannot be less than 6 characters",
+                    maxlength: "Password cannot be greater than 20 characters"
+                },
+                confirm: {
+                    required: "Confirm password is required",
+                    equalTo: "Two password entries are inconsistent"
+                },
+                "loginName": {
+                    remote: "Login mobile number already exists"
+                }
+            },
+            onsubmit: true,
+            submitHandler: function (form) {
+                $.ajax({
+                    type: 'POST',
+                    url: ctx + 'registerAdd',
+                    dataType: 'json',
+                    data: $('#form-register').serialize(),
+                    async: false,  //同步请求，
+                    error: function (request) {
+                        $.modal.alertError("System error");
+                    },
+                    success: function (result) {
+                        if (result.code == web_status.SUCCESS) {
+                            layer.confirm('Are you sure you want to log in?', {btn: ['confirm', 'close'], title: "System hint"}, function () {
+                                login();
+                            })
+                        } else {
+                            $.modal.alertError(result.msg);
+                        }
+                    }
+                });
+            }
+        });
+    })
+
+    // 跳转注册页面
+    function login() {
+        window.location.href = "/login";
+    }
+
+</script>
+</body>
+</html>

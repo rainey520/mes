@@ -1,5 +1,6 @@
 package com.ruoyi.project.system.indexSetting;
 
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
@@ -56,6 +57,9 @@ public class IndexSettingController {
             }
         }
         mmap.put("company", company);
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/indexSettingEn";
+        }
         return prefix + "/indexSetting";
     }
 }

@@ -1,5 +1,6 @@
 package com.ruoyi.project.system.user.controller;
 
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.project.system.user.domain.User;
@@ -32,7 +33,10 @@ public class RegisterController extends BaseController {
      * @return
      */
     @GetMapping("/register")
-    public String register() {
+    public String register(Integer langV) {
+        if (UserConstants.LANGUAGE_EN.equals(langV)) {
+            return "registerEn";
+        }
         return "register";
     }
 

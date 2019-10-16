@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/jquery-layout/jquery.layout-latest.css}" rel="stylesheet"/>
+<body class="gray-bg">
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse" shiro:hasPermission="mes:mesBatch:list">
+				<form id="formId1">
+					<input name="batchCode" type="hidden" th:value="${mesCode}">
+					<div class="select-list">
+						<ul>
+							<li>
+								Product code：<input type="text" name="pbCode"/>
+							</li>
+							<li class="select-time">
+								<label>Creation time： </label>
+								<input type="text" class="time-input" id="startTime" placeholder="startTime"
+									   name="params[beginTime]"/>
+								<span>-</span>
+								<input type="text" class="time-input" id="endTime" placeholder="endTime"
+									   name="params[endTime]"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;search</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="formReset1()"><i class="fa fa-refresh"></i>&nbsp;reset</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			<div class="col-sm-12 search-collapse" shiro:hasPermission="mes:mesBatch:list">
+				<form id="formId2" class="col-sm-6">
+					<div class="select-list">
+						<ul>
+							<li>
+								Batch number：<input type="text" id="batchCode"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="searchMesData()"><i class="fa fa-search"></i>&nbsp;search</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="formReset2()"><i class="fa fa-refresh"></i>&nbsp;reset</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+				<form id="formId3" class="col-sm-6">
+					<div class="select-list">
+						<ul>
+							<li>
+								Work order number：<input type="text" id="workCode"/>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="searchWorkData()"><i class="fa fa-search"></i>&nbsp;search</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="formReset3()"><i class="fa fa-refresh"></i>&nbsp;reset</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="mes:mesBatch:export">
+						<i class="fa fa-download"></i> export
+				 </a>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+	 <script th:src="@{/ajax/libs/jquery-layout/jquery.layout-latest.js}"></script>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('mes:mesBatch:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('mes:mesBatch:remove')}]];
+        var prefix = ctx + "mes/mesBatch";
+
+		$(function () {
+			$("select").select2({
+				width:"180px",
+				// placeholder:'请选择'
+			});
+		})
+		// 重置搜索表单信息
+		function formReset1() {
+			$('#formId1')[0].reset();//input标签重置
+			$("select").val(null).trigger("change"); // select2标签重置
+		}
+		// 重置搜索表单信息
+		function formReset2() {
+			$('#formId2')[0].reset();//input标签重置
+		}
+		// 重置搜索表单信息
+		function formReset3() {
+			$('#formId3')[0].reset();//input标签重置
+		}
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "MES batch tracking",
+				search: false,
+				showExport: false,
+				showSearch:true,
+				showRefresh:true,
+				showColumns:false,
+				showToggle:true,
+                columns: [
+				{
+					field : 'id', 
+					title : '主键',
+					visible: false
+				},
+				{
+					field : 'pbCode',
+					title : 'Product code',
+					sortable: true
+				},
+				{
+					field : 'mesCode', 
+					title : 'Master code',
+					sortable: true,
+					formatter:function (value, row, index) {
+						return '<a href="javascript:void(0)" onclick="showMesData(\''+ row.mesCode +'\')"><span style="font-weight: bold;color: blue">'+ value +'</span></a>';
+					}
+				},
+				{
+					field : 'workCode', 
+					title : 'Work order number',
+					sortable: true
+				},
+				{
+					field : 'cTime', 
+					title : 'Creation time',
+					sortable: true
+				}]
+            };
+            $.table.init(options);
+			$.table.search("formId1");
+        });
+
+		/**
+		 * 通过批次查询mes详情信息
+		 */
+		function searchMesData() {
+			var batchCode = $.common.trim($("#batchCode").val());
+			if ($.common.isEmpty(batchCode)) {
+			    $.modal.alertWarning("Please enter batch information");
+			    return;
+			}
+			var url = prefix + "/selectMesData?batchCode=" + batchCode;
+			createMenuItem(url,"See " + batchCode + " Batch related information");
+		}
+
+		/**
+		 * 查看MES明细
+		 */
+		function showMesData(batchCode) {
+			var url = prefix + "/selectMesData?batchCode=" + batchCode;
+			createMenuItem(url,"See " + batchCode + " Batch related information");
+		}
+
+		/**
+		 * 通过工单号查询明细
+		 */
+		function searchWorkData() {
+			var workCode = $.common.trim($("#workCode").val());
+			if ($.common.isEmpty(workCode)) {
+			    $.modal.alertWarning("Please enter the work order number");
+			    return;
+			}
+			var url = prefix + "/selectWorkData?workCode=" + workCode;
+			createMenuItem(url,"See " + workCode + " Batch related information");
+		}
+    </script>
+</body>
+</html>

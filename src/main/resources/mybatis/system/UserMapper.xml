@@ -34,6 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<result property="devCode"    column="devCode"    />
 		<result property="grade"    column="grade"    />
 		<result property="sign"    column="sign"    />
+		<result property="langVersion"    column="lang_version"    />
 		<association property="devCompany"    column="company_id" javaType="DevCompany" resultMap="DevCompanyResult" />
 		<association property="dept"    column="dept_id" javaType="Dept" resultMap="deptResult" />
 		<collection  property="roles"   javaType="java.util.List"        resultMap="RoleResult" />
@@ -69,7 +70,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<sql id="selectUserVo">
         select  u.user_id,  u.login_name, u.user_name, u.email, u.sex, u.avatar, u.password,
         u.salt, u.status, u.del_flag, u.login_ip, u.login_date, u.create_time, u.remark,
-        u.user_department,u.user_position,u.phonenumber,u.login_tag,u.sign,
+        u.user_department,u.user_position,u.phonenumber,u.login_tag,u.sign,u.lang_version,
        		    r.role_id, r.role_name, r.role_key, r.role_sort, r.data_scope, r.status as role_status,
        		    u.company_id,u.tag,u.create_by
 		from sys_user u
@@ -232,6 +233,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="devCode != null  and devCode != ''  ">devCode = #{devCode},</if>
 			<if test="grade != null  and grade != ''  ">grade = #{grade},</if>
 			<if test="sign != null  and sign != ''  ">sign = #{sign},</if>
+			<if test="langVersion != null and langVersion != ''  ">lang_version = #{langVersion},</if>
  			update_time = sysdate()
  		</set>
  		where user_id = #{userId}
@@ -359,4 +361,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="appSelectUserList" resultType="com.ruoyi.project.system.user.domain.UserApp">
         SELECT user_id as uid,login_name as phone,user_name as userName FROM sys_user where company_id = #{companyId}
 	</select>
+
+	<!--更新用户语言版本-->
+	<update id="updateUserLangVersion" parameterType="User">
+		update sys_user
+		<set>
+			<if test="langVersion != null and langVersion != ''  ">lang_version = #{langVersion},</if>
+		</set>
+		where user_id = #{userId}
+	</update>
 </mapper>

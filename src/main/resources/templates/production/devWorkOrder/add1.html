@@ -66,7 +66,7 @@
                 <div class="col-sm-8">
                     <select id="productCode" name="productCode"
                             class="form-control"
-                            th:with="productList=${@product.selectProductAllByCompanyId(-1)}">
+                            th:with="productList=${@product.selectAllProductByRuleId(-1)}">
                         <option value="">请选择</option>
                         <option th:each="pro : ${productList}"
                                 th:data-code="${pro.productCode}" th:date-sign="${pro.sign}"
@@ -75,6 +75,14 @@
                     </select>
                     <input type="hidden" id="ecn-status" value="0">
                     <input type="hidden" name="wlSign" value="0">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">生产数量：</label>
+                <div class="col-sm-8">
+                    <input id="productNumber" name="productNumber" class="form-control">
                 </div>
             </div>
         </div>
@@ -135,6 +143,9 @@
             productionStart: {
                 required: true,
             },
+            productNumber: {
+                required: true,
+            },
         },
         messages: {
             "workorderNumber": {
@@ -148,6 +159,9 @@
             },
             lineId: {
                 required: "请选择产线",
+            },
+            productNumber: {
+                required: "生产数量必填",
             },
         },
     });

@@ -102,4 +102,12 @@ public class UserConstants
     public final static String LOGIN_TAG_REG = "1";
 
     public static final String NOT_LOGIN = "未登录或登录超时";
+
+    /**
+     * 用户语言版本 <br>
+     *      1 默认中文 <br>
+     *      2 英文
+     */
+    public static final Integer LANGUAGE_CHN = 1;
+    public static final Integer LANGUAGE_EN = 2;
 }

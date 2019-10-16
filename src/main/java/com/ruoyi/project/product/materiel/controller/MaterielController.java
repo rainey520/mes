@@ -1,5 +1,6 @@
 package com.ruoyi.project.product.materiel.controller;
 
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.exception.BusinessException;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
@@ -13,6 +14,7 @@ import com.ruoyi.project.product.importConfig.service.IImportConfigService;
 import com.ruoyi.project.product.materiel.domain.Materiel;
 import com.ruoyi.project.product.materiel.service.IMaterielService;
 import com.ruoyi.project.system.menu.service.IMenuService;
+import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -45,6 +47,10 @@ public class MaterielController extends BaseController {
     @RequiresPermissions("erp:materiel:view")
     @GetMapping()
     public String materiel() {
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/materielEn";
+        }
         return prefix + "/materiel";
     }
 
@@ -104,6 +110,10 @@ public class MaterielController extends BaseController {
     @GetMapping("/importConfig")
     public String mConfig(int type,ModelMap modelMap){
         modelMap.put("config",configService.selectImportConfigByType(type));
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix+"/mconfigEn";
+        }
         return prefix+"/mconfig";
     }
 
@@ -137,6 +147,10 @@ public class MaterielController extends BaseController {
      */
     @GetMapping("/add")
     public String add() {
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/addEn";
+        }
         return prefix + "/add";
     }
 
@@ -158,6 +172,10 @@ public class MaterielController extends BaseController {
     public String edit(@PathVariable("id") Integer id, ModelMap mmap) {
         Materiel materiel = materielService.selectMaterielById(id);
         mmap.put("materiel", materiel);
+        User user = JwtUtil.getUser();
+        if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+            return prefix + "/editEn";
+        }
         return prefix + "/edit";
     }
 

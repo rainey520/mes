@@ -1,0 +1,78 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-afterService-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Input batch information：</label>
+            <div class="col-sm-8">
+                <textarea id="inputBatchInfo" rows="4" name="inputBatchInfo" class="form-control"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var prefix = ctx + "quality/afterService"
+    $("#form-afterService-add").validate({
+        rules: {
+            inputBatchInfo: {
+                required: true,
+            },
+        },
+        messages: {
+            inputBatchInfo: {
+                required: "Please add batch information",
+            },
+        }
+    });
+
+
+    function submitHandler() {
+        $.modal.close();
+        window.parent.$.table.refresh();
+    }
+
+    /**
+     * 监测回车事件提交数据提交数据
+     */
+    $('#inputBatchInfo').keyup(function (e) {
+        if (e.keyCode == 13) {
+            if ($.validate.form()) {
+                var inputBatchInfo = $.common.trim($("#inputBatchInfo").val());
+                var data = {
+                    inputBatchInfo:inputBatchInfo,
+                }
+                addSave(prefix + "/add", data);
+            }
+        }
+    });
+
+    function addSave(url, data) {
+        var config = {
+            url: url,
+            type: "post",
+            dataType: "json",
+            data: data,
+            beforeSend: function () {
+                $.modal.loading("In process, please wait a moment....");
+                $.modal.disable();
+            },
+            success: function (result) {
+                if (result.code == web_status.SUCCESS) {
+                    $('#addServiceInfo').trigger("click");
+                    $("#inputBatchInfo").val('');
+                } else {
+                    $.modal.alertError(result.msg);
+                }
+                $.modal.closeLoading();
+                $.modal.enable();
+            }
+        };
+        $.ajax(config)
+    }
+</script>
+</body>
+</html>

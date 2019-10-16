@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/jquery-layout/jquery.layout-latest.css}" rel="stylesheet"/>
+<link th:href="@{/ajax/libs/jquery-ztree/3.5/css/metro/zTreeStyle.css}" rel="stylesheet"/>
+
+<body class="gray-bg">
+<div class="container-div ui-layout-center">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="user-form">
+                <input type="hidden" id="deptId" name="deptId">
+                <input type="hidden" id="parentId" name="parentId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            User name：<input id="userName" type="text" name="userName"/>
+                        </li>
+                        <li>
+                            User status：<select id="status" name="status" th:with="type=${@dict.getType('sys_normal_disable')}" style="width: 100px">
+                            <option value="">All</option>
+                            <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                    th:value="${dict.dictValue}"></option>
+                        </select>
+                        </li>
+
+                        <li class="select-time">
+                            <label>Creation time： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="Start time"
+                                   name="params[beginTime]"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="End time"
+                                   name="params[endTime]"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;Search</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="formReset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;Reset</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="add()" shiro:hasPermission="system:user:add">
+                <i class="fa fa-plus"></i> Add
+            </a>
+        </div>
+
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+
+<div th:include="include :: footer"></div>
+<script th:src="@{/ajax/libs/jquery-layout/jquery.layout-latest.js}"></script>
+<script th:src="@{/ajax/libs/jquery-ztree/3.5/js/jquery.ztree.all-3.5.js}"></script>
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('system:user:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('system:user:remove')}]];
+    var resetPwdFlag = [[${@permission.hasPermi('system:user:resetPwd')}]];
+    var prefix = ctx + "system/user";
+
+    $(function () {
+        $("#loginName").select2({
+            width:"160px",
+        });
+        var panehHidden = false;
+        if ($(this).width() < 769) {
+            panehHidden = true;
+        }
+        $('body').layout({initClosed: panehHidden, west__size: 185});
+        queryUserList();
+        // queryDeptTree();
+    });
+
+    // 重置搜索表单信息
+    function formReset(params) {
+        $('#user-form')[0].reset();//input标签重置
+        $("#loginName").val(null).trigger("change"); // select2标签重置
+    }
+
+    function queryUserList() {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            importUrl: prefix + "/importData",
+            importTemplateUrl: prefix + "/importTemplate",
+            sortName: "createTime",
+            sortOrder: "desc",
+            modalName: "User",
+            search: false,
+            showExport: false,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'userId',
+                    title: '',
+                    visible: false
+                },
+                {
+                    field: 'loginName',
+                    title: 'Login mobile number',
+                    sortable: true,
+                },
+                {
+                    field: 'userName',
+                    title: 'userName'
+                },
+                {
+                    field: 'email',
+                    title: 'email',
+                    formatter: function (value, row, index) {
+                        if (row.email != null && row.email != '') {
+                            return row.email;
+                        } else {
+                            return '--';
+                        }
+                    }
+                },
+                {
+                    field: 'sex',
+                    title: 'Gender',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        if (row.sex == 1) {
+                            return 'female';
+                        } else if (row.sex == 0) {
+                            return 'male';
+                        } else {
+                            return 'Unknown';
+                        }
+                    }
+                },
+                {
+                    visible: editFlag == 'hidden' ? false : true,
+                    title: 'User status',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return statusTools(row);
+                    }
+                },
+                {
+                    field: 'roles',
+                    title: 'Subordinate role',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (row.roles != null && row.roles.length != 0) {
+                            for (var i = 0; i < row.roles.length; i++) {
+                                actions.push ('<span class="label nav-label">' + row.roles[i].roleName + '</span> ');
+                            }
+                        } else {
+                            actions.push ('<span class="label nav-label">Unauthorized</span> ');
+                        }
+                        return actions.join('');
+                    }
+                },
+                {
+                    title: 'operation',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.userId + '\')"><i class="fa fa-edit"></i>edit</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="remove(\'' + row.userId + '\')"><i class="fa fa-remove"></i>remove</a> ');
+                        actions.push('<a class="btn btn-info btn-xs ' + resetPwdFlag + '" href="#" onclick="resetPwd(\'' + row.userId + '\')"><i class="fa fa-key"></i>reset</a>');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    }
+
+    $('#btnExpand').click(function () {
+        $._tree.expandAll(true);
+        $(this).hide();
+        $('#btnCollapse').show();
+    });
+
+    $('#btnCollapse').click(function () {
+        $._tree.expandAll(false);
+        $(this).hide();
+        $('#btnExpand').show();
+    });
+
+    $('#btnRefresh').click(function () {
+        queryDeptTree();
+    });
+
+
+    /* 用户管理-重置密码 */
+    function resetPwd(userId) {
+        var url = prefix + '/resetPwd/' + userId;
+        $.modal.open("reset password", url, '800', '300');
+    }
+
+    /* 用户状态显示 */
+    function statusTools(row) {
+        if (row.status == 1) {
+            return '<i class=\"fa fa-toggle-off text-info fa-2x\" onclick="enable(\'' + row.userId + '\')"></i> ';
+        } else {
+            return '<i class=\"fa fa-toggle-on text-info fa-2x\" onclick="disable(\'' + row.userId + '\')"></i> ';
+        }
+    }
+
+    /* 用户管理-停用 */
+    function disable(userId) {
+        $.modal.confirm("Are you sure you want to disable users?", function () {
+            $.operate.post(prefix + "/changeStatus", {"userId": userId, "status": 1});
+        })
+    }
+
+    /* 用户管理启用 */
+    function enable(userId) {
+        $.modal.confirm("Are you sure you want to enable users?", function () {
+            $.operate.post(prefix + "/changeStatus", {"userId": userId, "status": 0});
+        })
+    }
+
+    function remove(id) {
+        $.modal.confirm("Are you sure you want to delete this information?", function () {
+            var url = $.common.isEmpty(id) ? $.table._option.removeUrl : $.table._option.removeUrl.replace("{id}", id);
+            var data = {"ids": id};
+            $.operate.submit(url, "post", "json", data);
+        });
+    }
+
+    /**
+     * 生产二维码
+     */
+    function qrcode() {
+        createMenuItem(prefix+"/qrcode","用户二维码");
+    }
+
+    function add() {
+        $.modal.open("Add user",prefix+"/add",800,600);
+    }
+</script>
+</body>
+<form id="importForm" enctype="multipart/form-data" class="mt20 mb10" style="display: none;">
+    <div class="col-xs-offset-1">
+        <input type="file" id="file" name="file"/>
+        <div class="mt10 pt5">
+            <input type="checkbox" id="updateSupport" name="updateSupport" title="如果登录账户已经存在，更新这条数据。"> 是否更新已经存在的用户数据，以手机号作为标识
+            &nbsp; <a onclick="$.table.importTemplate()" class="btn btn-default btn-xs"><i
+                class="fa fa-file-excel-o"></i> 下载模板</a>
+        </div>
+        <font color="red" class="pull-left mt10">
+            提示：仅允许导入“xls”或“xlsx”格式文件！
+        </font>
+    </div>
+</form>
+</html>

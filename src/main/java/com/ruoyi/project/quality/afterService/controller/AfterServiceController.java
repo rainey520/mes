@@ -1,13 +1,16 @@
 package com.ruoyi.project.quality.afterService.controller;
 
+import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.framework.web.page.TableDataInfo;
 import com.ruoyi.project.quality.afterService.domain.AfterService;
 import com.ruoyi.project.quality.afterService.service.IAfterServiceService;
+import com.ruoyi.project.system.user.domain.User;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +32,9 @@ import java.util.List;
 public class AfterServiceController extends BaseController
 {
     private String prefix = "quality/afterService";
-	// 日志输出
+	/**
+	 * 日志输出
+	 */
 	private static final Logger log = LoggerFactory.getLogger(AfterServiceController.class);
 
 	@Autowired
@@ -39,7 +44,11 @@ public class AfterServiceController extends BaseController
 	@GetMapping()
 	public String afterService()
 	{
-	    return prefix + "/afterService";
+		User user = JwtUtil.getUser();
+		if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+			return prefix + "/afterServiceEn";
+		}
+		return prefix + "/afterService";
 	}
 	
 	/**
@@ -89,7 +98,11 @@ public class AfterServiceController extends BaseController
 	@GetMapping("/add")
 	public String add()
 	{
-	    return prefix + "/add";
+		User user = JwtUtil.getUser();
+		if (UserConstants.LANGUAGE_EN.equals(user.getLangVersion())) {
+			return prefix + "/addEn";
+		}
+		return prefix + "/add";
 	}
 	
 	/**

@@ -27,6 +27,13 @@ public interface MenuMapper
      * @return 菜单列表
      */
     public List<Menu> selectMenuAllByUserId(Long userId);
+
+    /**
+     * 通过角色id查询系统所有菜单（含按钮）En
+     *
+     * @return 菜单列表
+     */
+    public List<Menu> selectMenuAllByUserIdEn(Long userId);
     
     /**
      * 查询系统正常显示菜单（不含按钮）
@@ -42,6 +49,14 @@ public interface MenuMapper
      * @return 菜单列表
      */
     public List<Menu> selectMenusByUserId(Long userId);
+
+    /**
+     * 根据用户ID查询菜单英文
+     *
+     * @param userId 用户ID
+     * @return 菜单列表
+     */
+    public List<Menu> selectMenusByUserIdEn(Long userId);
 
     /**
      * 根据用户ID查询权限
