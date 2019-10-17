@@ -1,5 +1,14 @@
 package com.ruoyi.project.production.devWorkOrder.service;
 
+import cn.jiguang.common.ClientConfig;
+import cn.jiguang.common.resp.APIConnectionException;
+import cn.jiguang.common.resp.APIRequestException;
+import cn.jpush.api.JPushClient;
+import cn.jpush.api.push.PushResult;
+import cn.jpush.api.push.model.Platform;
+import cn.jpush.api.push.model.PushPayload;
+import cn.jpush.api.push.model.audience.Audience;
+import cn.jpush.api.push.model.notification.Notification;
 import com.alibaba.fastjson.JSON;
 import com.baidu.aip.ocr.AipOcr;
 import com.ruoyi.common.constant.UserConstants;
@@ -47,10 +56,13 @@ import com.ruoyi.project.quality.mesBatchRule.domain.MesBatchRule;
 import com.ruoyi.project.quality.mesBatchRule.domain.MesBatchRuleDetail;
 import com.ruoyi.project.quality.mesBatchRule.mapper.MesBatchRuleDetailMapper;
 import com.ruoyi.project.quality.mesBatchRule.mapper.MesBatchRuleMapper;
+import com.ruoyi.project.system.config.mapper.JpushInfoMapper;
 import com.ruoyi.project.system.user.domain.User;
 import com.ruoyi.project.system.user.mapper.UserMapper;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -71,6 +83,11 @@ import java.util.*;
  */
 @Service("workOrder")
 public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
+
+    /**
+     * logger
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DevWorkOrderServiceImpl.class);
 
     @Autowired
     private DevWorkOrderMapper devWorkOrderMapper;
@@ -220,6 +237,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         devWorkOrder.setProductName(devProductList.getProductName());
         // 设置工单产品编码
         devWorkOrder.setProductCode(devProductList.getProductCode());
+        devWorkOrder.setProductStandardHour(devProductList.getStandardHourYield());
         //产品型号
         devWorkOrder.setProductModel(devProductList.getProductModel());
         // 设置工单属于哪个公司
@@ -254,6 +272,7 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         workOrder.setProductName(product.getProductName());
         // 设置工单产品编码
         workOrder.setProductCode(product.getProductCode());
+        workOrder.setProductStandardHour(product.getStandardHourYield());
         //产品型号
         workOrder.setProductModel(product.getProductModel());
         // 设置工单属于哪个公司
@@ -365,6 +384,11 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         if (user == null) {
             throw new BusinessException(UserConstants.NOT_LOGIN);
         }
+        // 查询公司信息
+        DevCompany company = companyMapper.selectDevCompanyById(user.getCompanyId());
+        if (company == null) {
+            throw new BusinessException("公司不存在或被删除");
+        }
         DevWorkOrder devWorkOrder = devWorkOrderMapper.selectDevWorkOrderById(id);
 
         /**
@@ -417,6 +441,11 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_STARTING);   // 修改工单的操作状态为正在进行，页面显示暂停按钮
             devWorkOrder.setUpdateBy(user.getUserName());   // 工单的更新者
 
+            //推送看板
+            JPushWatchMsg(company);
+            // 推送ASOP
+            JPushMsg(1, devWorkOrder);
+
             // 工单MES逻辑判断
             DevProductList product = productListMapper.selectDevProductByCode(user.getCompanyId(), devWorkOrder.getProductCode());
             if (product != null && product.getRuleId() != null) {
@@ -463,6 +492,10 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         if (user == null) {
             throw new BusinessException(UserConstants.NOT_LOGIN);
         }
+        DevCompany company = companyMapper.selectDevCompanyById(user.getCompanyId());
+        if (company == null) {
+            throw new BusinessException("公司不存在或被删除");
+        }
         Long userId = user.getUserId();
         DevWorkOrder devWorkOrder = devWorkOrderMapper.selectDevWorkOrderById(id);
         ProductionLine productionLine = productionLineMapper.selectProductionLineById(devWorkOrder.getLineId());
@@ -482,6 +515,10 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                 }
             }
         }
+        //推送看板
+        JPushWatchMsg(company);
+        // 推送ASOP
+        JPushMsg(1, devWorkOrder);
         updateWork(user, devWorkOrder);
         return devWorkOrderMapper.updateDevWorkOrder(devWorkOrder);
     }
@@ -1647,5 +1684,82 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         List<DevWorkOrder> workOrders = devWorkOrderMapper.selectWorkOrderAllToday(user.getCompanyId());
         return workOrders;
     }
+
+
+    /***************************消息推送开始**********************************/
+
+    @Value("${jpush.mastersecret}")
+    private String MASTER_SECRET;
+
+    @Value("${jpush.appkey}")
+    private String APP_KEY;
+
+    @Autowired
+    private JpushInfoMapper jpushInfoMapper;
+
+    /**
+     * 推送生产看板
+     * @param company
+     */
+    private void JPushWatchMsg(DevCompany company) {
+        List<String> alias = jpushInfoMapper.selectJPushInfoList(company.getLoginNumber());
+        JSONObject data = new JSONObject();
+        data.put("msg", "1");
+        //进行消息推送生产看板
+        JPushClient jpushClient = new JPushClient("d2a09226055d96209ef6a0a5", "641ae46722063ecb6673ad2e", null, ClientConfig.getInstance());
+        PushPayload payload = PushPayload.newBuilder()
+                .setPlatform(Platform.all())
+                .setAudience(Audience.alias(alias))
+                .setNotification(Notification.alert(data.toString()))
+                .build();
+        try {
+            PushResult result = jpushClient.sendPush(payload);
+        } catch (APIConnectionException e) {
+            LOGGER.error("消息推送出现异常：" + e.getMessage());
+            // e.printStackTrace();
+        } catch (APIRequestException e) {
+            LOGGER.error("消息推送出现异常：" + e.getMessage());
+            // e.printStackTrace();
+        }
+    }
+
+    /**
+     * 推送ASOP
+     */
+    private void JPushMsg(int type, DevWorkOrder order) {
+        if (order == null)
+            return;
+        List<String> alias = null;
+        if (type == 1) {
+            //流水线信息推送
+            //1、查询对应产线
+            ProductionLine line = productionLineMapper.selectProductionLineById(order.getLineId());
+            //2、查询对应产线所有配置SOP看板硬件的硬件编码
+            if (line != null) {
+                alias = workstationMapper.countLineKBCode(line.getCompanyId(), line.getId());
+            }
+        }
+        if (alias == null || alias.size() <= 0) {
+            return;
+        }
+        JSONObject data = new JSONObject();
+        data.put("msg", "1");
+        //进行消息推送
+        JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY, null, ClientConfig.getInstance());
+        PushPayload payload = PushPayload.newBuilder()
+                .setPlatform(Platform.all())
+                .setAudience(Audience.alias(alias))
+                .setNotification(Notification.alert(data.toString()))
+                .build();
+        try {
+            PushResult result = jpushClient.sendPush(payload);
+        } catch (APIConnectionException e) {
+            e.printStackTrace();
+        } catch (APIRequestException e) {
+            e.printStackTrace();
+        }
+
+    }
+    /********************************消息推送结束*******************************/
 
 }

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.system.config.mapper.JpushInfoMapper">
+
+    <resultMap type="com.ruoyi.project.system.config.domain.JpushInfo" id="JpushInfoResult">
+        <id     property="id"     column="id"     />
+        <result property="companyNumber"   column="company_number"   />
+        <result property="firstTime"  column="first_time"   />
+        <result property="lastTime"  column="last_time"   />
+    </resultMap>
+
+    <sql id="selectJPushInfoVo">
+        select id,company_number,first_time,last_time from tab_jpush_info
+    </sql>
+
+    <!--查询极光推送对象-->
+    <select id="selectJPushInfoByFirstTime" resultMap="JpushInfoResult">
+        select * from tab_jpush_info
+        <where>
+            <if test="companyNumber != null and companyNumber != ''">
+                and company_number = #{companyNumber}
+            </if>
+            <if test="firstTime != null and firstTime != '' ">
+                and first_time = #{firstTime}
+            </if>
+        </where>
+        limit 1;
+    </select>
+
+    <insert id="insertJPushInfo" parameterType="JpushInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_jpush_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="companyNumber != null  and companyNumber != ''  ">company_number,</if>
+            <if test="firstTime != null  and firstTime != ''  ">first_time,</if>
+            <if test="lastTime != null ">last_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="companyNumber != null  and companyNumber != ''  ">#{companyNumber},</if>
+            <if test="firstTime != null  and firstTime != ''  ">#{firstTime},</if>
+            <if test="lastTime != null ">#{lastTime},</if>
+        </trim>
+    </insert>
+
+    <select id="selectJPushInfoById" parameterType="Integer" resultMap="JpushInfoResult">
+        <include refid="selectJPushInfoVo"/>
+        where id = #{id}
+    </select>
+
+    <update id="updateJPushInfo" parameterType="JpushInfo">
+        update tab_jpush_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="companyNumber != null  and companyNumber != ''  ">company_number = #{companyNumber},</if>
+            <if test="firstTime != null  and firstTime != ''  ">first_time = #{firstTime},</if>
+            <if test="lastTime != null ">last_time = #{lastTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <!--查询极光推送列表-->
+    <select id="selectJPushInfoList" resultType="java.lang.String">
+        select first_time from tab_jpush_info
+        <where>
+            <if test="companyNumber != null and companyNumber != ''">
+                and company_number = #{companyNumber}
+            </if>
+        </where>
+    </select>
+
+    <!--删除两个月都未登录的极光推送列表-->
+    <delete id="deleteInvalidTime">
+        delete from tab_jpush_info where last_time &lt;= #{invalidDate}
+    </delete>
+</mapper>
