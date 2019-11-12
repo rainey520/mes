@@ -66,4 +66,5 @@ public interface IAfterServiceService
 	 * @return 结果
 	 */
 	int deleteAfterServiceById(Integer id);
+
 }

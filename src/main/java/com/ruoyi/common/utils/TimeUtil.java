@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
-import java.util.UUID;
 
 public class TimeUtil {
     /***
@@ -57,8 +56,9 @@ public class TimeUtil {
         long day = diff / nd;
         long hour = diff % nd / nh;
         long min = diff % nd % nh / nm;
+        float t = (float) day * 24;
         float m = (float) min / 60;
-        return hour + m;
+        return t + hour + m;
     }
 
     public static Date getSystemDate() {
@@ -89,8 +89,9 @@ public class TimeUtil {
         long day = diff / nd;
         long hour = diff % nd / nh;
         long min = diff % nd % nh / nm;
+        float t = (float) day * 24;
         float m = (float) min / 60;
-        return hour + m;
+        return t + hour + m;
     }
 
     /**

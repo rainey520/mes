@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.project.quality.mesInput.mapper.MesInputMapper">
+    
+    <resultMap type="MesInput" id="MesInputResult">
+        <result property="id"    column="id"    />
+        <result property="workCode"    column="work_code"    />
+        <result property="mesInfo"    column="mes_info"    />
+        <result property="proCode"    column="pro_code"    />
+        <result property="workTime"    column="work_time"    />
+        <result property="workNum"    column="work_num"    />
+        <result property="backNum"    column="back_num"    />
+    </resultMap>
+	
+	<sql id="selectMesInputVo">
+        select id, work_code, mes_info, pro_code, work_time, work_num, back_num from tab_mes_input
+    </sql>
+	
+    <select id="selectMesInputList" parameterType="MesInput" resultMap="MesInputResult">
+        <include refid="selectMesInputVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="workCode != null  and workCode != '' "> and work_code = #{workCode}</if>
+             <if test="mesInfo != null  and mesInfo != '' "> and mes_info = #{mesInfo}</if>
+             <if test="proCode != null  and proCode != '' "> and pro_code = #{proCode}</if>
+             <if test="workTime != null "> and work_time = #{workTime}</if>
+             <if test="workNum != null "> and work_num = #{workNum}</if>
+             <if test="backNum != null "> and back_num = #{backNum}</if>
+         </where>
+    </select>
+    
+    <select id="selectMesInputById" parameterType="Integer" resultMap="MesInputResult">
+        <include refid="selectMesInputVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertMesInput" parameterType="MesInput" useGeneratedKeys="true" keyProperty="id">
+        insert into tab_mes_input
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="workCode != null  and workCode != ''  ">work_code,</if>
+			<if test="mesInfo != null  and mesInfo != ''  ">mes_info,</if>
+			<if test="proCode != null  and proCode != ''  ">pro_code,</if>
+			<if test="workTime != null  ">work_time,</if>
+			<if test="workNum != null  ">work_num,</if>
+			<if test="backNum != null  ">back_num,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="workCode != null  and workCode != ''  ">#{workCode},</if>
+			<if test="mesInfo != null  and mesInfo != ''  ">#{mesInfo},</if>
+			<if test="proCode != null  and proCode != ''  ">#{proCode},</if>
+			<if test="workTime != null  ">#{workTime},</if>
+			<if test="workNum != null  ">#{workNum},</if>
+			<if test="backNum != null  ">#{backNum},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateMesInput" parameterType="MesInput">
+        update tab_mes_input
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workCode != null  and workCode != ''  ">work_code = #{workCode},</if>
+            <if test="mesInfo != null  and mesInfo != ''  ">mes_info = #{mesInfo},</if>
+            <if test="proCode != null  and proCode != ''  ">pro_code = #{proCode},</if>
+            <if test="workTime != null  ">work_time = #{workTime},</if>
+            <if test="workNum != null  ">work_num = #{workNum},</if>
+            <if test="backNum != null  ">back_num = #{backNum},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteMesInputById" parameterType="Integer">
+        delete from tab_mes_input where id = #{id}
+    </delete>
+	
+    <delete id="deleteMesInputByIds" parameterType="String">
+        delete from tab_mes_input where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!--通过产品批次查询记录-->
+    <select id="selectMesInputByMesInfo" resultMap="MesInputResult">
+        <include refid="selectMesInputVo"/>
+        where mes_info = #{mesInfo} limit 1;
+    </select>
+
+    <!--查询所有的退货信息-->
+    <select id="selectMesInputListAll" resultMap="MesInputResult">
+        <include refid="selectMesInputVo"/>
+    </select>
+
+    <select id="selectMesInputListByPro" resultType="com.ruoyi.project.app.domain.Product">
+        select pro_code as productCode,sum(work_num) as totalWorkNum,sum(back_num) as totalBackNum,
+        min(work_time) as sTime,max(work_time) as eTime from tab_mes_input group by pro_code
+    </select>
+    
+</mapper>

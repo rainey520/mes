@@ -121,6 +121,8 @@
 		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="edit(\'' + row.companyId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
 		            	if(row.sign == 0){
 							actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="toVip(\'' + row.companyId + '\')"><i class="fa fa-edit"></i>升级为VIP</a> ');
+						} else {
+							actions.push('<a class="btn btn-danger btn-xs ' + editFlag + '" href="#" onclick="toVip(\'' + row.companyId + '\')"><i class="fa fa-edit"></i>取消VIP</a> ');
 						}
 						return actions.join('');
 		            }

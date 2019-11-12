@@ -34,6 +34,8 @@ public class AfterService extends BaseEntity
 	private String batchCode;
 	/** 所属公司ID */
 	private Integer companyId;
+	/** 数量 */
+	private Integer count;
 
 	/**
 	 * 权限拉取
@@ -45,6 +47,14 @@ public class AfterService extends BaseEntity
 	 */
 	private String searchBeginTime;
 	private String searchEndTime;
+
+	public Integer getCount() {
+		return count;
+	}
+
+	public void setCount(Integer count) {
+		this.count = count;
+	}
 
 	public String getSearchBeginTime() {
 		return searchBeginTime;
@@ -151,6 +161,10 @@ public class AfterService extends BaseEntity
 				", inputUserName='" + inputUserName + '\'' +
 				", batchCode='" + batchCode + '\'' +
 				", companyId=" + companyId +
+				", count=" + count +
+				", menuId=" + menuId +
+				", searchBeginTime='" + searchBeginTime + '\'' +
+				", searchEndTime='" + searchEndTime + '\'' +
 				'}';
 	}
 }

@@ -272,7 +272,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         SELECT id as proId,product_code as productCode FROM dev_product_list
         where def_id = 0 and rule_id > 0
         <if test="companyId != null and  companyId > 0"> and company_id = #{companyId}</if>
-        <if test="productCode != null  and productCode != '' "> and product_code  like concat(#{productCode}, '%') </if>
+        <if test="productCode != null  and productCode != '' "> and product_code  like concat('%',#{productCode}, '%') </if>
     </select>
 
 </mapper>

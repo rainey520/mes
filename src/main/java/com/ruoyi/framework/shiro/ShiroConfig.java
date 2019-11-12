@@ -131,7 +131,7 @@ public class ShiroConfig {
         filterRuleMap.put("/captcha/captchaImage**", "anon");
         // 不需要拦截的访问
         filterRuleMap.put("/login", "anon");
-        filterRuleMap.put("/app/login", "anon");
+        filterRuleMap.put("/app/**", "anon");
         filterRuleMap.put("/init/data", "anon");
         filterRuleMap.put("/system/user/checkLoginNameUnique", "anon");
         filterRuleMap.put("/device/devCompany/checkComNameUnique", "anon");

@@ -11,6 +11,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="inputUserId"    column="input_user_id"    />
         <result property="batchCode"    column="batch_code"    />
         <result property="companyId"    column="company_id"    />
+        <result property="count"    column="count"    />
         <association property="inputUserName" column="input_user_id" select="selectInputName">
             <result property="inputUserName" column="user_id"/>
         </association>

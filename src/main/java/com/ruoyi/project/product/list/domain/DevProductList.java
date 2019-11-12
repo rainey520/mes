@@ -25,7 +25,6 @@ public class DevProductList extends BaseEntity {
     /**
      * 公司名称
      */
-    @Excel(name = "所属公司",type = Excel.Type.EXPORT)
     private String comName;
     /**
      * 产品编码

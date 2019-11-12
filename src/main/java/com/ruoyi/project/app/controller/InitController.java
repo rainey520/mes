@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/app")
 public class InitController extends BaseController {
@@ -75,5 +77,30 @@ public class InitController extends BaseController {
     @RequestMapping("/getWorkCode")
     public AjaxResult getWorkCode() {
         return AjaxResult.success(iInitService.getWorkCode());
+    }
+
+
+    /**
+     * 录入数据
+     */
+    @RequestMapping("/saveInput")
+    public Map<String,Object> saveInput(@RequestBody Index index){
+        return iInitService.saveInput(index);
+    }
+
+    /**
+     * 拉取工单数据
+     */
+    @RequestMapping("/getMesBatch")
+    public Map<String,Object> getMesBatch(){
+        return iInitService.getMesBatch();
+    }
+
+    /**
+     * 拉取产品数据
+     */
+    @RequestMapping("/getProBatch")
+    public Map<String,Object> getProBatch(){
+        return iInitService.getProBatch();
     }
 }

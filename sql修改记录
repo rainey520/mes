@@ -1,3 +1,25 @@
 # 添加规则排序是否有效字段
 ALTER TABLE `mes`.`tab_mes_batch_rule`
 ADD COLUMN `status` INT NULL DEFAULT 0 COMMENT '规格排序是否有效(0、默认值无效，1、有效)' AFTER `u_time`;
+
+
+
+# 服务器未执行sql
+# 添加数量
+ALTER TABLE `bzystandard`.`tab_after_service`
+ADD COLUMN `count` INT NULL DEFAULT 0 COMMENT '数量' AFTER `company_id`;
+
+CREATE TABLE `bzystandard`.`tab_mes_input` (
+  `id` INT NOT NULL AUTO_INCREMENT COMMENT '录入主键',
+  `work_code` VARCHAR(45) NULL COMMENT '工单号',
+  `mes_info` VARCHAR(45) NULL COMMENT 'mes批次信息',
+  `pro_code` VARCHAR(45) NULL COMMENT '产品编码',
+  `work_time` DATE NULL COMMENT '工单时间',
+  `work_num` INT NULL DEFAULT 0 COMMENT '工单数量',
+  `back_num` INT NULL DEFAULT 0 COMMENT '退货数量',
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8
+COMMENT = 'mes录入信息记录';
+
+

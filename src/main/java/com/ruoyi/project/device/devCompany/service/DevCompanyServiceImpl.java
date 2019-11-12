@@ -153,7 +153,11 @@ public class DevCompanyServiceImpl implements IDevCompanyService {
         DevCompany company = devCompanyMapper.selectDevCompanyById(id);
         if(company == null)
         return 0;
-        company.setSign(1);
+        if (company.getSign() == 0) {
+            company.setSign(1);
+        } else {
+            company.setSign(0);
+        }
         devCompanyMapper.updateDevCompany(company);
         return 1;
     }
