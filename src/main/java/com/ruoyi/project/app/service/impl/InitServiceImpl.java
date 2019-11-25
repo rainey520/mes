@@ -128,19 +128,23 @@ public class InitServiceImpl implements IInitService {
                 map.put("msg", "请输入产品批次信息");
                 return map;
             }
+            MesInput mesInput = mesInputMapper.selectMesInputByMesInfo(index.getMesInfo());
+            if (mesInput == null) {
+                map.put("code", 0);
+                map.put("msg", "未找到主码明细");
+                return map;
+            }
+            // 更新工单退货
+            mesInput.setBackNum(mesInput.getBackNum() + 1);
+            mesInputMapper.updateMesInput(mesInput);
             // 保存产品批次
             AfterService afterService = new AfterService();
             afterService.setCompanyId(-1);
             afterService.setInputBatchInfo(index.getMesInfo());
             afterService.setInputTime(new Date());
             afterServiceMapper.insertAfterService(afterService);
-            // 更新工单退货
-            MesInput mesInput = mesInputMapper.selectMesInputByMesInfo(index.getMesInfo());
-            if (mesInput != null) {
-                mesInput.setBackNum(mesInput.getBackNum() + 1);
-                mesInputMapper.updateMesInput(mesInput);
-            }
             map.put("code", 1);
+            map.put("data", mesInput);
             map.put("msg", "录入成功");
             return map;
         } catch (Exception e) {

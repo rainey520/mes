@@ -1,12 +1,9 @@
 package com.ruoyi.project.monitor.job.service;
 
-import java.net.HttpCookie;
-import java.net.HttpRetryException;
-import java.util.HashMap;
-import java.util.List;
 import com.ruoyi.project.monitor.job.domain.Job;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 定时任务调度信息信息 服务层
@@ -102,4 +99,9 @@ public interface IJobService
      * @return 结果
      */
     public boolean checkCronExpressionIsValid(String cronExpression);
+
+    /**
+     * 删除两个月都未登录的极光推送列表
+     */
+    void deleteInvalidTime();
 }

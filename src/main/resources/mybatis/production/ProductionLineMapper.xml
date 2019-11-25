@@ -130,16 +130,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where id = #{id}
     </update>
 
-	<update id="deleteProductionLineById" parameterType="Integer">
-        update  dev_production_line set def_id =1 where id = #{id}
-    </update>
+	<delete id="deleteProductionLineById" parameterType="Integer">
+        delete from dev_production_line where id = #{id}
+    </delete>
 	
-    <update id="deleteProductionLineByIds" parameterType="String">
-        update  dev_production_line set def_id =1 where id in
+    <delete id="deleteProductionLineByIds" parameterType="String">
+        delete from dev_production_line where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
-    </update>
+    </delete>
 
 
     <!--查询产线已经配置的硬件信息-->

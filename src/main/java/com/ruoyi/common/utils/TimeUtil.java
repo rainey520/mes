@@ -41,25 +41,6 @@ public class TimeUtil {
         return c.get(Calendar.HOUR_OF_DAY);
     }
 
-    /**
-     * 获取时间与当前系统时间相差几个小时
-     *
-     * @param startDate 开始时间
-     * @return
-     */
-    public static float getDateDel(Date startDate) {
-        Date nowDate = new Date();
-        long nd = 1000 * 24 * 60 * 60;
-        long nh = 1000 * 60 * 60;
-        long nm = 1000 * 60;
-        long diff = nowDate.getTime() - startDate.getTime();
-        long day = diff / nd;
-        long hour = diff % nd / nh;
-        long min = diff % nd % nh / nm;
-        float t = (float) day * 24;
-        float m = (float) min / 60;
-        return t + hour + m;
-    }
 
     public static Date getSystemDate() {
         try {
@@ -81,6 +62,12 @@ public class TimeUtil {
         }
     }
 
+    /**
+     * 计算开始结束时间小时差值数
+     * @param startDate 开始日期
+     * @param endDate 结束日期
+     * @return 结果
+     */
     public static float getDateDel(Date startDate, Date endDate) {
         long nd = 1000 * 24 * 60 * 60;
         long nh = 1000 * 60 * 60;

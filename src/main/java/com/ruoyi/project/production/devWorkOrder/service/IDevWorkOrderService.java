@@ -63,11 +63,10 @@ public interface IDevWorkOrderService {
 
     /**
      * 工单开始暂停状态修改，第一次点击开始初始化数据
-     * @param id
-     * @param uid 用户id
-     * @return
+     * @param id 工单id
+     * @return 结果
      */
-    int editWorkerOrderById(Integer id,Integer uid);
+    int editWorkerOrderById(Integer id);
 
     /**
      * 校验流水线是否只有一个处于生产状态的工单

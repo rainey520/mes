@@ -24,7 +24,6 @@ import com.ruoyi.framework.config.RuoYiConfig;
 import com.ruoyi.framework.jwt.JwtUtil;
 import com.ruoyi.project.device.devCompany.domain.DevCompany;
 import com.ruoyi.project.device.devCompany.mapper.DevCompanyMapper;
-import com.ruoyi.project.device.devList.mapper.DevListMapper;
 import com.ruoyi.project.product.importConfig.domain.ImportConfig;
 import com.ruoyi.project.product.importConfig.mapper.ImportConfigMapper;
 import com.ruoyi.project.product.list.domain.DevProductList;
@@ -42,7 +41,7 @@ import com.ruoyi.project.production.singleWork.domain.SingleWork;
 import com.ruoyi.project.production.singleWork.domain.SingleWorkOrder;
 import com.ruoyi.project.production.singleWork.mapper.SingleWorkMapper;
 import com.ruoyi.project.production.singleWork.mapper.SingleWorkOrderMapper;
-import com.ruoyi.project.production.workData.mapper.WorkDataMapper;
+import com.ruoyi.project.production.workDayHour.domain.WorkDayHour;
 import com.ruoyi.project.production.workDayHour.mapper.WorkDayHourMapper;
 import com.ruoyi.project.production.workOrderChange.domain.WorkOrderChange;
 import com.ruoyi.project.production.workOrderChange.mapper.WorkOrderChangeMapper;
@@ -99,10 +98,10 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     private UserMapper userMapper;
 
     @Autowired
-    private ProductionLineMapper productionLineMapper; // 产线
+    private ProductionLineMapper productionLineMapper;
 
     @Autowired
-    private DevProductListMapper productListMapper; // 产品
+    private DevProductListMapper productListMapper;
 
     @Autowired
     private WorkOrderChangeMapper orderChangeMapper;
@@ -110,12 +109,8 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
     @Autowired
     private EcnLogMapper ecnLogMapper;
 
-
     @Autowired
     private WorkstationMapper workstationMapper;
-
-    @Autowired
-    private WorkDataMapper workDataMapper;
 
     @Autowired
     private WorkDayHourMapper workDayHourMapper;
@@ -128,9 +123,6 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
 
     @Autowired
     private SingleWorkOrderMapper singleWorkOrderMapper;
-
-    @Autowired
-    private DevListMapper devListMapper;
 
     @Autowired
     private DevCompanyMapper companyMapper;
@@ -225,14 +217,6 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         DevProductList devProductList = productListMapper.selectDevProductListById(productId);
         if (devProductList == null) return 0;//产品不存在
         devWorkOrder.setMakeType(devProductList.getSign());
-//        if (devWorkOrder.getWlSign() == 1) {//是车间
-//            //查询车间
-//            SingleWork work = singleWorkMapper.selectSingleWorkById(devWorkOrder.getLineId());
-//            if (work == null) {
-//                return 0;
-//            }
-//            devWorkOrder.setDeviceLiable(work.getLiableOne());
-//        }
         // 设置工单产品的名称
         devWorkOrder.setProductName(devProductList.getProductName());
         // 设置工单产品编码
@@ -374,15 +358,10 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int editWorkerOrderById(Integer id, Integer uid) {
-        User user = null;
-        if (uid == null) {
-            user = JwtUtil.getTokenUser(ServletUtils.getRequest());
-        } else {
-            user = userMapper.selectUserInfoById(uid);
-        }
+    public int editWorkerOrderById(Integer id) {
+        User user = JwtUtil.getUser();
         if (user == null) {
-            throw new BusinessException(UserConstants.NOT_LOGIN);
+            throw new BusinessException("用户不存在或被删除");
         }
         // 查询公司信息
         DevCompany company = companyMapper.selectDevCompanyById(user.getCompanyId());
@@ -394,8 +373,10 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         /**
          * 流水线
          */
-//        if (devWorkOrder.getWlSign().equals(WorkConstants.SING_LINE)) {
         ProductionLine productionLine = productionLineMapper.selectProductionLineById(devWorkOrder.getLineId());
+        if (productionLine == null) {
+            throw new BusinessException("产线不存在或被删除");
+        }
         // 不是工单负责人
         if (productionLine.getDeviceLiable() != user.getUserId().intValue() &&
                 productionLine.getDeviceLiableTow() != user.getUserId().intValue() &&
@@ -434,17 +415,48 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
             if (devWorkOrder.getOperationStatus().equals(WorkConstants.OPERATION_STATUS_NOSTART)) {
                 // 实际开始时间
                 devWorkOrder.setStartTime(new Date());
-                devWorkOrder.setSignTime(new Date());//标记开始时间
-                devWorkOrder.setSignHuor(0F);//标记用时
+                devWorkOrder.setSignTime(new Date());
+                devWorkOrder.setSignHuor(0F);
             }
             devWorkOrder.setWorkorderStatus(WorkConstants.WORK_STATUS_STARTING);  // 修改工单的状态为进行中
             devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_STARTING);   // 修改工单的操作状态为正在进行，页面显示暂停按钮
             devWorkOrder.setUpdateBy(user.getUserName());   // 工单的更新者
 
-            //推送看板
-            JPushWatchMsg(company);
-            // 推送ASOP
-            JPushMsg(1, devWorkOrder);
+            // 通过产线id获取各个工位信息
+            List<Workstation> workstationList = workstationMapper.selectWorkstationListByLineId(user.getCompanyId(), devWorkOrder.getLineId());
+            DevWorkData workData = null;
+            WorkDayHour workDayHour = null;
+            if (StringUtils.isNotEmpty(workstationList)) {
+                for (Workstation workstation : workstationList) {
+                    // 初始化工单数据
+                    workData = new DevWorkData();
+                    workData.setWorkId(devWorkOrder.getId());
+                    workData.setCompanyId(devWorkOrder.getCompanyId());
+                    workData.setLineId(devWorkOrder.getLineId());
+                    workData.setScType(WorkConstants.SING_LINE);
+                    // 设置计数器硬件
+                    workData.setDevId(workstation.getDevId());
+                    workData.setDevName(workstation.getDevName());
+                    // 设置工位
+                    workData.setIoId(workstation.getId());
+                    workData.setCreateTime(new Date());
+                    workData.setIoSign(workstation.getSign());
+                    devWorkDataMapper.insertDevWorkData(workData);
+
+                    // 初始化工单各个IO口每小时数据
+                    workDayHour = new WorkDayHour();
+                    workDayHour.setWorkId(devWorkOrder.getId());
+                    workDayHour.setCompanyId(devWorkOrder.getCompanyId());
+                    workDayHour.setLineId(devWorkOrder.getLineId());
+                    // 初始化硬件名称以及工位信息
+                    workDayHour.setDevId(workstation.getDevId());
+                    workDayHour.setDevName(workstation.getDevName());
+                    workDayHour.setIoId(workstation.getId());
+                    workDayHour.setDataTime(new Date());
+                    workDayHour.setCreateTime(new Date());
+                    workDayHourMapper.insertWorkDayHour(workDayHour);
+                }
+            }
 
             // 工单MES逻辑判断
             DevProductList product = productListMapper.selectDevProductByCode(user.getCompanyId(), devWorkOrder.getProductCode());
@@ -465,6 +477,11 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
                     }
                 }
             }
+
+            //推送看板
+            JPushWatchMsg(company);
+            // 推送ASOP
+            JPushMsg(1, devWorkOrder);
         }
         return devWorkOrderMapper.updateDevWorkOrder(devWorkOrder);
     }
@@ -538,6 +555,8 @@ public class DevWorkOrderServiceImpl implements IDevWorkOrderService {
         devWorkOrder.setOperationStatus(WorkConstants.OPERATION_STATUS_FINISH);
         // 设置结束时间
         devWorkOrder.setEndTime(new Date());
+        // 设置统计用时
+        devWorkOrder.setSignHuor(devWorkOrder.getSignHuor() + TimeUtil.getDateDel(devWorkOrder.getSignTime(), new Date()));
         devWorkOrder.setUpdateBy(user.getUserName());
         devWorkOrder.setUpdateTime(new Date());
     }
